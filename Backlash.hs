@@ -44,9 +44,9 @@ onV3 f (V3 x y z) (V3 x' y' z') = V3 (f x x') (f y y') (f z z')
 
 backlash2 :: Program -> V3 Double -> V3 Double -> V3 Double -> V3 Double -> Program
 backlash2 [] _ _ _ _ = []
-backlash2 ((Move pos mp):xs) backlash ppos pdir pcomp = 
-	if extraMove == V3 0 0 0 then (Move compensatedPos mp) : backlash2 xs backlash pos newdir compensation
-	else (Move extraMove mp) : (Move compensatedPos mp) : backlash2 xs backlash pos newdir compensation
+backlash2 (Move pos mp : xs) backlash ppos pdir pcomp = 
+	if extraMove == V3 0 0 0 then Move compensatedPos mp : backlash2 xs backlash pos newdir compensation
+	else Move extraMove mp : Move compensatedPos mp : backlash2 xs backlash pos newdir compensation
 	where 
 		sgn = signum (pos-ppos)
 		newdir = onV3 mem pdir sgn
