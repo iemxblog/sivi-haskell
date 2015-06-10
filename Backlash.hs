@@ -42,26 +42,6 @@ dirc _ _ = 0
 onV3 :: (a -> a -> a) -> V3 a -> V3 a -> V3 a
 onV3 f (V3 x y z) (V3 x' y' z') = V3 (f x x') (f y y') (f z z')
 
---dir xs = scanl (onV3 mem) (V3 0 0 0) (map signum $ diff xs)
---
---dirChange xs = zipWith (onV3 dirc) (dir xs) (tail $ dir xs)
---
---compensation xs = map (backlash*) $ scanl (+) (V3 0 0 0) (dirChange xs)
---
---compensatedPos xs = zipWith (+) xs (compensation xs)
---
---extraMove xs = [if a == V3 0 0 0 then V3 0 0 0 else b + c  | (a, b, c) <- zip3 (dirChange xs) xs (tail $ compensation xs)]
---
---
---cfusion :: [a] -> [a] -> (a -> Bool) -> [a]
---cfusion [] ys _ = ys
---cfusion xs [] _ = xs
---cfusion (x:xs) (y:ys) p
---	| p y  = x : y : cfusion xs ys p
---	| otherwise = x : cfusion xs ys p
---
---backlashCompensation xs = cfusion (compensatedPos xs)  (extraMove xs) (/= V3 0 0 0)
-
 backlash2 :: Program -> V3 Double -> V3 Double -> V3 Double -> V3 Double -> Program
 backlash2 [] _ _ _ _ = []
 backlash2 ((Move pos mp):xs) backlash ppos pdir pcomp = 
