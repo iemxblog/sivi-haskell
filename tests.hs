@@ -1,9 +1,9 @@
 import Test.HUnit
 import Linear
-
 import IR
+import Backlash
 
-initBacklash = [V3 0 0 0, V3 1 1 1]
+initPos = [V3 0 0 0, V3 1 1 1]
 
 p1 = V3 10 5 1
 p2 = V3 9 6 2
@@ -26,17 +26,20 @@ pointsWithCompensation = [p1, p1 - vBacklashX, p2 - vBacklashX, p2 - vBacklashY 
 
 
 prog1 :: Program
-prog1 = map Rapid points
+prog1 = map (\p -> Move p Rapid) points
 
 prog1WithCompensation :: Program
-prog1WithCompensation = map Rapid $ initBacklash ++ pointsWithCompensation
+prog1WithCompensation = map (\p -> Move p Rapid) $ initPos ++ pointsWithCompensation
 
 
 prog2 :: Program
-prog2 = map (\p -> LinearInterpolation p 100) points
+prog2 = map (\p -> Move p (LinearInterpolation 100)) points
 
 
 prog2WithCompensation :: Program
-prog2WithCompensation = map (\p -> LinearInterpolation p 100) pointsWithCompensation
+prog2WithCompensation = map (\p -> Move p Rapid) initPos ++ map (\p -> Move p (LinearInterpolation 100)) pointsWithCompensation
 
-testRapid = TestCase (assertEqual (backlashCompensation prog1 initBacklash (backlashX, backlashY, backlashZ)) prog1withCompensation)
+testRapid = TestCase (assertEqual "for backlashCompensation with Rapid move, " (backlashCompensation prog1 initPos (vBacklashX + vBacklashY + vBacklashZ)) prog1WithCompensation)
+testLinearInterpolation = TestCase (assertEqual "for backlashCompensation with LinearInterpolation move, " (backlashCompensation prog2 initPos (vBacklashX + vBacklashY + vBacklashZ)) prog2WithCompensation)
+
+tests = TestList [ TestLabel "testRapid" testRapid, TestLabel "testLinearInterpolation" testLinearInterpolation ]
