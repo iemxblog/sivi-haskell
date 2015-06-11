@@ -1,29 +1,12 @@
+module Backlash
+(
+	backlashCompensation
+) where
+
 import Linear
 import Data.List
 import IR
 
-pos :: [V3 Double]
-pos = [   V3 2 2 0
-	, V3 3 3 0
-	, V3 5 4 0
-	, V3 7 3 0
-	, V3 8 2 0 
-	, V3 12 3 0 
-	, V3 11 0 0
-	, V3 10 (-1) 0
-	, V3 7 (-1) 0
-	, V3 6 0 0
-	, V3 5 0 0
-	, V3 4 0 0
-	, V3 3 0 0
-	, V3 2 (-1) 0
-	]
-
-initPos :: [V3 Double]
-initPos = [V3 0 0 0, V3 1 1 1]
-
-backlash :: V3 Double
-backlash = V3 0.5 0.5 0.5
 
 diff :: Num a => [a] -> [a]
 diff xs = [b-a | (a,b) <- zip xs (tail xs)]
@@ -55,4 +38,6 @@ backlash2 (Move pos mp : xs) backlash ppos pdir pcomp =
 		compensatedPos = pos + compensation
 		extraMove = if dirChange == V3 0 0 0 then V3 0 0 0 else ppos + compensation
 
-prog = map (\x -> Move x Rapid) (initPos ++ pos)
+backlashCompensation :: Program -> [V3 Double] -> V3 Double -> Program
+backlashCompensation p initPos backlash = backlash2 (map (\x -> Move x Rapid) initPos ++ p) backlash (head initPos) (V3 0 0 0) (V3 0 0 0)
+
