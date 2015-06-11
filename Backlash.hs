@@ -1,11 +1,11 @@
 {-|
 Module		: Backlash
-Description	: Modifies a program to compensate for the backlash of the machine
+Description	: Modifies a program to compensate the backlash of the machine
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
-Maintaine	: iemxblog@gmail.com
+Maintainer	: iemxblog@gmail.com
 Stability	: experimental
-Portabily	: POSIX
+Portability	: POSIX
 -}
 module Backlash
 (
