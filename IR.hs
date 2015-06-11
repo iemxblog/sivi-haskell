@@ -47,5 +47,7 @@ compileIR (ChangeTool t) = "M6 T" ++ name t
 compileIR (Comment s) = "(" ++ s ++ ")"
 compileIR Pause = "M00"
 
-compile :: Program -> String
+-- | Compiles intermediate representation to G-CODE
+compile :: Program -- ^ The program in intermediate representation
+	 -> String -- ^ The generated G-Code
 compile p = unlines $ map compileIR p
