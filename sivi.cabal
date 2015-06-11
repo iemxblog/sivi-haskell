@@ -3,7 +3,7 @@
 
 name:                sivi
 version:             0.1.0.0
-synopsis:            A toolpath generation haskell library for CNC machining
+synopsis:            A toolpath generation Haskell Library for CNC machining
 -- description:         
 homepage:            https://github.com/iemxblog/sivi-haskell/
 license:             GPL-2
@@ -16,8 +16,8 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
-library
-  exposed-modules:     Backlash, IR, Sivi
+executable sivi
+  main-is:             Main.hs
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.6 && <4.7, linear >=1.18 && <1.19

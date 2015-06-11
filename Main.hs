@@ -1,3 +1,7 @@
+module Main (
+	main
+) where
+
 import Backlash
 import IR
 import Linear
