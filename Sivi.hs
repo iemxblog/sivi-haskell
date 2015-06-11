@@ -26,4 +26,4 @@ backlash :: V3 Double
 backlash = V3 0.5 0.5 0.5
 
 main :: IO()
-main = mapM_ print $ backlashCompensation (map (\x -> Move x Rapid) pos) initPos backlash 
+main = putStr . compile $ backlashCompensation (map (\x -> Move x Rapid) pos) initPos backlash 

@@ -4,6 +4,7 @@ module IR
 	, MoveParams(..)
 	, IR(..)
 	, Program
+	, compile
 ) where
 
 import Linear
