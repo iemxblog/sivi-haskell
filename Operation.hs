@@ -16,11 +16,12 @@ module Operation(
 import IR
 import Linear
 import Control.Monad.State
+import Control.Monad.Reader
 
-type Operation = (V3 Double, Double,  Double) -> State (V3 Double) [IR]
+type Operation = ReaderT (V3 Double, Double, Double) (State (V3 Double)) [IR]
 
 noOp :: Operation
-noOp = \_ -> state $ \p -> ([], p)
+noOp = lift $ return []
 
 
 -- Variables :
@@ -30,21 +31,39 @@ noOp = \_ -> state $ \p -> ([], p)
 -- pr : plunge rate
 
 rapid :: V3 Double -> Operation
-rapid dst = \(or, fr, pr) -> state $ \_ -> ([Move (or+dst) Rapid], or+dst)
+rapid dst = do
+		(or, fr, pr) <- ask
+		lift $ do 
+			put (or+dst)
+			return [Move (or+dst) Rapid]
 
 feed :: V3 Double -> Operation
-feed dst = \(or, fr, pr) -> state $ \_ -> ([Move (or+dst) (LinearInterpolation fr)], or+dst)
+feed dst = do
+		(or, fr, pr) <- ask
+		lift $ do
+			put (or+dst)
+			return [Move (or+dst) (LinearInterpolation fr)]
 
 plunge :: V3 Double -> Operation
-plunge dst = \(or, fr, pr) -> state $ \_ -> ([Move (or+dst) (LinearInterpolation pr)], or+dst)
+plunge dst = do
+		(or, fr, pr) <- ask
+		lift $ do
+			put (or+dst)
+			return [Move (or+dst) (LinearInterpolation pr)]
 
 retract :: Double -> Operation
-retract z_safe = \(or, fr, pr) -> state $ \p -> ([Move (p + V3 0 0 z_safe) Rapid], p + V3 0 0 z_safe)
+retract z_safe = do 
+			(or, fr, pr) <- ask
+			lift $ do
+				p <- get
+				put $ p + V3 0 0 z_safe
+				return [Move (p + V3 0 0 z_safe) Rapid]
 
 (+++) :: Operation -> Operation -> Operation
-o1 +++ o2 = \(sp, fr, pr) -> do ir1 <- o1 (sp, fr, pr) 
-				ir2 <- o2 (sp, fr, pr)			-- z_safe ???????????????????????
-				return $ ir1 ++ ir2
+o1 +++ o2 = do 
+		ir1 <- o1 
+		ir2 <- o2 			-- z_safe ???????????????????????
+		return $ ir1 ++ ir2
 
 next :: Double -> Operation -> Operation -> Operation
 next z_safe o1 o2 = retract z_safe +++ o1 +++ retract z_safe +++ o2 
@@ -57,7 +76,6 @@ oplist z_safe (o:os) = next z_safe o (oplist z_safe os)
 --	o1 <- rapid (V3 1 2 3)
 --	o2 <- feed (V3 4 5 6) 
 --	return (o1 +++ o2)
-
 
 test2 = next 1 (feed (V3 1 0 0)) (feed (V3 0 1 0))
 
@@ -77,4 +95,4 @@ atZ o = \z_safe -> retract z_safe +++ o
 
 
 run :: Operation -> Program
-run o = fst $ runState (o (V3 0 0 0, 100, 30)) (V3 0 0 0)
+run o = evalState (runReaderT o (V3 0 0 0, 100, 30))  (V3 0 0 0)
