@@ -55,9 +55,24 @@ retract :: Double -> Operation
 retract z_safe = do 
 			(or, fr, pr) <- ask
 			lift $ do
-				p <- get
-				put $ p + V3 0 0 z_safe
-				return [Move (p + V3 0 0 z_safe) Rapid]
+				V3 x y _ <- get
+				let V3 _ _ zo = or
+				put $ V3 x y (zo+z_safe)
+				return [Move (V3 x y (zo+z_safe)) Rapid]
+
+
+rapid_xy :: V3 Double -> Operation
+rapid_xy dst = do
+			(or, fr, pr) <- ask
+			lift $ do
+				V3 _ _ z <- get
+				let V3 xd yd _ = dst 
+				let V3 xo yo _ = or
+				put $ V3 (xo+xd) (yo+yd) z
+				return [Move (V3 (xo+xd) (yo+yd) z) Rapid]
+
+approach :: V3 Double -> Operation
+approach dst = rapid_xy dst +++ plunge dst
 
 (+++) :: Operation -> Operation -> Operation
 o1 +++ o2 = do 
@@ -82,17 +97,22 @@ test2 = next 1 (feed (V3 1 0 0)) (feed (V3 0 1 0))
 (+-+) :: (Double -> Operation) -> Operation -> Double -> Operation
 do1 +-+ o2 = \z_safe -> do1 z_safe +++ retract z_safe +++ o2
 
-square = atZ (plunge (V3 0 0 0)) 
+testAtZ = atZ (plunge (V3 0 0 0)) 
 	+-+ feed (V3 1 0 0) 
 	+-+ feed (V3 1 1 0) 
 	+-+ feed (V3 0 1 0) 
 	$ 10 
---square = oplist 10 [feed (V3 1 0 0), feed (V3 1 1 0), feed (V3 0 1 0)]
 
 atZ :: Operation -> Double -> Operation
 atZ o = \z_safe -> retract z_safe +++ o
 
-
-
 run :: Operation -> Program
-run o = evalState (runReaderT o (V3 0 0 0, 100, 30))  (V3 0 0 0)
+run o = evalState (runReaderT o (V3 10 10 10, 100, 30))  (V3 0 0 0)
+
+
+
+square = approach (V3 0 0 0) 
+	+++ feed (V3 1 0 0)
+	+++ feed (V3 1 1 0)
+	+++ feed (V3 0 1 0)
+	+++ feed (V3 0 0 0)
