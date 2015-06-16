@@ -12,6 +12,11 @@ module Operation(
 	, rapid
 	, feed
 	, plunge
+	, retract
+	, rapid_xy
+	, approach
+	, (+++)
+	, runOperation
 ) where
 import IR
 import Linear
@@ -77,7 +82,7 @@ approach dst = rapid_xy dst +++ plunge dst
 (+++) :: Operation -> Operation -> Operation
 o1 +++ o2 = do 
 		ir1 <- o1 
-		ir2 <- o2 			-- z_safe ???????????????????????
+		ir2 <- o2
 		return $ ir1 ++ ir2
 
 next :: Double -> Operation -> Operation -> Operation
@@ -87,32 +92,13 @@ oplist :: Double -> [Operation] -> Operation
 oplist _ [] = noOp
 oplist z_safe (o:os) = next z_safe o (oplist z_safe os)
 
---test = do
---	o1 <- rapid (V3 1 2 3)
---	o2 <- feed (V3 4 5 6) 
---	return (o1 +++ o2)
-
-test2 = next 1 (feed (V3 1 0 0)) (feed (V3 0 1 0))
-
-(+-+) :: (Double -> Operation) -> Operation -> Double -> Operation
-do1 +-+ o2 = \z_safe -> do1 z_safe +++ retract z_safe +++ o2
-
-testAtZ = atZ (plunge (V3 0 0 0)) 
-	+-+ feed (V3 1 0 0) 
-	+-+ feed (V3 1 1 0) 
-	+-+ feed (V3 0 1 0) 
-	$ 10 
-
-atZ :: Operation -> Double -> Operation
-atZ o = \z_safe -> retract z_safe +++ o
-
-run :: Operation -> Program
-run o = evalState (runReaderT o (V3 10 10 10, 100, 30))  (V3 0 0 0)
-
-
+runOperation :: Operation -> Program
+runOperation o = evalState (runReaderT o (V3 10 10 10, 100, 30))  (V3 0 0 0)
 
 square = approach (V3 0 0 0) 
 	+++ feed (V3 1 0 0)
 	+++ feed (V3 1 1 0)
 	+++ feed (V3 0 1 0)
 	+++ feed (V3 0 0 0)
+
+
