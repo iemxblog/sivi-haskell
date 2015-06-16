@@ -15,6 +15,7 @@ module Operation(
 	, retract
 	, rapid_xy
 	, approach
+	, translate
 	, (+++)
 	, runOperation
 ) where
@@ -79,6 +80,9 @@ rapid_xy dst = do
 approach :: V3 Double -> Operation
 approach dst = rapid_xy dst +++ plunge dst
 
+translate :: V3 Double -> Operation -> Operation
+translate v o =	local (\(or, fr, pr)->(or+v, fr, pr)) o
+
 (+++) :: Operation -> Operation -> Operation
 o1 +++ o2 = do 
 		ir1 <- o1 
@@ -100,5 +104,4 @@ square = approach (V3 0 0 0)
 	+++ feed (V3 1 1 0)
 	+++ feed (V3 0 1 0)
 	+++ feed (V3 0 0 0)
-
 
