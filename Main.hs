@@ -5,6 +5,7 @@ module Main (
 import Backlash
 import IR
 import Linear
+import Operation
 
 pos :: [V3 Double]
 pos = [   V3 2 2 0
