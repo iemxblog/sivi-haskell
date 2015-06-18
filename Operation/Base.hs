@@ -19,8 +19,16 @@ import Linear
 import Control.Monad.State
 import Control.Monad.Reader
 
--- | The Operation type
--- 
+-- | The Operation type.
+-- Parameters are :
+--
+-- * V3 Double : the operation's origin (for example, 'translate' moves the origin)
+--
+-- * Double : Feed rate
+--
+-- * Double : Plunge rate
+--
+-- * Double (in the State Monad) : the current machine position
 type Operation = ReaderT (V3 Double, Double, Double) (State (V3 Double)) [IR]
 
 -- | Do-nothing operation
