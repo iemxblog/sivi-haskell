@@ -25,18 +25,18 @@ pointsWithCompensation :: [V3 Double]
 pointsWithCompensation = [p1, p1 - vBacklashX, p2 - vBacklashX, p2 - vBacklashY - vBacklashZ, p3 - vBacklashY - vBacklashZ]
 
 
-prog1 :: Program
+prog1 :: IR
 prog1 = map (\p -> Move p Rapid) points
 
-prog1WithCompensation :: Program
+prog1WithCompensation :: IR
 prog1WithCompensation = map (\p -> Move p Rapid) $ initPos ++ pointsWithCompensation
 
 
-prog2 :: Program
+prog2 :: IR
 prog2 = map (\p -> Move p (LinearInterpolation 100)) points
 
 
-prog2WithCompensation :: Program
+prog2WithCompensation :: IR
 prog2WithCompensation = map (\p -> Move p Rapid) initPos ++ map (\p -> Move p (LinearInterpolation 100)) pointsWithCompensation
 
 testRapid = TestCase (assertEqual "for backlashCompensation with Rapid move, " (backlashCompensation prog1 initPos (vBacklashX + vBacklashY + vBacklashZ)) prog1WithCompensation)

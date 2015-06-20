@@ -40,7 +40,7 @@ getOrigin = do
 		return or
 
 -- | Do-nothing operation
-noOp :: Operation Program
+noOp :: Operation IR
 noOp = lift $ return []
 
 
@@ -52,7 +52,7 @@ noOp = lift $ return []
 
 -- | Rapid positioning
 rapid :: V3 Double		-- ^ dst : Destination
-	 -> Operation Program	-- Resulting operation
+	 -> Operation IR	-- Resulting operation
 rapid dst = do
 		or <- getOrigin
 		lift $ do 
@@ -60,7 +60,7 @@ rapid dst = do
 			return [Move (or+dst) Rapid]
 -- | Linear interpolation (with the default feedrate)
 feed :: V3 Double		-- ^ dst : Destination
-	 -> Operation Program	-- Resulting operation
+	 -> Operation IR	-- Resulting operation
 feed dst = do
 		(or, fr, pr) <- ask
 		lift $ do
@@ -69,7 +69,7 @@ feed dst = do
 
 -- | Linear interpolation (with the plunge feedrate)
 plunge :: V3 Double		-- ^ dst : Destination
-	 -> Operation Program	-- ^ Resulting operation
+	 -> Operation IR	-- ^ Resulting operation
 plunge dst = do
 		(or, fr, pr) <- ask
 		lift $ do
@@ -78,7 +78,7 @@ plunge dst = do
 
 -- | Tool retraction
 retract :: Double 		-- ^ z_safe : destination on the Z axis
-	-> Operation Program	-- ^ Resulting operation
+	-> Operation IR		-- ^ Resulting operation
 retract z_safe = do 
 			(or, fr, pr) <- ask
 			lift $ do
@@ -89,7 +89,7 @@ retract z_safe = do
 
 -- | Rapid in the XY plane (helper function for approach)
 rapid_xy :: V3 Double		-- ^ dst : Destination
-	 -> Operation Program	-- ^ Resulting operation
+	 -> Operation IR	-- ^ Resulting operation
 rapid_xy dst = do
 			(or, fr, pr) <- ask
 			lift $ do
@@ -100,26 +100,26 @@ rapid_xy dst = do
 				return [Move (V3 (xo+xd) (yo+yd) z) Rapid]
 -- | Rapid in the xy plane + plunge to destination
 approach :: V3 Double		-- ^ dst : Destination
-	 -> Operation Program	-- ^ Resulting operation
+	 -> Operation IR	-- ^ Resulting operation
 approach dst = rapid_xy dst +++ plunge dst
 
 -- | Translate an operation
 translate :: V3 Double		-- ^ v : Translation vector
-	-> Operation Program	-- ^ o : Operation to translate
-	-> Operation Program	-- Resulting operation
+	-> Operation IR		-- ^ o : Operation to translate
+	-> Operation IR		-- Resulting operation
 translate v o =	local (\(or, fr, pr)->(or+v, fr, pr)) o
 
 -- | Chain two operations (without tool retraction between operations)
-(+++) :: Operation Program	-- ^ o1 : Operation 1
-	-> Operation Program	-- ^ o2 : Operation 2
-	-> Operation Program	-- ^ Operation 1 followed by operation 2
+(+++) :: Operation IR	-- ^ o1 : Operation 1
+	-> Operation IR	-- ^ o2 : Operation 2
+	-> Operation IR	-- ^ Operation 1 followed by operation 2
 o1 +++ o2 = do 
 		ir1 <- o1 
 		ir2 <- o2
 		return $ ir1 ++ ir2
 
 -- | Pause operation, takes no arguments
-pause :: Operation Program
+pause :: Operation IR
 pause = return [Pause]
 
 -- | Runs an operation with default starting position, feed rate and plunge rate.
@@ -129,7 +129,7 @@ pause = return [Pause]
 -- 	* Feed rate : 100mm/min
 --
 -- 	* Plunge rate : 30 mm/min
-runOperation :: Operation Program	-- ^ o : The operation to run
-		-> Program		-- ^ The resulting program in Intermediate Representation
+runOperation :: Operation IR	-- ^ o : The operation to run
+		-> IR		-- ^ The resulting program in Intermediate Representation
 runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30))  (V3 0 0 0)
 
