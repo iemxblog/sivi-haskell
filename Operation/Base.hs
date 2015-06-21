@@ -33,16 +33,32 @@ import Control.Monad.Reader
 type Operation a = ReaderT (V3 Double, Double, Double) (State (V3 Double)) a
 
 
---getOrigin :: Reader (V3 Double, Double, Double) (V3 Double)
 getOrigin :: Operation (V3 Double)
 getOrigin = do 
 		(or, _, _) <- ask
 		return or
 
+getFeedRate :: Operation Double
+getFeedRate = do
+		(_, fr, _) <- ask
+		return fr
+
+getPlungeRate :: Operation Double
+getPlungeRate = do
+		(_, _, pr) <- ask
+		return pr
+
+-- | Returns the machine's current position (from the State monad)
+getCurrentPosition :: Operation (V3 Double)
+getCurrentPosition = lift get
+
 -- | Do-nothing operation
 noOp :: Operation IR
 noOp = lift $ return []
 
+-- | Helper function to avoid duplicate code
+move :: V3 Double -> MoveParams -> Operation IR
+move dst params = lift $ put dst >> return [Move dst params] 
 
 -- Variables :
 -- dst : destination
@@ -55,49 +71,41 @@ rapid :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- Resulting operation
 rapid dst = do
 		or <- getOrigin
-		lift $ do 
-			put (or+dst)
-			return [Move (or+dst) Rapid]
+		move (or+dst) Rapid
+
 -- | Linear interpolation (with the default feedrate)
 feed :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- Resulting operation
 feed dst = do
-		(or, fr, pr) <- ask
-		lift $ do
-			put (or+dst)
-			return [Move (or+dst) (LinearInterpolation fr)]
+		or <- getOrigin
+		fr <- getFeedRate	
+		move (or+dst) (LinearInterpolation fr)
 
 -- | Linear interpolation (with the plunge feedrate)
 plunge :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- ^ Resulting operation
 plunge dst = do
-		(or, fr, pr) <- ask
-		lift $ do
-			put (or+dst)
-			return [Move (or+dst) (LinearInterpolation pr)]
+		or <- getOrigin
+		pr <- getPlungeRate
+		move (or+dst) (LinearInterpolation pr)
 
 -- | Tool retraction
 retract :: Double 		-- ^ z_safe : destination on the Z axis
 	-> Operation IR		-- ^ Resulting operation
 retract z_safe = do 
-			(or, fr, pr) <- ask
-			lift $ do
-				V3 x y _ <- get
-				let V3 _ _ zo = or
-				put $ V3 x y (zo+z_safe)
-				return [Move (V3 x y (zo+z_safe)) Rapid]
+			V3 _ _ zo <- getOrigin
+			V3 x y _ <- getCurrentPosition
+			move (V3 x y (zo+z_safe)) Rapid
 
 -- | Rapid in the XY plane (helper function for approach)
 rapid_xy :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- ^ Resulting operation
 rapid_xy dst = do
-			(or, fr, pr) <- ask
-			lift $ do
-				V3 _ _ z <- get
-				let V3 xd yd _ = dst 
-				let V3 xo yo _ = or
-				put $ V3 (xo+xd) (yo+yd) z
-				return [Move (V3 (xo+xd) (yo+yd) z) Rapid]
+			V3 xo yo _ <- getOrigin
+			V3 _ _ z <- getCurrentPosition	
+			let V3 xd yd _ = dst 
+			move (V3 (xo+xd) (yo+yd) z) Rapid
+
 -- | Rapid in the xy plane + plunge to destination
 approach :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- ^ Resulting operation
