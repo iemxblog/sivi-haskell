@@ -10,8 +10,10 @@ Portability	: POSIX
 module Operation(
 	module Operation.Base
 	, module Operation.Repetition
+	, module Operation.Pocket
 ) where
 
 import Operation.Base
 import Operation.Repetition
+import Operation.Pocket
 
