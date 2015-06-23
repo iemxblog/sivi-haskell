@@ -11,7 +11,7 @@ module Operation(
 	module Operation.Base
 	, module Operation.Repetition
 	, module Operation.Pocket
-	, module Misc
+	, module Operation.Misc
 ) where
 
 import Operation.Base
