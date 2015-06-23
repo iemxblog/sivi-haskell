@@ -3,6 +3,8 @@ module Operation.Base (
 	, getOrigin
 	, getFeedRate
 	, getPlungeRate
+	, getTool
+	, getToolDiameter
 	, noOp	
 	, rapid
 	, feed
@@ -54,11 +56,13 @@ getPlungeRate = do
 		(_, _, pr, _) <- ask
 		return pr
 
+-- | Returns the current tool
 getTool :: Operation Tool
 getTool = do
 		(_, _, _, tool) <- ask
 		return tool
 
+-- | Returns the current tool's diameter
 getToolDiameter :: Operation Double
 getToolDiameter = do
 			tool <- getTool
