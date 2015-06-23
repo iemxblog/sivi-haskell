@@ -31,27 +31,39 @@ import Control.Monad.Reader
 --
 -- * Double : Plunge rate
 --
+-- * Tool : The current tool
+--
 -- * Double (in the State Monad) : the current machine position
-type Operation a = ReaderT (V3 Double, Double, Double) (State (V3 Double)) a
+type Operation a = ReaderT (V3 Double, Double, Double, Tool) (State (V3 Double)) a
 
 -- | Returns the origin of an operation
 getOrigin :: Operation (V3 Double)
 getOrigin = do 
-		(or, _, _) <- ask
+		(or, _, _, _) <- ask
 		return or
 
 -- | Returns the current feed rate
 getFeedRate :: Operation Double
 getFeedRate = do
-		(_, fr, _) <- ask
+		(_, fr, _, _) <- ask
 		return fr
 
 -- | Returns the current plunge rate
 getPlungeRate :: Operation Double
 getPlungeRate = do
-		(_, _, pr) <- ask
+		(_, _, pr, _) <- ask
 		return pr
 
+getTool :: Operation Tool
+getTool = do
+		(_, _, _, tool) <- ask
+		return tool
+
+getToolDiameter :: Operation Double
+getToolDiameter = do
+			tool <- getTool
+			return $ diameter tool
+		
 -- | Returns the machine's current position (from the State monad)
 getCurrentPosition :: Operation (V3 Double)
 getCurrentPosition = lift get
@@ -119,7 +131,7 @@ approach dst = rapid_xy dst +++ plunge dst
 translate :: V3 Double		-- ^ v : Translation vector
 	-> Operation IR		-- ^ o : Operation to translate
 	-> Operation IR		-- Resulting operation
-translate v o =	local (\(or, fr, pr)->(or+v, fr, pr)) o
+translate v o =	local (\(or, fr, pr, tool)->(or+v, fr, pr, tool)) o
 
 -- | Chain two operations (without tool retraction between operations)
 (+++) :: Operation IR	-- ^ o1 : Operation 1
@@ -134,14 +146,16 @@ o1 +++ o2 = do
 pause :: Operation IR
 pause = return [Pause]
 
--- | Runs an operation with default starting position, feed rate and plunge rate.
+-- | Runs an operation with default starting position, feed rate, plunge rate and tool.
 --
 -- 	* Starting position : V3 0 0 0
 --
 -- 	* Feed rate : 100mm/min
 --
 -- 	* Plunge rate : 30 mm/min
+--
+--	* Tool : EndMill : name="01" diameter=3 length=42
 runOperation :: Operation IR	-- ^ o : The operation to run
 		-> IR		-- ^ The resulting program in Intermediate Representation
-runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30))  (V3 0 0 0)
+runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30, EndMill {name="01", diameter=3, len=42}))  (V3 0 0 0)
 
