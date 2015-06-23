@@ -1,6 +1,8 @@
 module Operation.Base (
 	Operation
 	, getOrigin
+	, getFeedRate
+	, getPlungeRate
 	, noOp	
 	, rapid
 	, feed
@@ -32,17 +34,19 @@ import Control.Monad.Reader
 -- * Double (in the State Monad) : the current machine position
 type Operation a = ReaderT (V3 Double, Double, Double) (State (V3 Double)) a
 
-
+-- | Returns the origin of an operation
 getOrigin :: Operation (V3 Double)
 getOrigin = do 
 		(or, _, _) <- ask
 		return or
 
+-- | Returns the current feed rate
 getFeedRate :: Operation Double
 getFeedRate = do
 		(_, fr, _) <- ask
 		return fr
 
+-- | Returns the current plunge rate
 getPlungeRate :: Operation Double
 getPlungeRate = do
 		(_, _, pr) <- ask
