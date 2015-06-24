@@ -35,6 +35,7 @@ onV3 f (V3 x y z) (V3 x' y' z') = V3 (f x x') (f y y') (f z z')
 
 backlash2 :: IR -> V3 Double -> V3 Double -> V3 Double -> V3 Double -> IR
 backlash2 [] _ _ _ _ = []
+backlash2 (Move _ (Arc _ _ _) : xs) _ _ _ _ = error "Backlash compensation not implemented for arcs."
 backlash2 (Move pos mp : xs) backlash ppos pdir pcomp = 
 	if extraMove == V3 0 0 0 then Move compensatedPos mp : backlash2 xs backlash pos newdir compensation
 	else Move extraMove mp : Move compensatedPos mp : backlash2 xs backlash pos newdir compensation
@@ -45,6 +46,7 @@ backlash2 (Move pos mp : xs) backlash ppos pdir pcomp =
 		compensation = pcomp + backlash * dirChange
 		compensatedPos = pos + compensation
 		extraMove = if dirChange == V3 0 0 0 then V3 0 0 0 else ppos + compensation
+backlash2 (x : xs) backlash ppos pdir pcomp = x : backlash2 xs backlash ppos pdir pcomp
 
 backlashCompensation :: IR		-- ^ The program to modifiy
 			-> [V3 Double]  -- ^ The positions to prepend to the program to put the machine in a known backlash

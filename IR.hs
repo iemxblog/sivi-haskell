@@ -28,9 +28,14 @@ data Tool =
 type Coordinate = Double
 type FeedRate = Double
 
+data ArcDirection = CW | CCW deriving (Eq, Show)
+
 -- | Parameters for the 'Move' data constructor.
 -- A move is either a Rapid move, or a linear interpolation with a feed rate. So there is only one data constructor for moves.
-data MoveParams = Rapid | LinearInterpolation { feedRate :: FeedRate } deriving (Eq, Show)
+data MoveParams = Rapid 
+		| LinearInterpolation { feedRate :: FeedRate } 
+		| Arc { direction :: ArcDirection, center :: (V3 Double), feedRate :: FeedRate }
+		deriving (Eq, Show)
 
 -- | Intermediate Representation
 data Instruction = 
@@ -49,20 +54,28 @@ example = [
 	ChangeTool (EndMill "01" 3 42)
 	, Move (V3 1 0 0) Rapid
 	, Move (V3 2 2 0) (LinearInterpolation 100)
+	, Move (V3 2 0 0) (Arc CW (V3 1 1 0) 100)
 	, Pause
 	, Move (V3 0 0 0) Rapid,
 	Comment "Commentaire"
 	]
 
 -- | Helper function for "compile"
-compileInstruction :: Instruction -> String
-compileInstruction (Move (V3 x y z) Rapid) = "G00 X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z
-compileInstruction (Move (V3 x y z) (LinearInterpolation f)) = "G01 X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z ++ " F" ++ show f
-compileInstruction (ChangeTool t) = "M6 T" ++ name t
-compileInstruction (Comment s) = "(" ++ s ++ ")"
-compileInstruction Pause = "M00"
+compile' :: IR		-- ^ The program to compile 
+	-> V3 Double 	-- ^ The current position of the tool (needed for arcs, because i j k are relative to current position)
+	-> [String]	-- ^ The gcode stored as a list of lines
+compile' [] cp = []
+compile' ((Move (V3 x y z) Rapid) : xs) cp = ["G00 X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z] ++ compile' xs (V3 x y z)
+compile' ((Move (V3 x y z) (LinearInterpolation f)) : xs) cp = ["G01 X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z ++ " F" ++ show f] ++ compile' xs (V3 x y z)
+compile' ((Move (V3 x y z) (Arc dir center f)) : xs) cp = [g dir ++ " X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z ++ " I" ++ show i ++ " J" ++ show j ++ " K" ++ show k ++ " F" ++ show f] ++ compile' xs (V3 x y z)
+							where 	g CW = "G02"
+								g CCW = "G03"
+								V3 i j k = center - cp
+compile' ((ChangeTool t) : xs) cp = ["M6 T" ++ name t] ++ compile' xs cp
+compile' ((Comment s) : xs) cp = ["(" ++ s ++ ")"] ++ compile' xs cp
+compile' (Pause : xs) cp = ["M00"] ++ compile' xs cp
 
 -- | Compiles intermediate representation to G-CODE
 compile :: IR 		-- ^ The program in intermediate representation
 	 -> String 	-- ^ The generated G-Code
-compile p = unlines $ map compileInstruction p
+compile p = unlines $ compile' p (V3 0 0 0)
