@@ -128,7 +128,7 @@ retract z_safe = do
 			V3 x y _ <- getCurrentPosition
 			move (V3 x y (zo+z_safe)) Rapid
 
--- | Rapid in the XY plane (helper function for approach)
+-- | Rapid in the XY plane (helper function for 'approach')
 rapid_xy :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- ^ Resulting operation
 rapid_xy dst = do
