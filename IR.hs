@@ -10,6 +10,7 @@ Portability	: POSIX
 module IR 
 (
 	Tool(..)
+	, ArcDirection(..)
 	, MoveParams(..)
 	, Instruction(..)
 	, IR

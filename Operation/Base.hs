@@ -8,6 +8,7 @@ module Operation.Base (
 	, noOp	
 	, rapid
 	, feed
+	, arc
 	, plunge
 	, retract
 	, rapid_xy
@@ -100,6 +101,16 @@ feed dst = do
 		or <- getOrigin
 		fr <- getFeedRate	
 		move (or+dst) (LinearInterpolation fr)
+
+-- | Circular interpolation
+arc :: ArcDirection 		-- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
+	-> V3 Double		-- ^ center : The center of the arc (relative to the origin of the operation)
+	-> V3 Double		-- ^ dst : The destination point
+	-> Operation IR		-- ^ Resulting operation
+arc dir center dst = do
+			or <- getOrigin
+			fr <- getFeedRate
+			move (or+dst) (Arc { direction=dir, center=(or+center), feedRate=fr})	
 
 -- | Linear interpolation (with the plunge feedrate)
 plunge :: V3 Double		-- ^ dst : Destination
