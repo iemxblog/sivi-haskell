@@ -12,9 +12,11 @@ module Operation(
 	, module Operation.Repetition
 	, module Operation.Pocket
 	, module Operation.Misc
+	, module Operation.BasicShape
 ) where
 
 import Operation.Base
 import Operation.Repetition
 import Operation.Pocket
 import Operation.Misc
+import Operation.BasicShape
