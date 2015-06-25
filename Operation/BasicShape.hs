@@ -13,10 +13,10 @@ import Linear
 
 -- | Circle (does not cut the inside of the circle, but just the contour).
 -- Warning !!! No tool radius compensation !
-circle :: Double 		-- ^ r : Radius of the circle
+circle :: Double 		-- ^ d : Diameter of the circle
 	-> Operation IR		-- ^ Resulting operation
-circle r = approach startingPoint +++ arc CCW (V3 0 0 0) startingPoint
-	where startingPoint = V3 r 0 0
+circle d = approach startingPoint +++ arc CCW (V3 0 0 0) startingPoint
+	where startingPoint = V3 (d/2) 0 0
 
 -- | Rectangle (does not cut the inside of the rectangle, but just the contour).
 -- The origin is the bottom left corner.
