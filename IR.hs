@@ -68,10 +68,11 @@ compile' :: IR		-- ^ The program to compile
 compile' [] cp = []
 compile' ((Move (V3 x y z) Rapid) : xs) cp = ["G00 X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z] ++ compile' xs (V3 x y z)
 compile' ((Move (V3 x y z) (LinearInterpolation f)) : xs) cp = ["G01 X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z ++ " F" ++ show f] ++ compile' xs (V3 x y z)
-compile' ((Move (V3 x y z) (Arc dir center f)) : xs) cp = [g dir ++ " X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z ++ " I" ++ show i ++ " J" ++ show j ++ " K" ++ show k ++ " F" ++ show f] ++ compile' xs (V3 x y z)
+compile' ((Move (V3 x y z) (Arc dir center f)) : xs) cp = [g dir ++ " X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z ++ notZero " I" i ++ notZero " J" j ++ notZero " K" k ++ " F" ++ show f] ++ compile' xs (V3 x y z)
 							where 	g CW = "G02"
 								g CCW = "G03"
 								V3 i j k = center - cp
+								notZero s v = if v /= 0 then s ++ show v else ""
 compile' ((ChangeTool t) : xs) cp = ["M6 T" ++ name t] ++ compile' xs cp
 compile' ((Comment s) : xs) cp = ["(" ++ s ++ ")"] ++ compile' xs cp
 compile' (Pause : xs) cp = ["M00"] ++ compile' xs cp
