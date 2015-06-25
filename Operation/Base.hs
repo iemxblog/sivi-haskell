@@ -15,6 +15,7 @@ module Operation.Base (
 	, approach
 	, translate
 	, (+++)
+	, opsequence
 	, runOperation
 	, pause
 )
@@ -156,6 +157,9 @@ o1 +++ o2 = do
 		ir1 <- o1 
 		ir2 <- o2
 		return $ ir1 ++ ir2
+
+opsequence :: [Operation IR] -> Operation IR
+opsequence = foldr (+++) noOp
 
 -- | Pause operation, takes no arguments
 pause :: Operation IR

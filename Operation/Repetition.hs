@@ -17,10 +17,10 @@ next :: Double 			-- ^ z_safe : Tool retraction
 next z_safe o1 o2 = retract z_safe +++ o1 +++ retract z_safe +++ o2 
 
 repetition :: [V3 Double] -> Double -> Operation IR -> Operation IR
-repetition xs z_safe op = foldr (+++) noOp $ map (\v -> retract z_safe +++ translate v op) xs
+repetition xs z_safe op = opsequence $ map (\v -> retract z_safe +++ translate v op) xs
 
 repetitionWithoutRetract :: [V3 Double] -> Operation IR -> Operation IR
-repetitionWithoutRetract xs op = foldr (+++) noOp $ map (\v -> translate v op) xs
+repetitionWithoutRetract xs op = opsequence $ map (\v -> translate v op) xs
 
 -- | Repeats an operation on a circle (and adds a tool retraction each time)
 circularRepetition :: Double			-- ^ d : Diameter 
