@@ -1,5 +1,6 @@
 module Operation.BasicShape (
 	circle
+	, circleFromHere
 	, rectangle
 	, square
 	, centeredRectangle
@@ -17,6 +18,13 @@ circle :: Double 		-- ^ d : Diameter of the circle
 	-> Operation IR		-- ^ Resulting operation
 circle d = approach startingPoint +++ arc CCW (V3 0 0 0) startingPoint
 	where startingPoint = V3 (d/2) 0 0
+
+circleFromHere :: Operation IR
+circleFromHere = do
+			or <- getOrigin
+			fr <- getFeedRate
+			cp <- getCurrentPosition
+			move cp (Arc { direction = CCW, center=or, feedRate = fr })
 
 -- | Rectangle (does not cut the inside of the rectangle, but just the contour).
 -- The origin is the bottom left corner.
