@@ -18,6 +18,7 @@ module IR
 ) where
 
 import Linear
+import Numeric
 
 -- | Tool data type.
 -- Used for tool changes, radius compensation.
@@ -61,18 +62,22 @@ example = [
 	Comment "Commentaire"
 	]
 
+
+showDouble :: Double -> String
+showDouble d = showFFloat (Just 3) d ""
+
 -- | Helper function for "compile"
 compile' :: IR		-- ^ The program to compile 
 	-> V3 Double 	-- ^ The current position of the tool (needed for arcs, because i j k are relative to current position)
 	-> [String]	-- ^ The gcode stored as a list of lines
 compile' [] cp = []
-compile' ((Move (V3 x y z) Rapid) : xs) cp = ["G00 X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z] ++ compile' xs (V3 x y z)
-compile' ((Move (V3 x y z) (LinearInterpolation f)) : xs) cp = ["G01 X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z ++ " F" ++ show f] ++ compile' xs (V3 x y z)
-compile' ((Move (V3 x y z) (Arc dir center f)) : xs) cp = [g dir ++ " X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z ++ notZero " I" i ++ notZero " J" j ++ notZero " K" k ++ " F" ++ show f] ++ compile' xs (V3 x y z)
+compile' ((Move (V3 x y z) Rapid) : xs) cp = ["G00 X" ++ showDouble x ++ " Y" ++ showDouble y ++ " Z" ++ showDouble z] ++ compile' xs (V3 x y z)
+compile' ((Move (V3 x y z) (LinearInterpolation f)) : xs) cp = ["G01 X" ++ showDouble x ++ " Y" ++ showDouble y ++ " Z" ++ showDouble z ++ " F" ++ showDouble f] ++ compile' xs (V3 x y z)
+compile' ((Move (V3 x y z) (Arc dir center f)) : xs) cp = [g dir ++ " X" ++ showDouble x ++ " Y" ++ showDouble y ++ " Z" ++ showDouble z ++ notZero " I" i ++ notZero " J" j ++ notZero " K" k ++ " F" ++ showDouble f] ++ compile' xs (V3 x y z)
 							where 	g CW = "G02"
 								g CCW = "G03"
 								V3 i j k = center - cp
-								notZero s v = if v /= 0 then s ++ show v else ""
+								notZero s v = if v /= 0 then s ++ showDouble v else ""
 compile' ((ChangeTool t) : xs) cp = ["M6 T" ++ name t] ++ compile' xs cp
 compile' ((Comment s) : xs) cp = ["(" ++ s ++ ")"] ++ compile' xs cp
 compile' (Pause : xs) cp = ["M00"] ++ compile' xs cp
