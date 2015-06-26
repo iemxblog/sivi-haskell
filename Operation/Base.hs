@@ -5,7 +5,9 @@ module Operation.Base (
 	, getPlungeRate
 	, getTool
 	, getToolDiameter
+	, getCurrentPosition
 	, noOp	
+	, move
 	, rapid
 	, feed
 	, arc
