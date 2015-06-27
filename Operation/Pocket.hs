@@ -1,3 +1,12 @@
+{-|
+Module		: Operation.pocket
+Description	: Pocketing operations (circular pocket, rectangular pocket, ...)
+Copyright	: (c) Maxime ANDRE, 2015
+License		: GPL-2
+Maintainer	: iemxblog@gmail.com
+Stability	: experimental
+Portability	: POSIX
+-}
 module Operation.Pocket (
 	circularPocket
 	, rectangularPocket
@@ -9,11 +18,11 @@ import Operation.BasicShape
 import IR
 import Linear
 
--- | Generates an archimedean spiral. (used in circularPocket)
+-- | Generates an archimedean spiral. (used in 'circularPocket')
 -- Increment in angle is +1 degree. 
-archimedeanSpiral :: 	Double
-			-> Double
-			-> Operation IR
+archimedeanSpiral :: 	Double			-- ^ d : External diameter of the spiral
+			-> Double		-- ^ step_over : the end mill covers step_over mm of the precedent turn
+			-> Operation IR		-- ^ Resulting operation
 archimedeanSpiral d step_over = 
 	do
 		a <- approach (V3 0 0 0) 
@@ -24,9 +33,11 @@ archimedeanSpiral d step_over =
 		sp <- opsequence [feed (V3 (r*cos(a)) (r*sin(a)) 0) | (r, a) <- zip radius angle ++ [lastPoint]]
 		return (a ++ sp)
 
-circularPocket :: Double
-		-> Double
-		-> Operation IR
+-- | Generates a circular pocket.
+-- To be used with 'Operation.Repetition.zRepetition' for the depth.
+circularPocket :: Double			-- ^ d : Diameter of the pocket
+		-> Double			-- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
+		-> Operation IR			-- ^ Resulting operation
 circularPocket d step_over = do
 				a <- approach (V3 0 0 0)
 				df <- getToolDiameter
@@ -35,27 +46,31 @@ circularPocket d step_over = do
 				return (a ++ sp ++ c)
 				
 
-
-rectangularSpiral' :: (Num a, Integral b) => (a, a)
-			-> b
-			-> a
-			-> a 
-			-> [(a, a)]
-rectangularSpiral' (xo, yo) i sx sy  = 
-		[(xo, yo), (xo+i'*sx, yo), (xo+i'*sx, yo+i'*sy), (xo-sx, yo+i'*sy)] ++ rectangularSpiral' (xo-sx, yo-sy) (i+2) sx sy
+-- | Generates the coordinates of a rectangular spiral (in 2D).
+-- Recursive function which generates a piece of spiral, then calls itself to generate a bigger piece.
+rectangularSpiralR :: (Num a, Integral b) => (a, a)	-- ^ (xo, yo) : Coordinates of the origin of the spiral
+			-> b				-- ^ i : Multiplicator coefficient to generate bigger and bigger pieces 
+			-> a				-- ^ sx : Spacing between each turn for the x axis
+			-> a 				-- ^ sy : Spacing between each turn for the y axis
+			-> [(a, a)]			-- ^ Resulting rectangular spiral
+rectangularSpiralR (xo, yo) i sx sy  = 
+		[(xo, yo), (xo+i'*sx, yo), (xo+i'*sx, yo+i'*sy), (xo-sx, yo+i'*sy)] ++ rectangularSpiralR (xo-sx, yo-sy) (i+2) sx sy
 		where
 			i' = fromIntegral i
 
+-- | Interface for 'rectangularSpiralR'
 rectangularSpiral :: Num a => 
-			a
-			-> a
-			-> [(a, a)]
-rectangularSpiral = rectangularSpiral' (0, 0) 1
+			a				-- ^ sx : Spacing betwenn each turn for the x axis
+			-> a				-- ^ sy : Spacing between each turn for the y axis
+			-> [(a, a)]			-- ^ Resulting rectangular spiral
+rectangularSpiral = rectangularSpiralR (0, 0) 1
 
-rectangularPocket :: 	Double 
-			-> Double 
-			-> Double 
-			-> Operation IR
+-- | Generates a rectangular pocket.
+-- To be used with 'Operation.Repetition.zRepetition' for the depth.
+rectangularPocket :: 	Double 				-- ^ lx : Size of the pocket on the x axis
+			-> Double 			-- ^ ly : Size of the pocket on the y axis
+			-> Double 			-- ^ step_over : The end mill covers step_over mm of the precedent turn
+			-> Operation IR			-- Resulting operation
 rectangularPocket lx ly step_over = do
 			a <- approach (V3 0 0 0)
 			df <- getToolDiameter		
