@@ -1,3 +1,13 @@
+{-|
+Module		: Operation.Misc
+Description	: Miscellaneous operations (saw, drill, ...)
+Copyright	: (c) Maxime ANDRE, 2015
+License		: GPL-2
+Maintainer	: iemxblog@gmail.com
+Stability	: experimental
+Portability	: POSIX
+-}
+
 module Operation.Misc (
 	saw_left
 	, drill

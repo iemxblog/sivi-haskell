@@ -1,3 +1,12 @@
+{-|
+Module		: Operation.BasicShape
+Description	: Basic shapes like circle, rectangle, square, ...
+Copyright	: (c) Maxime ANDRE, 2015
+License		: GPL-2
+Maintainer	: iemxblog@gmail.com
+Stability	: experimental
+Portability	: POSIX
+-}
 module Operation.BasicShape (
 	circle
 	, circleFromHere

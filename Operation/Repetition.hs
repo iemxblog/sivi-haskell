@@ -1,3 +1,12 @@
+{-|
+Module		: Operation.Repetition
+Description	: Operations that repeat other operations
+Copyright	: (c) Maxime ANDRE, 2015
+License		: GPL-2
+Maintainer	: iemxblog@gmail.com
+Stability	: experimental
+Portability	: POSIX
+-}
 module Operation.Repetition (
 	circularRepetition
 	, gridRepetition

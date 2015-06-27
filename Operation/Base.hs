@@ -1,3 +1,13 @@
+{-|
+Module		: Operation.Base
+Description	: Base operations
+Copyright	: (c) Maxime ANDRE, 2015
+License		: GPL-2
+Maintainer	: iemxblog@gmail.com
+Stability	: experimental
+Portability	: POSIX
+-}
+
 module Operation.Base (
 	Operation
 	, getOrigin
