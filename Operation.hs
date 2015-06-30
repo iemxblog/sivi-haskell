@@ -13,6 +13,7 @@ module Operation(
 	, module Operation.Pocket
 	, module Operation.Misc
 	, module Operation.BasicShape
+	, module Operation.Contour
 ) where
 
 import Operation.Base
@@ -20,3 +21,4 @@ import Operation.Repetition
 import Operation.Pocket
 import Operation.Misc
 import Operation.BasicShape
+import Operation.Contour
