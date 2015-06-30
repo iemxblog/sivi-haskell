@@ -45,4 +45,4 @@ rotate :: Double			-- ^ The rotation angle
 	-> Operation IR			-- ^ The operation to rotate
 	-> Operation IR			-- ^ The transformed operation
 rotate angle op = op >>= (\ir -> return $ applyMatrix m ir)
-	where m = V3 (V3 (cos angle) (sin angle) 0) (V3 (-sin angle) (cos angle) 0) (V3 0 0 1)
+	where m = V3 (V3 (cos angle) (-sin angle) 0) (V3 (sin angle) (cos angle) 0) (V3 0 0 1)
