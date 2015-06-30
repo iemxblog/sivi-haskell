@@ -65,13 +65,16 @@ zRepetition depth step m_z_safe op = case m_z_safe of
 					Just z_safe -> repetition pos_list z_safe op
 					Nothing -> repetitionWithoutRetract pos_list op
 					where
-						pos_list = map (V3 0 0) $ zRange 0 depth step
+						pos_list = map (V3 0 0) $ zRange step depth step
 
 -- | Helper function for zRepetition.
 -- Generates a list of depths (on the Z axis) for each iteration of the repetition.
 -- It is close to a haskell range like [0,step..depth], but the last element is equal to depth.
 -- Which is not the case for the range syntax.
-zRange :: (Eq a, Num a) => a -> a -> a -> [a]
+zRange :: (Eq a, Num a) => a 		-- ^ acc : Accumulator used for recursion (it is also the starting depth)
+			-> a		-- ^ depth
+			-> a		-- ^ step : depth of each cutting pass
+			-> [a]		-- ^ Resulting list of depths
 zRange acc depth step 	| signum (depth - acc) == signum step = acc : zRange (acc+step) depth step 
 			| otherwise = [depth]
 
