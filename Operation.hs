@@ -14,6 +14,7 @@ module Operation(
 	, module Operation.Misc
 	, module Operation.BasicShape
 	, module Operation.Contour
+	, module Operation.Transformation
 ) where
 
 import Operation.Base
@@ -22,3 +23,4 @@ import Operation.Pocket
 import Operation.Misc
 import Operation.BasicShape
 import Operation.Contour
+import Operation.Transformation
