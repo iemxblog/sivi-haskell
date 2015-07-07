@@ -9,6 +9,7 @@ Portability	: POSIX
 -}
 module GCode
 (
+	GCode(..)
 ) where
 
 import Numeric
