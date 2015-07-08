@@ -16,7 +16,7 @@ module GCode.Parser
 import Data.Attoparsec.ByteString.Char8
 import Control.Applicative
 import Data.List
-import GCode
+import GCode.Base
 
 word :: Char -> Parser (Maybe Double)
 word wn = do
