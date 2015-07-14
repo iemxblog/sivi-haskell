@@ -6,6 +6,7 @@ import Backlash
 import IR
 import Linear
 import Operation
+import GCode
 
 pos :: [V3 Double]
 pos = [   V3 2 2 0
@@ -31,4 +32,4 @@ backlash :: V3 Double
 backlash = V3 0.5 0.5 0.5
 
 main :: IO()
-main = putStr . compile $ backlashCompensation (map (\x -> Move x Rapid) pos) initPos backlash 
+main = putStr . unlines . map show . compile $ backlashCompensation (map (\x -> Move x Rapid) pos) initPos backlash 
