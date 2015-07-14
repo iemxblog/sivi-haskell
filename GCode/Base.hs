@@ -26,15 +26,19 @@ data GCode = 	G00 { x :: Maybe Double, y :: Maybe Double, z :: Maybe Double }
 		| CLine { x :: Maybe Double, y :: Maybe Double, z :: Maybe Double,
 			i :: Maybe Double, j :: Maybe Double, k :: Maybe Double, f :: Maybe Double }
 
+-- | Helper function used to show a Double with 3 decimals
 showDouble :: Double -> String
 showDouble d = showFFloat (Just 3) d ""
 
-
+-- | Shows a GCode word (with Maybe value)
 gword :: Char -> Maybe Double -> String
 gword w (Just v) = w : showDouble v
 gword w Nothing = ""
 
-compileParams :: [Char] -> [Maybe Double] -> String
+-- | Compiles parameters of a GCode command
+compileParams :: [Char] 		-- ^ List of parameter names
+		-> [Maybe Double] 	-- ^ List of parameter values
+		-> String		-- ^ Compiled parameters
 compileParams pn pv = unwords . filter (/= "") $ (zipWith gword pn pv)
 
 instance Show GCode where
