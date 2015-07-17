@@ -97,27 +97,27 @@ filterNothing = Map.map f . Map.filter (/= Nothing)
 mem :: (Ord a, Eq b) => [(a, Maybe b)] -> Map.Map a b -> Map.Map a b
 mem xs pm = Map.union (filterNothing . Map.fromList $ xs) pm 
 
-memorizeParams :: Map.Map String Double
-		-> GCode
+memorizeParams :: GCode
 		-> Map.Map String Double
-memorizeParams pm (G00 mx my mz) = mem [("X", mx), ("Y", my), ("Z", mz)] pm
-memorizeParams pm (G01 mx my mz mf) = mem [("X", mx), ("Y", my), ("Z", mz), ("F", mf)] pm
-memorizeParams pm (G02 mx my mz mi mj mk mf) = mem [("X", mx), ("Y", my), ("Z", mz), ("I", mi), ("J", mj), ("K", mk), ("F", mf)] pm
-memorizeParams pm (G03 mx my mz mi mj mk mf) = mem [("X", mx), ("Y", my), ("Z", mz), ("I", mi), ("J", mj), ("K", mk), ("F", mf)] pm
-memorizeParams pm (M06 _) = pm
-memorizeParams pm (GCode.Base.Comment _) = pm
-memorizeParams pm M00 = pm
-memorizeParams pm (CLine mx my mz mi mj mk mf) = mem [("X", mx), ("Y", my), ("Z", mz), ("I", mi), ("J", mj), ("K", mk), ("F", mf)] pm
+		-> Map.Map String Double
+memorizeParams (G00 mx my mz) pm = mem [("X", mx), ("Y", my), ("Z", mz)] pm
+memorizeParams (G01 mx my mz mf) pm = mem [("X", mx), ("Y", my), ("Z", mz), ("F", mf)] pm
+memorizeParams (G02 mx my mz mi mj mk mf) pm = mem [("X", mx), ("Y", my), ("Z", mz), ("I", mi), ("J", mj), ("K", mk), ("F", mf)] pm
+memorizeParams (G03 mx my mz mi mj mk mf) pm = mem [("X", mx), ("Y", my), ("Z", mz), ("I", mi), ("J", mj), ("K", mk), ("F", mf)] pm
+memorizeParams (M06 _) pm = pm
+memorizeParams (GCode.Base.Comment _) pm = pm
+memorizeParams M00 pm = pm
+memorizeParams (CLine mx my mz mi mj mk mf) pm = mem [("X", mx), ("Y", my), ("Z", mz), ("I", mi), ("J", mj), ("K", mk), ("F", mf)] pm
 
-memorizeCommand :: String -> GCode -> String
-memorizeCommand _ (G00 _ _ _) = "G00"
-memorizeCommand _ (G01 _ _ _ _) = "G01"
-memorizeCommand _ (G02 _ _ _ _ _ _ _) = "G02"
-memorizeCommand _ (G03 _ _ _ _ _ _ _) = "G03"
-memorizeCommand s (M06 _) = s
-memorizeCommand s (GCode.Base.Comment _) = s
-memorizeCommand s M00 = s
-memorizeCommand s (CLine _ _ _ _ _ _ _) = s
+memorizeCommand :: GCode -> String -> String
+memorizeCommand (G00 _ _ _) _ = "G00"
+memorizeCommand (G01 _ _ _ _) _ = "G01"
+memorizeCommand (G02 _ _ _ _ _ _ _) _ = "G02"
+memorizeCommand (G03 _ _ _ _ _ _ _) _ = "G03"
+memorizeCommand (M06 _) s = s
+memorizeCommand (GCode.Base.Comment _) s = s
+memorizeCommand M00 s = s
+memorizeCommand (CLine _ _ _ _ _ _ _) s = s
 
 --fromGCode :: [GCode] -> Data.Map Char Double -> IR
 --fromGCode ((G00 mx my mz):xs) mp = Move (V3 x y z) Rapid : fromGCode xs nmp
