@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-|
 Module		: IR
 Description	: Intermediate representation of a CNC program
@@ -15,12 +16,19 @@ module IR
 	, Instruction(..)
 	, IR
 	, compile
+	, testProgram
+	, memorizedParams
+	, memorizeParams
+	, memorizedCommands
+	, memorizeCommand
 ) where
 
 import Linear
 import Numeric
 import qualified Data.Map as Map
 import GCode.Base
+import GCode.Parser
+import Data.Attoparsec.ByteString.Char8
 
 -- | Tool data type.
 -- Used for tool changes, radius compensation.
@@ -126,3 +134,8 @@ memorizedCommands = scanr memorizeCommand ""
 
 memorizedParams :: [GCode] -> [Map.Map Char Double]
 memorizedParams = scanr memorizeParams (Map.fromList [('X', 0), ('Y', 0), ('Z', 0), ('I', 0), ('J', 0), ('K', 0), ('F', 0)]) 
+
+--testProgram :: [GCode]
+testProgram = case parseOnly parser "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\n" of
+		Left err -> []
+		Right gcode -> gcode
