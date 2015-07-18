@@ -119,7 +119,10 @@ memorizeCommand (GCode.Base.Comment _) s = s
 memorizeCommand M00 s = s
 memorizeCommand (CLine _ _ _ _ _ _ _) s = s
 
---fromGCode :: [GCode] -> Data.Map Char Double -> IR
---fromGCode ((G00 mx my mz):xs) mp = Move (V3 x y z) Rapid : fromGCode xs nmp
---	where	nmp = updateMemParams (fromList [('X', nx), ('Y', ny), ('Z', nz)) mp
---		[x, y, z] = getMemParams "XYZ" nmp
+-- Utiliser scanl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+memorizedCommands :: [GCode] -> [String]
+memorizedCommands = scanr memorizeCommand ""
+
+memorizedParams :: [GCode] -> [Map.Map Char Double]
+memorizedParams = scanr memorizeParams (Map.fromList [('X', 0), ('Y', 0), ('Z', 0), ('I', 0), ('J', 0), ('K', 0), ('F', 0)]) 
