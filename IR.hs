@@ -98,16 +98,16 @@ mem :: (Ord a, Eq b) => [(a, Maybe b)] -> Map.Map a b -> Map.Map a b
 mem xs pm = Map.union (filterNothing . Map.fromList $ xs) pm 
 
 memorizeParams :: GCode
-		-> Map.Map String Double
-		-> Map.Map String Double
-memorizeParams (G00 mx my mz) pm = mem [("X", mx), ("Y", my), ("Z", mz)] pm
-memorizeParams (G01 mx my mz mf) pm = mem [("X", mx), ("Y", my), ("Z", mz), ("F", mf)] pm
-memorizeParams (G02 mx my mz mi mj mk mf) pm = mem [("X", mx), ("Y", my), ("Z", mz), ("I", mi), ("J", mj), ("K", mk), ("F", mf)] pm
-memorizeParams (G03 mx my mz mi mj mk mf) pm = mem [("X", mx), ("Y", my), ("Z", mz), ("I", mi), ("J", mj), ("K", mk), ("F", mf)] pm
+		-> Map.Map Char Double
+		-> Map.Map Char Double
+memorizeParams (G00 mx my mz) pm = mem [('X', mx), ('Y', my), ('Z', mz)] pm
+memorizeParams (G01 mx my mz mf) pm = mem [('X', mx), ('Y', my), ('Z', mz), ('F', mf)] pm
+memorizeParams (G02 mx my mz mi mj mk mf) pm = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
+memorizeParams (G03 mx my mz mi mj mk mf) pm = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
 memorizeParams (M06 _) pm = pm
 memorizeParams (GCode.Base.Comment _) pm = pm
 memorizeParams M00 pm = pm
-memorizeParams (CLine mx my mz mi mj mk mf) pm = mem [("X", mx), ("Y", my), ("Z", mz), ("I", mi), ("J", mj), ("K", mk), ("F", mf)] pm
+memorizeParams (CLine mx my mz mi mj mk mf) pm = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
 
 memorizeCommand :: GCode -> String -> String
 memorizeCommand (G00 _ _ _) _ = "G00"
