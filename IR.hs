@@ -127,8 +127,6 @@ memorizeCommand s (GCode.Base.Comment _) = s
 memorizeCommand s M00 = s
 memorizeCommand s (CLine _ _ _ _ _ _ _) = s
 
--- Utiliser scanl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 memorizedCommands :: [GCode] -> [String]
 memorizedCommands = tail . scanl memorizeCommand ""
 
@@ -139,3 +137,14 @@ memorizedParams = tail . scanl memorizeParams (Map.fromList [('X', 0), ('Y', 0),
 testProgram = case parseOnly parser "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\n" of
 		Left err -> []
 		Right gcode -> gcode
+
+getParams :: Map.Map Char Double -> [Char] -> [Double]
+getParams mp = map $ f . (flip Map.lookup $ mp)
+	where
+		f (Just x) = x
+		f Nothing = error "Error in getParams. Probably due to a bug."
+
+previousPositions :: [GCode] -> [V3 Double]
+previousPositions = (V3 0 0 0 :) . init . map ( f . (flip getParams) "XYZ" ) . memorizedParams
+	where f [x, y, z] = V3 x y z
+
