@@ -10,11 +10,12 @@ Portability	: POSIX
 {-# LANGUAGE OverloadedStrings #-}
 module GCode.Parser
 (
-	parser
+	parse
 ) where
 
-import Data.Attoparsec.ByteString.Char8
+import Data.Attoparsec.ByteString.Char8 hiding (parse)
 import Control.Applicative
+import qualified Data.ByteString as B
 import Data.List
 import GCode.Base
 
@@ -98,5 +99,5 @@ pProgram :: Parser [GCode]
 pProgram = pGCode `sepBy` endOfLine
 
 -- | Parses a GCode program
-parser :: Parser [GCode]
-parser = pProgram
+parse :: B.ByteString -> Either String [GCode]
+parse = parseOnly pProgram

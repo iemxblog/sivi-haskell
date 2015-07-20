@@ -16,7 +16,6 @@ module IR.FromGCode
 import Linear
 import qualified Data.Map as Map
 import Data.List
-import Data.Attoparsec.ByteString.Char8
 import IR.Base
 import GCode
 
@@ -67,7 +66,7 @@ memorizedParams = tail . scanl memorizeParams (Map.fromList [('X', 0), ('Y', 0),
 
 -- | Example. To remove !!!!
 testProgram :: [GCode]
-testProgram = case parseOnly parser "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-1\nM06 T01" of
+testProgram = case parse "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-1\nM06 T01" of
 		Left err -> []
 		Right gcode -> gcode
 
