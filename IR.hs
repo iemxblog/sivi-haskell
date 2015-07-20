@@ -21,11 +21,14 @@ module IR
 	, memorizeParams
 	, memorizedCommands
 	, memorizeCommand
+	, previousPositions
+	, fromGCode
 ) where
 
 import Linear
 import Numeric
 import qualified Data.Map as Map
+import Data.List
 import GCode.Base
 import GCode.Parser
 import Data.Attoparsec.ByteString.Char8
@@ -133,8 +136,8 @@ memorizedCommands = tail . scanl memorizeCommand ""
 memorizedParams :: [GCode] -> [Map.Map Char Double]
 memorizedParams = tail . scanl memorizeParams (Map.fromList [('X', 0), ('Y', 0), ('Z', 0), ('I', 0), ('J', 0), ('K', 0), ('F', 0)]) 
 
---testProgram :: [GCode]
-testProgram = case parseOnly parser "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\n" of
+testProgram :: [GCode]
+testProgram = case parseOnly parser "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-1" of
 		Left err -> []
 		Right gcode -> gcode
 
@@ -148,3 +151,44 @@ previousPositions :: [GCode] -> [V3 Double]
 previousPositions = (V3 0 0 0 :) . init . map ( f . (flip getParams) "XYZ" ) . memorizedParams
 	where f [x, y, z] = V3 x y z
 
+fromGCode' :: 	GCode 			-- ^ GCode to translate to an Instruction
+		-> String 		-- ^ s : Memorized command
+		-> Map.Map Char Double	-- ^ mp : Memorized parameters
+		-> V3 Double		-- ^ pp : Previous position (used only for 'Arc')
+		-> [Tool]		-- ^ ts : List of tools
+		-> Instruction		-- ^ The resulting Instruction
+fromGCode' (G00 _ _ _) _ mp _ _ = Move (V3 x y z) Rapid
+			where
+				[x, y, z] = getParams mp "XYZ"
+fromGCode' (G01 _ _ _ _) _ mp _ _ = Move (V3 x y z) (LinearInterpolation f)
+			where
+				[x, y, z, f] = getParams mp "XYZF"
+fromGCode' (G02 _ _ _ _ _ _ _) _ mp pp _ = Move (V3 x y z) (Arc CW (pp + V3 i j k) f)
+			where
+				[x, y, z, i, j, k, f] = getParams mp "XYZIJKF"
+
+fromGCode' (G03 _ _ _ _ _ _ _) _ mp pp _ = Move (V3 x y z) (Arc CCW (pp + V3 i j k) f)
+			where
+				[x, y, z, i, j, k, f] = getParams mp "XYZIJKF"
+
+fromGCode' (M06 tn) _ mp _ ts = case find (\t -> name t == tn) ts of
+					Just t -> ChangeTool t
+					Nothing -> error $ "Tool " ++ show tn ++ " not found."
+
+fromGCode' (GCode.Base.Comment s) _ _ _ _ = IR.Comment s
+
+fromGCode' M00 _ _ _ _ = Pause
+
+fromGCode' (CLine _ _ _ _ _ _ _) mc mp pp _ = 
+	case mc of
+		"G00" -> Move (V3 x y z) Rapid
+		"G01" -> Move (V3 x y z) (LinearInterpolation f)
+		"G02" -> Move (V3 x y z) (Arc CW (pp + V3 i j k) f)
+		"G03" -> Move (V3 x y z) (Arc CCW (pp + V3 i j k) f)
+		otherwise -> error "Unknown memorized command. Probably due to a bug during GCode to IR conversion."
+	where
+		[x, y, z, i, j, k, f] = getParams mp "XYZIJKF"
+
+
+fromGCode :: [Tool] -> [GCode] -> IR
+fromGCode ts xs = [fromGCode' gi mc mp pp ts | (gi, mc, mp, pp) <- zip4 xs (memorizedCommands xs) (memorizedParams xs) (previousPositions xs)]
