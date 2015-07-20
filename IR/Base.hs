@@ -28,10 +28,12 @@ data Tool =
 type Coordinate = Double
 type FeedRate = Double
 
-data ArcDirection = CW | CCW deriving (Eq, Show)
+data ArcDirection = 	CW 	-- ^ Clockwise
+			| CCW 	-- ^ Counterclockwise
+			deriving (Eq, Show)
 
 -- | Parameters for the 'Move' data constructor.
--- A move is either a Rapid move, or a linear interpolation with a feed rate. So there is only one data constructor for moves.
+-- A move is either a Rapid move, or a linear interpolation with a feed rate, or an arc. So there is only one data constructor for moves.
 data MoveParams = Rapid 
 		| LinearInterpolation { feedRate :: FeedRate } 
 		| Arc { direction :: ArcDirection, center :: (V3 Double), feedRate :: FeedRate }
@@ -39,10 +41,10 @@ data MoveParams = Rapid
 
 -- | Intermediate Representation
 data Instruction = 
-	Move (V3 Coordinate) MoveParams
-	| ChangeTool Tool
-	| Comment String
-	| Pause
+	Move (V3 Coordinate) MoveParams		-- ^ Rapid, Linear interpolation, Arc, ... (all actions that make the tool move)
+	| ChangeTool Tool			-- ^ Tool change
+	| Comment String			-- ^ Comments
+	| Pause					-- ^ Pause (waits for user interaction, translated to a M00 GCode). In GRBL, program will stop until Cycle Start is pressed.
 	deriving (Eq, Show)
 
 -- | A program is a list of instructions in intermediate representation.
