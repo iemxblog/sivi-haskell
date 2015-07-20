@@ -32,4 +32,4 @@ backlash :: V3 Double
 backlash = V3 0.5 0.5 0.5
 
 main :: IO()
-main = putStr . unlines . map show . compile $ backlashCompensation (map (\x -> Move x Rapid) pos) initPos backlash 
+main = putStr . unlines . map show . toGCode $ backlashCompensation (map (\x -> Move x Rapid) pos) initPos backlash 
