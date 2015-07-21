@@ -43,4 +43,5 @@ rotateIR :: 	Double 		-- ^ angle : The rotation angle
 		-> IR		-- ^ The intermediate representation to rotate
 		-> IR		-- ^ The transformed intermediate representation
 rotateIR angle = applyMatrix m
-	where m = V3 (V3 (cos angle) (-sin angle) 0) (V3 (sin angle) (cos angle) 0) (V3 0 0 1)
+	where 	m = V3 (V3 (cos radians) (-sin radians) 0) (V3 (sin radians) (cos radians) 0) (V3 0 0 1)
+		radians = angle * pi / 180
