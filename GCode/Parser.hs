@@ -70,10 +70,6 @@ pG03 = do
 		[x, y, z, i, j, k, f] <- pParams ['X', 'Y', 'Z', 'I', 'J', 'K', 'F']
 		return $ G03 x y z i j k f
 
--- | Parses a M06 (tool change)
-pM06 :: Parser GCode
-pM06 = symbol "M06" >> token (char 'T' >> many1 digit) >>= \tn -> return (M06 tn)
-
 -- | Parses a comment
 pComment :: Parser GCode
 pComment = do
@@ -92,7 +88,7 @@ pCLine = do
 		return $ CLine x y z i j k f
 
 -- | Parses a GCode command
-pGCode = pG00 <|> pG01 <|> pG02 <|> pG03 <|> pM06 <|> pComment <|> pM00 <|> pCLine
+pGCode = pG00 <|> pG01 <|> pG02 <|> pG03 <|> pComment <|> pM00 <|> pCLine
 
 -- | Parses a GCode program (list of commands)
 pProgram :: Parser [GCode]

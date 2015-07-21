@@ -36,7 +36,6 @@ memorizeParams pm (G00 mx my mz) = mem [('X', mx), ('Y', my), ('Z', mz)] pm
 memorizeParams pm (G01 mx my mz mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('F', mf)] pm
 memorizeParams pm (G02 mx my mz mi mj mk mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
 memorizeParams pm (G03 mx my mz mi mj mk mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
-memorizeParams pm (M06 _) = pm
 memorizeParams pm (GCode.Comment _) = pm
 memorizeParams pm M00 = pm
 memorizeParams pm (CLine mx my mz mi mj mk mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
@@ -49,7 +48,6 @@ memorizeCommand _ (G00 _ _ _) = "G00"
 memorizeCommand _ (G01 _ _ _ _) = "G01"
 memorizeCommand _ (G02 _ _ _ _ _ _ _) = "G02"
 memorizeCommand _ (G03 _ _ _ _ _ _ _) = "G03"
-memorizeCommand s (M06 _) = s
 memorizeCommand s (GCode.Comment _) = s
 memorizeCommand s M00 = s
 memorizeCommand s (CLine _ _ _ _ _ _ _) = s
@@ -90,31 +88,26 @@ fromGCode' :: 	GCode 			-- ^ GCode to translate to an Instruction
 		-> String 		-- ^ s : Memorized command
 		-> Map.Map Char Double	-- ^ mp : Memorized parameters
 		-> V3 Double		-- ^ pp : Previous position (used only for 'Arc')
-		-> [Tool]		-- ^ ts : List of tools
 		-> Instruction		-- ^ The resulting Instruction
-fromGCode' (G00 _ _ _) _ mp _ _ = Move (V3 x y z) Rapid
+fromGCode' (G00 _ _ _) _ mp _ = Move (V3 x y z) Rapid
 			where
 				[x, y, z] = getParams mp "XYZ"
-fromGCode' (G01 _ _ _ _) _ mp _ _ = Move (V3 x y z) (LinearInterpolation f)
+fromGCode' (G01 _ _ _ _) _ mp _ = Move (V3 x y z) (LinearInterpolation f)
 			where
 				[x, y, z, f] = getParams mp "XYZF"
-fromGCode' (G02 _ _ _ _ _ _ _) _ mp pp _ = Move (V3 x y z) (Arc CW (pp + V3 i j k) f)
+fromGCode' (G02 _ _ _ _ _ _ _) _ mp pp = Move (V3 x y z) (Arc CW (pp + V3 i j k) f)
 			where
 				[x, y, z, i, j, k, f] = getParams mp "XYZIJKF"
 
-fromGCode' (G03 _ _ _ _ _ _ _) _ mp pp _ = Move (V3 x y z) (Arc CCW (pp + V3 i j k) f)
+fromGCode' (G03 _ _ _ _ _ _ _) _ mp pp = Move (V3 x y z) (Arc CCW (pp + V3 i j k) f)
 			where
 				[x, y, z, i, j, k, f] = getParams mp "XYZIJKF"
 
-fromGCode' (M06 tn) _ mp _ ts = case find (\t -> name t == tn) ts of
-					Just t -> ChangeTool t
-					Nothing -> error $ "Tool " ++ show tn ++ " not found."
+fromGCode' (GCode.Comment s) _ _ _ = IR.Base.Comment s
 
-fromGCode' (GCode.Comment s) _ _ _ _ = IR.Base.Comment s
+fromGCode' M00 _ _ _ = Pause
 
-fromGCode' M00 _ _ _ _ = Pause
-
-fromGCode' (CLine _ _ _ _ _ _ _) mc mp pp _ = 
+fromGCode' (CLine _ _ _ _ _ _ _) mc mp pp = 
 	case mc of
 		"G00" -> Move (V3 x y z) Rapid
 		"G01" -> Move (V3 x y z) (LinearInterpolation f)
@@ -125,7 +118,6 @@ fromGCode' (CLine _ _ _ _ _ _ _) mc mp pp _ =
 		[x, y, z, i, j, k, f] = getParams mp "XYZIJKF"
 
 -- | Translates GCode to 'IR' (Intermediate Representation)
-fromGCode :: 	[Tool]		-- ^ The list of tools used in the program 
-		-> [GCode]	-- ^ The GCode program
+fromGCode :: 	[GCode]	-- ^ The GCode program
 		 -> IR		-- ^ The resulting intermediate representation.
-fromGCode ts xs = [fromGCode' gi mc mp pp ts | (gi, mc, mp, pp) <- zip4 xs (memorizedCommands xs) (memorizedParams xs) (previousPositions xs)]
+fromGCode xs = [fromGCode' gi mc mp pp | (gi, mc, mp, pp) <- zip4 xs (memorizedCommands xs) (memorizedParams xs) (previousPositions xs)]

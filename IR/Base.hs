@@ -42,7 +42,6 @@ data MoveParams = Rapid
 -- | Intermediate Representation
 data Instruction = 
 	Move (V3 Coordinate) MoveParams		-- ^ Rapid, Linear interpolation, Arc, ... (all actions that make the tool move)
-	| ChangeTool Tool			-- ^ Tool change
 	| Comment String			-- ^ Comments
 	| Pause					-- ^ Pause (waits for user interaction, translated to a M00 GCode). In GRBL, program will stop until Cycle Start is pressed.
 	deriving (Eq, Show)
@@ -53,8 +52,7 @@ type IR = [Instruction]
 
 example :: IR
 example = [
-	ChangeTool (EndMill "01" 3 42)
-	, Move (V3 1 0 0) Rapid
+	Move (V3 1 0 0) Rapid
 	, Move (V3 2 2 0) (LinearInterpolation 100)
 	, Move (V3 2 0 0) (Arc CW (V3 1 1 0) 100)
 	, Pause

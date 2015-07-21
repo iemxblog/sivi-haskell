@@ -33,7 +33,6 @@ toGCode' ((Move (V3 x y z) (Arc dir center f)) : xs) cp = g dir (Just x) (Just y
 								g CCW = G03
 								V3 i j k = center - cp
 								notZero v = if v /= 0 then Just v else Nothing
-toGCode' ((ChangeTool t) : xs) cp = M06 (name t) : toGCode' xs cp
 toGCode' ((IR.Base.Comment s) : xs) cp = GCode.Comment s : toGCode' xs cp
 toGCode' (Pause : xs) cp = M00 : toGCode' xs cp
 

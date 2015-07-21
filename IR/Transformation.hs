@@ -28,7 +28,6 @@ applyMatrix' :: M33 Double		-- ^ m : The transformation matrix
 		-> Instruction		-- ^ p : The program in Intermediate Representation
 		-> Instruction		-- ^ The resulting Intermediate Representationg
 applyMatrix' m (Move dst mp) = Move (m !* dst) (applyMatrixMP m  mp)
-applyMatrix' m (ChangeTool t) = ChangeTool t 
 applyMatrix' m (Comment s) = Comment s
 applyMatrix' m Pause = Pause
 
