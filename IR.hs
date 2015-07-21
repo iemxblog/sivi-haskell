@@ -12,10 +12,12 @@ module IR
 	module IR.Base
 	, module IR.ToGCode
 	, module IR.FromGCode
+	, module IR.Transformation
 ) where
 
 import IR.Base
 import IR.ToGCode
 import IR.FromGCode
+import IR.Transformation
 
 
