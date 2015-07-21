@@ -10,6 +10,7 @@ Portability	: POSIX
 module IR.ToGCode
 (
 	toGCode
+	, toString
 ) where
 
 import Linear
@@ -36,9 +37,12 @@ toGCode' ((ChangeTool t) : xs) cp = M06 (name t) : toGCode' xs cp
 toGCode' ((IR.Base.Comment s) : xs) cp = GCode.Comment s : toGCode' xs cp
 toGCode' (Pause : xs) cp = M00 : toGCode' xs cp
 
--- | Compiles intermediate representation to G-CODE
+-- | Compiles intermediate representation to 'GCode'
 toGCode :: IR 		-- ^ The program in intermediate representation
 	 -> [GCode] 	-- ^ The generated G-Code
 toGCode p = toGCode' p (V3 0 0 0)
 
-
+-- | Compiles 'IR' (intermediate representation) to a GCode string
+toString :: 	IR 		-- ^ The program in intermediate representation
+		-> String	-- ^ The string containing GCode instructions
+toString = unlines . map show . toGCode
