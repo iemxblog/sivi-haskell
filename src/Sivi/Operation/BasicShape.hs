@@ -1,5 +1,5 @@
 {-|
-Module		: Operation.BasicShape
+Module		: Sivi.Operation.BasicShape
 Description	: Basic shapes like circle, rectangle, square, ...
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,7 +7,7 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module Operation.BasicShape (
+module Sivi.Operation.BasicShape (
 	circle
 	, circleFromHere
 	, rectangle
@@ -17,8 +17,8 @@ module Operation.BasicShape (
 )
 where
 
-import IR
-import Operation.Base
+import Sivi.IR
+import Sivi.Operation.Base
 import Linear
 
 -- | Circle (does not cut the inside of the circle, but just the contour).

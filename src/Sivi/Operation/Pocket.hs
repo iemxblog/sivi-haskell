@@ -1,5 +1,5 @@
 {-|
-Module		: Operation.pocket
+Module		: Sivi.Operation.pocket
 Description	: Pocketing operations (circular pocket, rectangular pocket, ...)
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,15 +7,15 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module Operation.Pocket (
+module Sivi.Operation.Pocket (
 	circularPocket
 	, rectangularPocket
 )
 where
 
-import Operation.Base
-import Operation.BasicShape
-import IR
+import Sivi.Operation.Base
+import Sivi.Operation.BasicShape
+import Sivi.IR
 import Linear
 
 -- | Generates an archimedean spiral. (used in 'circularPocket')

@@ -1,5 +1,5 @@
 {-|
-Module		: Operation.Contour
+Module		: Sivi.Operation.Contour
 Description	: Contour operation
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,15 +7,15 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module Operation.Contour (
+module Sivi.Operation.Contour (
 	Side(..)
 	, contour
 )
 where
 
 import Linear
-import Operation.Base
-import IR
+import Sivi.Operation.Base
+import Sivi.IR
 
 data Side = LeftSide | RightSide
 

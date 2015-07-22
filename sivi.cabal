@@ -16,13 +16,21 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
-executable sivi
-  main-is:             Main.hs
-  -- other-modules:       
-  other-extensions:    OverloadedStrings
+Library
   build-depends:       base >=4.7 && <4.8, linear >=1.18 && <1.19, containers >=0.5 && <0.6, attoparsec >=0.12 && <0.13, mtl >=2.2 && <2.3, bytestring >=0.10.4 && < 0.10.5
+  Exposed-modules:     Sivi
+  other-extensions:    OverloadedStrings
+  ghc-options:         -Wall
   hs-source-dirs:      src 
   default-language:    Haskell2010
+
+--executable sivi
+--  main-is:             Main.hs
+--  -- other-modules:       
+--  other-extensions:    OverloadedStrings
+--  build-depends:       base >=4.7 && <4.8, linear >=1.18 && <1.19, containers >=0.5 && <0.6, attoparsec >=0.12 && <0.13, mtl >=2.2 && <2.3, bytestring >=0.10.4 && < 0.10.5
+--  hs-source-dirs:      src 
+--  default-language:    Haskell2010
 
 executable sivi-rotate
   main-is:             sivi-rotate.hs
@@ -38,6 +46,7 @@ test-suite tests
    type: exitcode-stdio-1.0
    main-is: Spec.hs
    build-depends:       base,
-                        hspec                >=2.1.8 && <2.1.9
+                        hspec                >=2.1.8 && <2.1.9,
+                        sivi
    hs-source-dirs:      tests
    default-language:    Haskell2010

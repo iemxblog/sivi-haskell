@@ -1,4 +1,4 @@
-module Main (
+module Sivi.Main (
 	main
 ) where
 

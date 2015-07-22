@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-|
-Module		: IR.FromGCode
+Module		: Sivi.IR.FromGCode
 Description	: Conversion of GCode to IR
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -8,7 +8,7 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module IR.FromGCode
+module Sivi.IR.FromGCode
 (
 	fromGCode	
 ) where
@@ -16,8 +16,8 @@ module IR.FromGCode
 import Linear
 import qualified Data.Map as Map
 import Data.List
-import IR.Base
-import GCode
+import Sivi.IR.Base
+import Sivi.GCode
 
 -- | Takes a Map a (Maybe b), removes 'Nothing' values, and removes the 'Just' data constructor.
 filterNothing :: Eq b => Map.Map a (Maybe b) -> Map.Map a b
@@ -36,7 +36,7 @@ memorizeParams pm (G00 mx my mz) = mem [('X', mx), ('Y', my), ('Z', mz)] pm
 memorizeParams pm (G01 mx my mz mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('F', mf)] pm
 memorizeParams pm (G02 mx my mz mi mj mk mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
 memorizeParams pm (G03 mx my mz mi mj mk mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
-memorizeParams pm (GCode.Comment _) = pm
+memorizeParams pm (Sivi.GCode.GComment _) = pm
 memorizeParams pm M00 = pm
 memorizeParams pm (CLine mx my mz mi mj mk mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
 
@@ -48,7 +48,7 @@ memorizeCommand _ (G00 _ _ _) = "G00"
 memorizeCommand _ (G01 _ _ _ _) = "G01"
 memorizeCommand _ (G02 _ _ _ _ _ _ _) = "G02"
 memorizeCommand _ (G03 _ _ _ _ _ _ _) = "G03"
-memorizeCommand s (GCode.Comment _) = s
+memorizeCommand s (Sivi.GCode.GComment _) = s
 memorizeCommand s M00 = s
 memorizeCommand s (CLine _ _ _ _ _ _ _) = s
 
@@ -103,7 +103,7 @@ fromGCode' (G03 _ _ _ _ _ _ _) _ mp pp = Move (V3 x y z) (Arc CCW (pp + V3 i j k
 			where
 				[x, y, z, i, j, k, f] = getParams mp "XYZIJKF"
 
-fromGCode' (GCode.Comment s) _ _ _ = IR.Base.Comment s
+fromGCode' (Sivi.GCode.GComment s) _ _ _ = Sivi.IR.Base.Comment s
 
 fromGCode' M00 _ _ _ = Pause
 

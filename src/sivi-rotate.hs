@@ -1,5 +1,5 @@
-import IR
-import GCode
+import Sivi.IR
+import Sivi.GCode
 import qualified Data.ByteString as B
 
 main :: IO ()

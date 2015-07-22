@@ -1,5 +1,5 @@
 {-|
-Module		: GCode.Parser
+Module		: Sivi.GCode.Parser
 Description	: GCode parser
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -8,7 +8,7 @@ Stability	: experimental
 Portability	: POSIX
 -}
 {-# LANGUAGE OverloadedStrings #-}
-module GCode.Parser
+module Sivi.GCode.Parser
 (
 	parse
 ) where
@@ -17,7 +17,7 @@ import Data.Attoparsec.ByteString.Char8 hiding (parse)
 import Control.Applicative
 import qualified Data.ByteString as B
 import Data.List
-import GCode.Base
+import Sivi.GCode.Base
 
 -- | Parses a GCode word
 word :: Char 				-- ^ wn : The name of the word
@@ -76,7 +76,7 @@ pComment = do
 		symbol "(" 
 		c <- many (satisfy (/=')')) 
 		symbol ")"
-		return $ Comment (dropWhileEnd isSpace c)
+		return $ GComment (dropWhileEnd isSpace c)
 
 -- | Parses a M00 (pause)
 pM00 :: Parser GCode

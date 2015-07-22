@@ -1,5 +1,5 @@
 {-|
-Module		: IR.Transformation
+Module		: Sivi.IR.Transformation
 Description	: Transformations (rotations, etc) of intermediate representation
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,13 +7,13 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module IR.Transformation
+module Sivi.IR.Transformation
 (
 	rotateIR
 ) where
 
 import Linear
-import IR.Base
+import Sivi.IR.Base
 
 -- | Applies a matrix transformation to move parameters.
 applyMatrixMP :: M33 Double 	-- ^ m : The transformation matrix

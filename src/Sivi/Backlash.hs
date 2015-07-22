@@ -1,5 +1,5 @@
 {-|
-Module		: Backlash
+Module		: Sivi.Backlash
 Description	: Modifies a program to compensate the backlash of the machine
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,14 +7,14 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module Backlash
+module Sivi.Backlash
 (
 	backlashCompensation
 ) where
 
 import Linear
 import Data.List
-import IR
+import Sivi.IR
 
 diff :: Num a => [a] -> [a]
 diff xs = [b-a | (a,b) <- zip xs (tail xs)]

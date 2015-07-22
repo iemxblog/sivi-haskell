@@ -1,5 +1,5 @@
 {-|
-Module		: Operation.Misc
+Module		: Sivi.Operation.Misc
 Description	: Miscellaneous operations (saw, drill, ...)
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -8,14 +8,14 @@ Stability	: experimental
 Portability	: POSIX
 -}
 
-module Operation.Misc (
+module Sivi.Operation.Misc (
 	saw_left
 	, drill
 )
 where
-import IR
+import Sivi.IR
 import Linear
-import Operation.Base
+import Sivi.Operation.Base
 
 saw_left :: Double
 	-> Operation IR

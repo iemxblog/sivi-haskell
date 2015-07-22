@@ -1,5 +1,5 @@
 {-|
-Module		: IR.Base
+Module		: Sivi.IR.Base
 Description	: IR Datatype declaration
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,7 +7,7 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module IR.Base
+module Sivi.IR.Base
 (
 	Tool(..)
 	, ArcDirection(..)
@@ -57,7 +57,7 @@ example = [
 	, Move (V3 2 0 0) (Arc CW (V3 1 1 0) 100)
 	, Pause
 	, Move (V3 0 0 0) Rapid,
-	IR.Base.Comment "Commentaire"
+	Sivi.IR.Base.Comment "Commentaire"
 	]
 
 

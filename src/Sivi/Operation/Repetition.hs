@@ -1,5 +1,5 @@
 {-|
-Module		: Operation.Repetition
+Module		: Sivi.Operation.Repetition
 Description	: Operations that repeat other operations
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,15 +7,15 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module Operation.Repetition (
+module Sivi.Operation.Repetition (
 	circularRepetition
 	, gridRepetition
 	, zRepetition
 	, zRange 
 ) where
 
-import Operation.Base
-import IR
+import Sivi.Operation.Base
+import Sivi.IR
 import Linear
 
 -- | Chains two operations, and adds a tool rectraction before each operation

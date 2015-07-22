@@ -1,5 +1,5 @@
 {-|
-Module		: Operation.Base
+Module		: Sivi.Operation.Base
 Description	: Base operations
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -8,7 +8,7 @@ Stability	: experimental
 Portability	: POSIX
 -}
 
-module Operation.Base (
+module Sivi.Operation.Base (
 	Operation
 	, getOrigin
 	, getFeedRate
@@ -33,7 +33,7 @@ module Operation.Base (
 )
 where
 
-import IR
+import Sivi.IR
 import Linear
 import Control.Monad.State
 import Control.Monad.Reader

@@ -1,9 +1,9 @@
-module BacklashSpec (
+module Sivi.BacklashSpec (
 	main
 ) where
 
 import Test.Hspec
-import Backlash
+import Sivi.Backlash
 
 main :: IO ()
 main = hspec $ do

@@ -1,5 +1,5 @@
 {-|
-Module		: IR.ToGCode
+Module		: Sivi.IR.ToGCode
 Description	: Conversion of IR to GCode
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,7 +7,7 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module IR.ToGCode
+module Sivi.IR.ToGCode
 (
 	toGCode
 	, toString
@@ -15,8 +15,8 @@ module IR.ToGCode
 
 import Linear
 import Numeric
-import IR.Base
-import GCode 
+import Sivi.IR.Base
+import Sivi.GCode 
 
 showDouble :: Double -> String
 showDouble d = showFFloat (Just 3) d ""
@@ -33,7 +33,7 @@ toGCode' ((Move (V3 x y z) (Arc dir center f)) : xs) cp = g dir (Just x) (Just y
 								g CCW = G03
 								V3 i j k = center - cp
 								notZero v = if v /= 0 then Just v else Nothing
-toGCode' ((IR.Base.Comment s) : xs) cp = GCode.Comment s : toGCode' xs cp
+toGCode' ((Sivi.IR.Base.Comment s) : xs) cp = Sivi.GCode.GComment s : toGCode' xs cp
 toGCode' (Pause : xs) cp = M00 : toGCode' xs cp
 
 -- | Compiles intermediate representation to 'GCode'
