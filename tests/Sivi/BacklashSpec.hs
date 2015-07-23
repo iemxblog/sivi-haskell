@@ -1,12 +1,10 @@
 module Sivi.BacklashSpec (
-	main
+	spec	
 ) where
 
 import Test.Hspec
 import Sivi.Backlash
 
-main :: IO ()
-main = hspec $ do
-	describe "Backlash" $ do
+spec = describe "Backlash" $ do
 		it "pouf" $ do
 			True `shouldBe` False	
