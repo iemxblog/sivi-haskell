@@ -123,7 +123,7 @@ arc :: ArcDirection 		-- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
 arc dir center dst = do
 			or <- getOrigin
 			fr <- getFeedRate
-			move (or+dst) (Arc { direction=dir, center=(or+center), feedRate=fr})	
+			move (or+dst) Arc { direction=dir, center=or+center, feedRate=fr}
 
 -- | Linear interpolation (with the plunge feedrate)
 plunge :: V3 Double		-- ^ dst : Destination
@@ -159,7 +159,7 @@ approach dst = rapid_xy dst +++ plunge dst
 translate :: V3 Double		-- ^ v : Translation vector
 	-> Operation IR		-- ^ o : Operation to translate
 	-> Operation IR		-- Resulting operation
-translate v o =	local (\(or, fr, pr, tool)->(or+v, fr, pr, tool)) o
+translate v = local (\(or, fr, pr, tool)->(or+v, fr, pr, tool))
 
 -- | Chain two operations (without tool retraction between operations)
 (+++) :: Operation IR	-- ^ o1 : Operation 1

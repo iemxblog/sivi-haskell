@@ -26,7 +26,7 @@ filterNothing = Map.map f . Map.filter (/= Nothing)
 
 -- | Helper function for 'memorizeParams'
 mem :: (Ord a, Eq b) => [(a, Maybe b)] -> Map.Map a b -> Map.Map a b
-mem xs pm = Map.union (filterNothing . Map.fromList $ xs) pm 
+mem xs = Map.union (filterNothing . Map.fromList $ xs)
 
 -- | Helper function for 'memorizedParams'
 memorizeParams :: Map.Map Char Double	-- ^ The parameters of the previous instruction
@@ -72,7 +72,7 @@ testProgram = case parse "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-
 getParams :: 	Map.Map Char Double	-- ^ mp : Parameter names and their values stored in a Map
 		-> [Char] 		-- ^ Names of the parameters we want to get
 		-> [Double]		-- ^ Values of the parameters we want to get, in the order of the names given as parameter
-getParams mp = map $ f . (flip Map.lookup $ mp)
+getParams mp = map $ f . (flip Map.lookup mp)
 	where
 		f (Just x) = x
 		f Nothing = error "Error in getParams. Probably due to a bug."
@@ -80,7 +80,7 @@ getParams mp = map $ f . (flip Map.lookup $ mp)
 -- | Calculates the previous position of the tool for each line of the program.
 previousPositions :: 	[GCode] 	-- ^ The GCode program
 			-> [V3 Double]	-- ^ The previous positions of the tool
-previousPositions = (V3 0 0 0 :) . init . map ( f . (flip getParams) "XYZ" ) . memorizedParams
+previousPositions = (V3 0 0 0 :) . init . map ( f . flip getParams "XYZ" ) . memorizedParams
 	where f [x, y, z] = V3 x y z
 
 -- | Helper function for 'fromGCode'. Translates a single GCode instruction to an IR 'Instruction'.

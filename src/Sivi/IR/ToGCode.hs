@@ -26,9 +26,9 @@ toGCode' :: IR		-- ^ The program to compile
 	-> V3 Double 	-- ^ The current position of the tool (needed for arcs, because i j k are relative to current position)
 	-> [GCode]	-- ^ The resulting 'GCode'
 toGCode' [] cp = []
-toGCode' ((Move (V3 x y z) Rapid) : xs) cp = G00 (Just x) (Just y) (Just z) : toGCode' xs (V3 x y z)
-toGCode' ((Move (V3 x y z) (LinearInterpolation f)) : xs) cp = G01 (Just x) (Just y) (Just z) (Just f) : toGCode' xs (V3 x y z)
-toGCode' ((Move (V3 x y z) (Arc dir center f)) : xs) cp = g dir (Just x) (Just y) (Just z) (notZero i) (notZero j) (notZero k) (Just f) : toGCode' xs (V3 x y z)
+toGCode' (Move (V3 x y z) Rapid : xs) cp = G00 (Just x) (Just y) (Just z) : toGCode' xs (V3 x y z)
+toGCode' (Move (V3 x y z) (LinearInterpolation f) : xs) cp = G01 (Just x) (Just y) (Just z) (Just f) : toGCode' xs (V3 x y z)
+toGCode' (Move (V3 x y z) (Arc dir center f) : xs) cp = g dir (Just x) (Just y) (Just z) (notZero i) (notZero j) (notZero k) (Just f) : toGCode' xs (V3 x y z)
 							where 	g CW = G02
 								g CCW = G03
 								V3 i j k = center - cp

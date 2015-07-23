@@ -40,34 +40,34 @@ symbol xs = token (string xs)
 -- | Parses parameters of a GCode command
 pParams :: [Char] 			-- ^ List of parameter names
 	-> Parser [Maybe Double]	-- ^ Resulting parser
-pParams = sequence . map (\c -> token $ word c) 
+pParams = mapM (token . word) 
 
 -- | Parses a G00 (rapid move)
 pG00 :: Parser GCode
 pG00 = do 
 		symbol "G00"
-		[x, y, z] <- pParams ['X', 'Y', 'Z']
+		[x, y, z] <- pParams "XYZ"
 		return $ G00 x y z
 
 -- | Parses a G01 (linear interpolation)
 pG01 :: Parser GCode
 pG01 = do
 		symbol "G01"
-		[x, y, z, f] <- pParams ['X', 'Y', 'Z', 'F']
+		[x, y, z, f] <- pParams "XYZF"
 		return $ G01 x y z f
 
 -- | Parses a G02 (clockwise circular interpolation)
 pG02 :: Parser GCode
 pG02 = do
 		symbol "G02"
-		[x, y, z, i, j, k, f] <- pParams ['X', 'Y', 'Z', 'I', 'J', 'K', 'F']
+		[x, y, z, i, j, k, f] <- pParams "XYZIJKF"
 		return $ G02 x y z i j k f
 
 -- | Parses a G03 (counter-clockwise circular interpolation)
 pG03 :: Parser GCode
 pG03 = do
 		symbol "G03"
-		[x, y, z, i, j, k, f] <- pParams ['X', 'Y', 'Z', 'I', 'J', 'K', 'F']
+		[x, y, z, i, j, k, f] <- pParams "XYZIJKF"
 		return $ G03 x y z i j k f
 
 -- | Parses a comment
@@ -84,7 +84,7 @@ pM00 = symbol "M00" >> return M00
 
 -- | Parses a line with only parameters, and no command
 pCLine = do
-		[x, y, z, i, j, k, f] <- pParams ['X', 'Y', 'Z', 'I', 'J', 'K', 'F']
+		[x, y, z, i, j, k, f] <- pParams "XYZIJKF"
 		return $ CLine x y z i j k f
 
 -- | Parses a GCode command

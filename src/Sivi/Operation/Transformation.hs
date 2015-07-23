@@ -19,4 +19,4 @@ import Sivi.Operation.Base
 rotate :: Double			-- ^ angle : The rotation angle
 	-> Operation IR			-- ^ op : The operation to rotate
 	-> Operation IR			-- ^ The transformed operation
-rotate angle op = op >>= (\ir -> return $ rotateIR angle ir)
+rotate angle op = op >>= (return . rotateIR angle)

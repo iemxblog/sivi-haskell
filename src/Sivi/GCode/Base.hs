@@ -38,16 +38,16 @@ gword w Nothing = ""
 compileParams :: [Char] 		-- ^ List of parameter names
 		-> [Maybe Double] 	-- ^ List of parameter values
 		-> String		-- ^ Compiled parameters
-compileParams pn pv = unwords . filter (/= "") $ (zipWith gword pn pv)
+compileParams pn pv = unwords . filter (/= "") $ zipWith gword pn pv
 
 instance Show GCode where
-	show (G00 mx my mz) = "G00 " ++ compileParams ['X', 'Y', 'Z'] [mx, my, mz]
-	show (G01 mx my mz mf) = "G01 " ++ compileParams ['X', 'Y', 'Z', 'F'] [mx, my, mz, mf]
-	show (G02 mx my mz mi mj mk mf) = "G02 " ++ compileParams ['X', 'Y', 'Z', 'I', 'J', 'K', 'F'] [mx, my, mz, mi, mj, mk, mf]
-	show (G03 mx my mz mi mj mk mf) = "G03 " ++ compileParams ['X', 'Y', 'Z', 'I', 'J', 'K', 'F'] [mx, my, mz, mi, mj, mk, mf]
+	show (G00 mx my mz) = "G00 " ++ compileParams "XYZ" [mx, my, mz]
+	show (G01 mx my mz mf) = "G01 " ++ compileParams "XYZF" [mx, my, mz, mf]
+	show (G02 mx my mz mi mj mk mf) = "G02 " ++ compileParams "XYZIJKF" [mx, my, mz, mi, mj, mk, mf]
+	show (G03 mx my mz mi mj mk mf) = "G03 " ++ compileParams "XYZIJKF" [mx, my, mz, mi, mj, mk, mf]
 	show (GComment c) = "( " ++ c ++ " )"
 	show M00 = "M00"
-	show (CLine mx my mz mi mj mk mf) = compileParams ['X', 'Y', 'Z', 'I', 'J', 'K', 'F'] [mx, my, mz, mi, mj, mk, mf]
+	show (CLine mx my mz mi mj mk mf) = compileParams "XYZIJKF" [mx, my, mz, mi, mj, mk, mf]
 
 
 example :: [GCode]

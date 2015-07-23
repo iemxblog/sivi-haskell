@@ -36,7 +36,7 @@ data ArcDirection = 	CW 	-- ^ Clockwise
 -- A move is either a Rapid move, or a linear interpolation with a feed rate, or an arc. So there is only one data constructor for moves.
 data MoveParams = Rapid 
 		| LinearInterpolation { feedRate :: FeedRate } 
-		| Arc { direction :: ArcDirection, center :: (V3 Double), feedRate :: FeedRate }
+		| Arc { direction :: ArcDirection, center :: V3 Double, feedRate :: FeedRate }
 		deriving (Eq, Show)
 
 -- | Intermediate Representation

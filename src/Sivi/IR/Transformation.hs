@@ -19,8 +19,8 @@ import Sivi.IR.Base
 applyMatrixMP :: M33 Double 	-- ^ m : The transformation matrix
 		-> MoveParams	-- ^ The move parameters
 		-> MoveParams	-- ^ The transformed move parameters
-applyMatrixMP m Rapid = Rapid
-applyMatrixMP m (LinearInterpolation f) = LinearInterpolation f
+applyMatrixMP _ Rapid = Rapid
+applyMatrixMP _ (LinearInterpolation f) = LinearInterpolation f
 applyMatrixMP m (Arc dir center f) = Arc dir (m !* center) f
 
 -- | This function applies a matrix transformation to an instruction (of Intermediate Representation)
@@ -28,8 +28,8 @@ applyMatrix' :: M33 Double		-- ^ m : The transformation matrix
 		-> Instruction		-- ^ p : The program in Intermediate Representation
 		-> Instruction		-- ^ The resulting Intermediate Representationg
 applyMatrix' m (Move dst mp) = Move (m !* dst) (applyMatrixMP m  mp)
-applyMatrix' m (Comment s) = Comment s
-applyMatrix' m Pause = Pause
+applyMatrix' _ (Comment s) = Comment s
+applyMatrix' _ Pause = Pause
 
 -- | Applies a matrix transformation to an Intermediate Representation of a program.
 applyMatrix :: V3 (V3 Double)		-- ^ The transformation matrix

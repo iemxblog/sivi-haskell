@@ -57,7 +57,7 @@ spec = describe "backlashCompensation" $ do
 		let fRapid = map (\x -> Move x Rapid)
 		let fLinearInterpolation = map (\x -> Move x (LinearInterpolation 100))
 		it "compensates backlash for rapid moves" $ do
-			backlashCompensation (fRapid pos) initPos backlash  `shouldBe` (fRapid $ initPos ++ expectedPos)
+			backlashCompensation (fRapid pos) initPos backlash  `shouldBe` fRapid (initPos ++ expectedPos)
 
 		it "compensates backlash for linear interpolations" $ do
 			backlashCompensation (fLinearInterpolation pos) initPos backlash  `shouldBe` (fRapid initPos ++ fLinearInterpolation expectedPos)

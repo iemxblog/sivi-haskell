@@ -30,7 +30,7 @@ archimedeanSpiral d step_over =
 		let angle = [i * pi / 180 | i <- [0..]] -- angle = [1 degree, 2 degrees, ...]
 		let radius = takeWhile (\r -> r+df/2 < d/2) [a * (df - step_over) / (2 * pi) | a <- angle]
 		let lastPoint = ((d-df)/2, pi*(d-df)/(df-step_over))  -- So at the end we are at the exact radius (d-df)/2
-		sp <- opsequence [feed (V3 (r*cos(a)) (r*sin(a)) 0) | (r, a) <- zip radius angle ++ [lastPoint]]
+		sp <- opsequence [feed (V3 (r*cos a) (r*sin a) 0) | (r, a) <- zip radius angle ++ [lastPoint]]
 		return (a ++ sp)
 
 -- | Generates a circular pocket.

@@ -33,7 +33,7 @@ circleFromHere = do
 			or <- getOrigin
 			fr <- getFeedRate
 			cp <- getCurrentPosition
-			move cp (Arc { direction = CCW, center=or, feedRate = fr })
+			move cp Arc { direction = CCW, center=or, feedRate = fr }
 
 -- | Rectangle (does not cut the inside of the rectangle, but just the contour).
 -- The origin is the bottom left corner.

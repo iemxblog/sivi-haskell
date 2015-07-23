@@ -45,7 +45,7 @@ offset d side cycle path = newPath
 			True -> zip path (tail path ++ [head path])
 			False -> zip path (tail path)
 		vectors = [b-a | (a, b) <- lines]
-		offsets = [ d *^ (perpNorm v side)| v <- vectors]
+		offsets = [ d *^ perpNorm v side | v <- vectors]
 		newLines = [ (p1+o, p2+o) | ((p1, p2), o) <- zip lines offsets]
 		couples = case cycle of
 			True -> zip newLines (tail newLines ++ [head newLines])
@@ -80,7 +80,7 @@ perpNorm v side = case side of
 			LeftSide -> o
 			RightSide -> -o
 		where
-			o = (perp v) ^/ (norm v)
+			o = perp v ^/ norm v
 
 -- | Transforms a (V2 a) into a (V3 a), by appending a 0 for the Z axis.
 v2tov3 :: Num a => V2 a 
