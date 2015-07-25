@@ -82,13 +82,26 @@ pComment = do
 pM00 :: Parser GCode
 pM00 = symbol "M00" >> return M00
 
+-- | Parses a G38.2 (probe)
+pG38d2 :: Parser GCode
+pG38d2 = do
+		symbol "G38.2"
+		[x, y, z, f] <- pParams "XYZF"
+		return $ G38d2 x y z f
+
+pG92 :: Parser GCode
+pG92 = do
+		symbol "G92"
+		[x, y, z] <- pParams "XYZ"
+		return $ G92 x y z
+
 -- | Parses a line with only parameters, and no command
 pCLine = do
 		[x, y, z, i, j, k, f] <- pParams "XYZIJKF"
 		return $ CLine x y z i j k f
 
 -- | Parses a GCode command
-pGCode = pG00 <|> pG01 <|> pG02 <|> pG03 <|> pComment <|> pM00 <|> pCLine
+pGCode = pG00 <|> pG01 <|> pG02 <|> pG03 <|> pComment <|> pM00 <|> pG38d2 <|> pG92 <|> pCLine 
 
 -- | Parses a GCode program (list of commands)
 pProgram :: Parser [GCode]

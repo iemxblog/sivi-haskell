@@ -11,6 +11,7 @@ Portability	: POSIX
 module Sivi.IR.FromGCode
 (
 	fromGCode	
+	, testProgram
 ) where
 
 import Linear
@@ -38,6 +39,8 @@ memorizeParams pm (G02 mx my mz mi mj mk mf) = mem [('X', mx), ('Y', my), ('Z', 
 memorizeParams pm (G03 mx my mz mi mj mk mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
 memorizeParams pm (Sivi.GCode.GComment _) = pm
 memorizeParams pm M00 = pm
+memorizeParams pm (G38d2 mx my mz mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('F', mf)] pm
+memorizeParams pm (G92 mx my mz) = mem [('X', mx), ('Y', my), ('Z', mz)] pm	-- particular case : we memorize the params, but not the command
 memorizeParams pm (CLine mx my mz mi mj mk mf) = mem [('X', mx), ('Y', my), ('Z', mz), ('I', mi), ('J', mj), ('K', mk), ('F', mf)] pm
 
 -- | Helper fuunction for 'memorizedCommands'
@@ -50,6 +53,8 @@ memorizeCommand _ (G02 _ _ _ _ _ _ _) = "G02"
 memorizeCommand _ (G03 _ _ _ _ _ _ _) = "G03"
 memorizeCommand s (Sivi.GCode.GComment _) = s
 memorizeCommand s M00 = s
+memorizeCommand _ (G38d2 _ _ _ _) = "G38.2"
+memorizeCommand s (G92 _ _ _) = s		-- particular case : we memorize the params, but not the command
 memorizeCommand s (CLine _ _ _ _ _ _ _) = s
 
 -- | When we do a G00 X1 Y2 Z3, it is not mandatory to mention the command in the next line, for example : X2 Y3. So we need to memorize commands. memorizedCommands generates a list of commands for each instruction of the program.
@@ -64,7 +69,7 @@ memorizedParams = tail . scanl memorizeParams (Map.fromList [('X', 0), ('Y', 0),
 
 -- | Example. To remove !!!!
 testProgram :: [GCode]
-testProgram = case parse "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-1\nM06 T01" of
+testProgram = case parse "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-1\nG38.2 X-10 F10\nY-10\nG92 X0 Y0\nZ-10" of
 		Left err -> []
 		Right gcode -> gcode
 
@@ -107,12 +112,21 @@ fromGCode' (Sivi.GCode.GComment s) _ _ _ = Sivi.IR.Base.Comment s
 
 fromGCode' M00 _ _ _ = Pause
 
+fromGCode' (G38d2 _ _ _ _) _ mp _ = Move (V3 x y z) (Probe f)
+			where
+				[x, y, z, f] = getParams mp "XYZF"
+
+fromGCode' (G92 _ _ _) _ mp _ = DefCurPos (V3 x y z)
+			where
+				[x, y, z] = getParams mp "XYZ"
+
 fromGCode' (CLine _ _ _ _ _ _ _) mc mp pp = 
 	case mc of
 		"G00" -> Move (V3 x y z) Rapid
 		"G01" -> Move (V3 x y z) (LinearInterpolation f)
 		"G02" -> Move (V3 x y z) (Arc CW (pp + V3 i j k) f)
 		"G03" -> Move (V3 x y z) (Arc CCW (pp + V3 i j k) f)
+		"G38.2" -> Move (V3 x y z) (Probe f)
 		otherwise -> error "Unknown memorized command. Probably due to a bug during GCode to IR conversion."
 	where
 		[x, y, z, i, j, k, f] = getParams mp "XYZIJKF"

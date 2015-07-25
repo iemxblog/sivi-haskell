@@ -24,6 +24,8 @@ data GCode = 	G00 { x :: Maybe Double, y :: Maybe Double, z :: Maybe Double }
 		| M00
 		| CLine { x :: Maybe Double, y :: Maybe Double, z :: Maybe Double,
 			i :: Maybe Double, j :: Maybe Double, k :: Maybe Double, f :: Maybe Double }
+		| G38d2 { x:: Maybe Double, y :: Maybe Double, z :: Maybe Double, f :: Maybe Double }
+		| G92 { x:: Maybe Double, y :: Maybe Double, z :: Maybe Double }
 
 -- | Helper function used to show a Double with 3 decimals
 showDouble :: Double -> String
@@ -48,6 +50,8 @@ instance Show GCode where
 	show (GComment c) = "( " ++ c ++ " )"
 	show M00 = "M00"
 	show (CLine mx my mz mi mj mk mf) = compileParams "XYZIJKF" [mx, my, mz, mi, mj, mk, mf]
+	show (G38d2 mx my mz mf) = "G38.2 " ++ compileParams "XYZF" [mx, my, mz, mf]
+	show (G92 mx my mz) = "G92 " ++ compileParams "XYZ" [mx, my, mz]
 
 
 example :: [GCode]

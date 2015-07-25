@@ -30,6 +30,8 @@ module Sivi.Operation.Base (
 	, opsequence
 	, runOperation
 	, pause
+	, probe
+	, defCurPos
 )
 where
 
@@ -176,6 +178,17 @@ opsequence = foldr (+++) noOp
 -- | Pause operation, takes no arguments
 pause :: Operation IR
 pause = return [Pause]
+
+probe :: V3 Double -> Operation IR
+probe dst = do
+		or <- getOrigin
+		fr <- getFeedRate
+		move (or+dst) (Probe fr)	
+
+defCurPos :: V3 Double -> Operation IR
+defCurPos p = do
+		or <- getOrigin
+		lift $ put (or+p) >> return [DefCurPos (or+p)]
 
 -- | Runs an operation with default starting position, feed rate, plunge rate and tool.
 --
