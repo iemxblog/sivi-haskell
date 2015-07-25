@@ -48,17 +48,3 @@ data Instruction =
 
 -- | A program is a list of instructions in intermediate representation.
 type IR = [Instruction]
-
-
-example :: IR
-example = [
-	Move (V3 1 0 0) Rapid
-	, Move (V3 2 2 0) (LinearInterpolation 100)
-	, Move (V3 2 0 0) (Arc CW (V3 1 1 0) 100)
-	, Pause
-	, Move (V3 0 0 0) Rapid,
-	Sivi.IR.Base.Comment "Commentaire"
-	]
-
-
-
