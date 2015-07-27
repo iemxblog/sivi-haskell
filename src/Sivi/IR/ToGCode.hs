@@ -36,7 +36,7 @@ toGCode' (Move (V3 x y z) (Arc dir center f) : xs) cp = g dir (Just x) (Just y) 
 toGCode' (Move (V3 x y z) (Probe f) : xs) cp = G38d2 (Just x) (Just y) (Just z) (Just f) : toGCode' xs (V3 x y z)
 toGCode' ((Sivi.IR.Base.Comment s) : xs) cp = Sivi.GCode.GComment s : toGCode' xs cp
 toGCode' (Pause : xs) cp = M00 : toGCode' xs cp
-tGCode' (DefCurPos (V3 x y z) : xs) cp = G92 (Just x) (Just y) (Just z) : toGCode' xs (V3 x y z)
+toGCode' (DefCurPos (V3 x y z) : xs) cp = G92 (Just x) (Just y) (Just z) : toGCode' xs (V3 x y z)
 
 -- | Compiles intermediate representation to 'GCode'
 toGCode :: IR 		-- ^ The program in intermediate representation
