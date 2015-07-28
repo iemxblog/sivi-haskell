@@ -25,6 +25,7 @@ module Sivi.Operation.Base (
 	, retract
 	, rapid_xy
 	, approach
+	, approach_rapid
 	, translate
 	, (+++)
 	, opsequence
@@ -32,6 +33,7 @@ module Sivi.Operation.Base (
 	, pause
 	, probe
 	, defCurPos
+	, comment
 )
 where
 
@@ -157,6 +159,11 @@ approach :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- ^ Resulting operation
 approach dst = rapid_xy dst +++ plunge dst
 
+-- | Same as approach, but plunge with rapid move
+approach_rapid :: V3 Double	-- ^ dst : Destination
+		-> Operation IR -- ^ Resulting operation
+approach_rapid dst = rapid_xy dst +++ rapid dst
+
 -- | Translate an operation
 translate :: V3 Double		-- ^ v : Translation vector
 	-> Operation IR		-- ^ o : Operation to translate
@@ -189,6 +196,9 @@ defCurPos :: V3 Double -> Operation IR
 defCurPos p = do
 		or <- getOrigin
 		lift $ put (or+p) >> return [DefCurPos (or+p)]
+
+comment :: String -> Operation IR
+comment s = return [Comment s]
 
 -- | Runs an operation with default starting position, feed rate, plunge rate and tool.
 --
