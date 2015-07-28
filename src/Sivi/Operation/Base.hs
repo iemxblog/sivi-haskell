@@ -13,9 +13,11 @@ module Sivi.Operation.Base (
 	, getOrigin
 	, getFeedRate
 	, getPlungeRate
-	, getTool
-	, getToolDiameter
 	, getCurrentPosition
+	, putCurrentPosition
+	, getTool
+	, putTool
+	, getToolDiameter
 	, noOp	
 	, move
 	, rapid
@@ -34,6 +36,7 @@ module Sivi.Operation.Base (
 	, probe
 	, defCurPos
 	, comment
+	, changeTool
 )
 where
 
@@ -51,44 +54,55 @@ import Control.Monad.Reader
 --
 -- * Double : Plunge rate
 --
--- * Tool : The current tool
+-- * Double (in the State Monad) : The current machine position
 --
--- * Double (in the State Monad) : the current machine position
-type Operation a = ReaderT (V3 Double, Double, Double, Tool) (State (V3 Double)) a
+-- * Tool (in the State Monad) : The current tool
+type Operation a = ReaderT (V3 Double, Double, Double) (State (V3 Double, Tool)) a
 
 -- | Returns the origin of an operation
 getOrigin :: Operation (V3 Double)
 getOrigin = do 
-		(or, _, _, _) <- ask
+		(or, _, _) <- ask
 		return or
 
 -- | Returns the current feed rate
 getFeedRate :: Operation Double
 getFeedRate = do
-		(_, fr, _, _) <- ask
+		(_, fr, _) <- ask
 		return fr
 
 -- | Returns the current plunge rate
 getPlungeRate :: Operation Double
 getPlungeRate = do
-		(_, _, pr, _) <- ask
+		(_, _, pr) <- ask
 		return pr
+
+		
+-- | Returns the machine's current position (from the State monad)
+getCurrentPosition :: Operation (V3 Double)
+getCurrentPosition = liftM fst (lift get)
+
+-- | Sets the current position
+putCurrentPosition :: V3 Double -> Operation ()
+putCurrentPosition cp = do
+				(_, t) <- get
+				put (cp, t)
 
 -- | Returns the current tool
 getTool :: Operation Tool
-getTool = do
-		(_, _, _, tool) <- ask
-		return tool
+getTool = liftM snd (lift get)
+
+-- | Sets the current tool
+putTool :: Tool -> Operation ()
+putTool t = do
+		(cp, _) <- get
+		put (cp, t)
 
 -- | Returns the current tool's diameter
 getToolDiameter :: Operation Double
 getToolDiameter = do
 			tool <- getTool
 			return $ diameter tool
-		
--- | Returns the machine's current position (from the State monad)
-getCurrentPosition :: Operation (V3 Double)
-getCurrentPosition = lift get
 
 -- | Do-nothing operation
 noOp :: Operation IR
@@ -96,7 +110,7 @@ noOp = lift $ return []
 
 -- | Helper function to avoid duplicate code
 move :: V3 Double -> MoveParams -> Operation IR
-move dst params = lift $ put dst >> return [Move dst params] 
+move dst params = putCurrentPosition dst >> return [Move dst params] 
 
 -- Variables :
 -- dst : destination
@@ -168,7 +182,7 @@ approach_rapid dst = rapid_xy dst +++ rapid dst
 translate :: V3 Double		-- ^ v : Translation vector
 	-> Operation IR		-- ^ o : Operation to translate
 	-> Operation IR		-- Resulting operation
-translate v = local (\(or, fr, pr, tool)->(or+v, fr, pr, tool))
+translate v = local (\(or, fr, pr)->(or+v, fr, pr))
 
 -- | Chain two operations (without tool retraction between operations)
 (+++) :: Operation IR	-- ^ o1 : Operation 1
@@ -195,10 +209,16 @@ probe dst = do
 defCurPos :: V3 Double -> Operation IR
 defCurPos p = do
 		or <- getOrigin
-		lift $ put (or+p) >> return [DefCurPos (or+p)]
+		putCurrentPosition (or+p) >> return [DefCurPos (or+p)]
 
 comment :: String -> Operation IR
 comment s = return [Comment s]
+
+changeTool :: Tool -> Operation IR
+changeTool t = retract 30
+		+++ comment "Please place the tool " ++ show tool ++ "in the spindle."
+		+++ pause
+		+++ putTool t
 
 -- | Runs an operation with default starting position, feed rate, plunge rate and tool.
 --
@@ -211,5 +231,5 @@ comment s = return [Comment s]
 --	* Tool : EndMill : name="01" diameter=3 length=42
 runOperation :: Operation IR	-- ^ o : The operation to run
 		-> IR		-- ^ The resulting program in Intermediate Representation
-runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30, EndMill {name="01", diameter=3, len=42}))  (V3 0 0 0)
+runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30))  (V3 0 0 0, EndMill {name="01", diameter=3, len=42})
 
