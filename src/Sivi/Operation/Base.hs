@@ -44,6 +44,7 @@ import Sivi.IR
 import Linear
 import Control.Monad.State
 import Control.Monad.Reader
+import Control.Applicative
 
 -- | The Operation type.
 -- Parameters are :
@@ -209,16 +210,17 @@ probe dst = do
 defCurPos :: V3 Double -> Operation IR
 defCurPos p = do
 		or <- getOrigin
-		putCurrentPosition (or+p) >> return [DefCurPos (or+p)]
+		putCurrentPosition (or+p) 
+		return [DefCurPos (or+p)]
 
 comment :: String -> Operation IR
 comment s = return [Comment s]
 
 changeTool :: Tool -> Operation IR
 changeTool t = retract 30
-		+++ comment "Please place the tool " ++ show tool ++ "in the spindle."
+		+++ comment ("Please place the tool " ++ show t ++ " in the spindle.")
 		+++ pause
-		+++ putTool t
+		<* putTool t
 
 -- | Runs an operation with default starting position, feed rate, plunge rate and tool.
 --
