@@ -22,12 +22,14 @@ applyMatrixMP :: M33 Double 	-- ^ m : The transformation matrix
 applyMatrixMP _ Rapid = Rapid
 applyMatrixMP _ (LinearInterpolation f) = LinearInterpolation f
 applyMatrixMP m (Arc dir center f) = Arc dir (m !* center) f
+applyMatrixMP _ (Probe f) = Probe f
 
 -- | This function applies a matrix transformation to an instruction (of Intermediate Representation)
 applyMatrix' :: M33 Double		-- ^ m : The transformation matrix	
 		-> Instruction		-- ^ p : The program in Intermediate Representation
 		-> Instruction		-- ^ The resulting Intermediate Representationg
 applyMatrix' m (Move dst mp) = Move (m !* dst) (applyMatrixMP m  mp)
+applyMatrix' m (DefCurPos cp) = DefCurPos (m !* cp)
 applyMatrix' _ (Comment s) = Comment s
 applyMatrix' _ Pause = Pause
 

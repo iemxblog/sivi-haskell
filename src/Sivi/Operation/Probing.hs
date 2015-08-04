@@ -69,5 +69,3 @@ probeZMinus :: 	V3 Double		-- ^ Point to probe
 		-> Operation IR
 probeZMinus = probeHelper (V3 0 0 (-1)) False
 
-
--- Ajouter DefCurPos dans applyMatrix #############################################################################################
