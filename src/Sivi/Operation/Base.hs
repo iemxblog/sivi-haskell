@@ -37,6 +37,7 @@ module Sivi.Operation.Base (
 	, defCurPos
 	, comment
 	, changeTool
+	, withTool
 )
 where
 
@@ -221,6 +222,14 @@ changeTool t = retract 30
 		+++ comment ("Please place the tool " ++ show t ++ " in the spindle.")
 		+++ pause
 		<* putTool t
+
+-- | Do an operation with a temporary tool.
+withTool :: 	Tool 		-- ^ t : The tool to use for the operation
+		-> Operation IR -- ^ op : The operation to run with the given tool.
+		-> Operation IR -- ^ The resulting operation.
+withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
+	
+	
 
 -- | Runs an operation with default starting position, feed rate, plunge rate and tool.
 --
