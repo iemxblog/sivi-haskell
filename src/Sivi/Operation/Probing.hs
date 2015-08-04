@@ -54,26 +54,5 @@ probeYPlus = probeHelper (V3 0 1 0)
 probeZMinus :: V3 Double -> Double -> Operation IR
 probeZMinus = probeHelper (V3 0 0 (-1))
 
---probeCylinder :: Double -> Double -> Tool -> Operation IR
---probeCylinder d l probe =
---	do {
---		t <- getTool;
---		changeTool probe;
---		td <- getToolDiameter;
---		(comment "Place the probe 5mm above the right side of the cylinder, centered on the axis of the cylinder."
---		+++ pause
---		+++ translate (V3 0 0 margin) (probeZMinus (2*margin) 0)
---		+++ translate (V3 (margin+td/2) 0 (-d/2-td/2)) (probeXMinus (2*margin) (l+td/2))
---		+++ retract 5
---		+++ translate (V3 0 (-margin-d/2-td/2) (-d/2-td/2)) (probeYPlus (2*margin) (-d/2-td/2))
---		+++ retract 5
---		+++ changeTool t
---		+++ translate (V3 0 0 margin) (probeZMinus (2*margin) 0)
---		)
---	}
---	where margin = 10
-
-
-
 
 -- Ajouter DefCurPos dans applyMatrix #############################################################################################
