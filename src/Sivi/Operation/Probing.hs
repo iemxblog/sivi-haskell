@@ -1,6 +1,6 @@
 {-|
 Module		: Sivi.Operation.Probing
-Description	: Base operations
+Description	: Probing operations
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
 Maintainer	: iemxblog@gmail.com
@@ -39,23 +39,34 @@ probeHelper dir compFlag dst margin =
 		return (o1 ++ o2 ++ o3 ++ o4)
 			
 	
--- | Probes a part in the X direction, from right to left.
-probeXMinus :: 	V3 Double	
-		 -> Double
+-- | Probes a part in the X direction, descending tool coordinate.
+probeXMinus ::	V3 Double		-- ^ Point to probe
+		 -> Double		-- ^ Margin (distance between point to probe and initial tool position)
 		 -> Operation IR
 probeXMinus = probeHelper (V3 (-1) 0 0) True
 
-probeXPlus :: V3 Double -> Double -> Operation IR
+-- | Probes a part in the X direction, ascending tool coordinate.
+probeXPlus :: 	V3 Double 		-- ^ Point to probe
+		-> Double 		-- ^ Margin (distance between point to probe and initial tool position)
+		-> Operation IR
 probeXPlus = probeHelper (V3 1 0 0) True
 
-
-probeYMinus :: V3 Double -> Double -> Operation IR
+-- | Probes a part in the Y direction, descending tool coordinate.
+probeYMinus :: 	V3 Double 		-- ^ Point to probe
+		-> Double 		-- ^ Margin (distance between point to probe and initial tool position)
+		-> Operation IR
 probeYMinus = probeHelper (V3 0 (-1) 0) True
 
-probeYPlus :: V3 Double -> Double -> Operation IR
+-- | Probes a part in the Y direction, ascending tool coordinate.
+probeYPlus :: 	V3 Double 		-- ^ Point to probe
+		-> Double 		-- ^ Margin (distance between point to probe and initial tool position)
+		-> Operation IR
 probeYPlus = probeHelper (V3 0 1 0) True
 
-probeZMinus :: V3 Double -> Double -> Operation IR
+-- | Probes a part in the Z direction, descending tool coordinate.
+probeZMinus :: 	V3 Double		-- ^ Point to probe
+		-> Double		-- ^ Margin (distance between point to probe and initial tool position) 
+		-> Operation IR
 probeZMinus = probeHelper (V3 0 0 (-1)) False
 
 
