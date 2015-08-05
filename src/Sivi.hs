@@ -13,9 +13,11 @@ module Sivi
 	, module Sivi.GCode
 	, module Sivi.IR
 	, module Sivi.Operation
+	, module Sivi.Interface
 ) where
 
 import Sivi.Backlash
 import Sivi.GCode
 import Sivi.IR
 import Sivi.Operation
+import Sivi.Interface
