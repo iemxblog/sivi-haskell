@@ -15,6 +15,7 @@ module Sivi.Interface
 import System.Console.ANSI
 import System.IO
 import Control.Concurrent
+import System.Hardware.Serialport
 
 data Input = XMinus | XPlus | YMinus | YPlus | ZMinus | ZPlus | Exit deriving (Eq, Show)
 
@@ -28,7 +29,7 @@ initInterface = do
 
 exitInterface :: IO ()
 exitInterface = do
-	--clearScreen
+	clearScreen
 	setCursorPosition 0 0
 	showCursor
 
@@ -44,11 +45,11 @@ getInput = do
 		'q' -> return Exit	
 		_ -> getInput
 
-loop = do
+loop s = do
 	i <- getInput
 	case i of
 		Exit -> return ()
-		_ -> putStrLn (show i) >> loop	
+		_ -> putStrLn (show i) >> loop s	
 
 counter n = do
 	setCursorPosition 10 10
@@ -58,7 +59,11 @@ counter n = do
 
 interface :: IO ()
 interface = do
+	let port = "/dev/ttyACM0"
+	s <- openSerial port defaultSerialSettings { commSpeed = CS115200 }
 	initInterface 
+	putStrLn "Serial port opened."
 	forkIO $ counter 0
-	loop
+	loop s
+	closeSerial s
 	exitInterface

@@ -17,7 +17,7 @@ extra-source-files:  README.md
 cabal-version:       >=1.10
 
 Library
-  build-depends:       base >=4.7 && <4.8, linear >=1.18 && <1.19, containers >=0.5 && <0.6, attoparsec >=0.12 && <0.13, mtl >=2.2 && <2.3, bytestring >=0.10.4 && < 0.10.5, ansi-terminal >=0.6.2.1 && <0.6.2.2
+  build-depends:       base >=4.7 && <4.8, linear >=1.18 && <1.19, containers >=0.5 && <0.6, attoparsec >=0.12 && <0.13, mtl >=2.2 && <2.3, bytestring >=0.10.4 && < 0.10.5, ansi-terminal >=0.6.2.1 && <0.6.2.2, serialport >=0.4.7 && <0.4.8
   Exposed-modules:     Sivi, Sivi.Backlash, Sivi.GCode, Sivi.GCode.Base, Sivi.GCode.Parser, Sivi.Interface, Sivi.IR, Sivi.IR.Base, Sivi.IR.FromGCode, Sivi.IR.ToGCode, Sivi.IR.Transformation, Sivi.Operation, Sivi.Operation.Base, Sivi.Operation.BasicShape, Sivi.Operation.Contour, Sivi.Operation.Misc, Sivi.Operation.Pocket, Sivi.Operation.Probing, Sivi.Operation.Repetition, Sivi.Operation.Transformation
   other-extensions:    OverloadedStrings
   ghc-options:         -Wall
@@ -37,7 +37,7 @@ test-suite tests
    default-extensions:  OverloadedStrings
    type: exitcode-stdio-1.0
    main-is: Spec.hs
-   build-depends:       base >=4.7 && <4.8, linear >=1.18 && <1.19, containers >=0.5 && <0.6, attoparsec >=0.12 && <0.13, mtl >=2.2 && <2.3, bytestring >=0.10.4 && < 0.10.5, ansi-terminal >=0.6.2.1 && <0.6.2.2,
+   build-depends:       base >=4.7 && <4.8, linear >=1.18 && <1.19, containers >=0.5 && <0.6, attoparsec >=0.12 && <0.13, mtl >=2.2 && <2.3, bytestring >=0.10.4 && < 0.10.5, ansi-terminal >=0.6.2.1 && <0.6.2.2, serialport >=0.4.7 && <0.4.8,
                         hspec                >=2.1.8 && <2.1.9,
                         sivi
    hs-source-dirs:      tests src
