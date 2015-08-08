@@ -16,8 +16,9 @@ import System.Console.ANSI
 import System.IO
 import Control.Concurrent
 import System.Hardware.Serialport
-import qualified Data.ByteString.Char8 as B
-import Control.Monad(forever)
+import Sivi.Interface.SerialWriter
+import Sivi.Interface.SerialReader
+import Sivi.Interface.ToolPositionThread
 
 data Input = XMinus | XPlus | YMinus | YPlus | ZMinus | ZPlus | Exit deriving (Eq, Show)
 
@@ -53,30 +54,6 @@ loop s = do
 		Exit -> return ()
 		_ -> putStrLn (show i) >> loop s	
 
-counter n = do
-	setCursorPosition 10 10
-	putStrLn $ show n
-	threadDelay (10^6)
-	counter (n+1)
-
-serialReader :: Chan String  -> SerialPort -> IO () 
-serialReader chan serial = forever $ do
-	msg <- recv serial 100
-	let msgString = B.unpack msg
-	if length msgString > 0 then
-		do 
-			writeChan chan msgString
-			putStrLn $ "Received : " ++ msgString
-	else
-		return ()
-	 
-
-serialWriter :: Chan String -> SerialPort -> IO ()
-serialWriter chan serial = forever $ do
-	msg <- readChan chan
-	send serial (B.pack msg)
-	putStrLn $ "Sent : " ++ msg
-	
 interface :: IO ()
 interface = do
 	let port = "/dev/ttyACM0"
@@ -85,9 +62,8 @@ interface = do
 	putStrLn "Serial port opened."
 	chanRead <- newChan
 	chanWrite <- newChan
-	forkIO $ counter 0
-	forkIO $ serialReader chanRead s
-	forkIO $ serialWriter chanWrite s
+	forkIO $ serialReader chanRead s []
+	forkIO $ serialWriter chanWrite s 
 	loop s
 	closeSerial s
 	exitInterface
