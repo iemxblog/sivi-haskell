@@ -12,16 +12,18 @@ module Sivi.Interface.ToolPositionThread
 	toolPositionThread
 ) where
 
-import Control.Concurrent.Chan
+import System.Console.ANSI
+import Control.Concurrent
 import Sivi.Interface.SerialWriter
 import Sivi.Interface.SerialReader
 import Control.Monad(forever)
 
-toolPositionThread :: Chan WriteCommand -> Chan ReadCommand -> IO ()
-toolPositionThread wc rc = forever $ do
+toolPositionThread :: Chan WriteCommand -> Chan ReadCommand -> Chan (IO ()) -> IO ()
+toolPositionThread wc rc pc = forever $ do
 	writeChan wc GetPosition
 	msg <- readChan rc
 	case msg of
-		Position (x, y, z) -> putStrLn $ "X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z
+		Position (x, y, z) -> writeChan pc (setCursorPosition 1 60 >> (putStrLn $ "X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z))
 		_ -> return ()
-	toolPositionThread wc rc
+	threadDelay (10^6)
+	toolPositionThread wc rc pc

@@ -19,6 +19,7 @@ import System.Hardware.Serialport
 import Sivi.Interface.SerialWriter
 import Sivi.Interface.SerialReader
 import Sivi.Interface.ToolPositionThread
+import Sivi.Interface.PrinterThread
 
 data Input = XMinus | XPlus | YMinus | YPlus | ZMinus | ZPlus | Exit deriving (Eq, Show)
 
@@ -62,8 +63,12 @@ interface = do
 	putStrLn "Serial port opened."
 	chanRead <- newChan
 	chanWrite <- newChan
-	forkIO $ serialReader chanRead s []
-	forkIO $ serialWriter chanWrite s 
+	chanPrint <- newChan
+	forkIO $ printerThread chanPrint
+	forkIO $ serialReader chanRead s [] chanPrint
+	forkIO $ serialWriter chanWrite s chanPrint
+	forkIO $ toolPositionThread chanWrite chanRead chanPrint
+	writeChan chanPrint $ putStrLn "Test !!!!"
 	loop s
 	closeSerial s
 	exitInterface

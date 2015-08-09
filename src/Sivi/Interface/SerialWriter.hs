@@ -19,15 +19,15 @@ import qualified Data.ByteString.Char8 as B
 import Control.Monad(forever)
 import Data.Char
 
-data WriteCommand = GetPosition | GCode String deriving Eq
+data WriteCommand = GetPosition | GCode String deriving (Eq, Show)
 
-instance Show WriteCommand where
-	show GetPosition = "?"
-	show (GCode s) = s
+toGRBLCommand :: WriteCommand -> String
+toGRBLCommand GetPosition = "?"
+toGRBLCommand (GCode s) = s ++ "\n"
 
-serialWriter :: Chan String -> SerialPort -> IO ()
-serialWriter chan serial = forever $ do
-	msg <- readChan chan
-	send serial (B.pack msg)
-	putStrLn $ "Sent : " ++ msg
+serialWriter :: Chan WriteCommand -> SerialPort -> Chan (IO ()) -> IO ()
+serialWriter chan serial pc = forever $ do
+	wc <- readChan chan
+	send serial (B.pack (toGRBLCommand wc))
+	writeChan pc (putStrLn $ "Sent : " ++ show wc)
 

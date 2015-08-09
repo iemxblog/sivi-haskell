@@ -26,7 +26,7 @@ data ReadCommand = Position (Double, Double, Double) | Ok deriving (Eq, Show)
 -- Parsers
 pPosition :: Parser ReadCommand
 pPosition = do
-	string ">Idle,MPos:"
+	string "<Idle,MPos:"
 	double
 	char ','
 	double
@@ -56,16 +56,16 @@ splitLine xs | not ('\n' `elem` xs) = ([], xs)
 splitLine xs = mapSnd tail . break (=='\n') $ xs
 	where mapSnd f (a, b) = (a, f b)
 
-serialReader :: Chan ReadCommand -> SerialPort -> String -> IO () 
-serialReader chan serial buffer = do
+serialReader :: Chan ReadCommand -> SerialPort -> String -> Chan (IO ()) -> IO () 
+serialReader chan serial buffer pc = do
 	msg <- recv serial 100
 	let msgString = B.unpack msg
 	let (newMsg, newBuf) = splitLine (buffer ++ msgString)
 	if length newMsg > 0 then
 		case parseOnly pReadCommand (B.pack newMsg) of
 			Left err -> return ()
-			Right rc -> writeChan chan rc >> putStrLn ("Received : " ++ show rc)
+			Right rc -> writeChan chan rc >> writeChan pc (putStrLn ("Received : " ++ show rc))
 	else
 		return ()
-	serialReader chan serial newBuf -- looping recursively
+	serialReader chan serial newBuf pc -- looping recursively
 
