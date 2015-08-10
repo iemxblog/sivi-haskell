@@ -58,16 +58,16 @@ loop s = do
 interface :: IO ()
 interface = do
 	let port = "/dev/ttyACM0"
-	s <- openSerial port defaultSerialSettings { commSpeed = CS115200 }
+	serial <- openSerial port defaultSerialSettings { commSpeed = CS115200 }
 	initInterface 
 	putStrLn "Serial port opened."
 	rc <- newChan
 	wc <- newChan
 	pc <- newChan
 	forkIO $ printerThread pc 
-	forkIO $ serialReader rc pc s []
-	forkIO $ serialWriter wc pc s 
+	forkIO $ serialReader rc pc serial []
+	forkIO $ serialWriter wc pc serial 
 	forkIO $ toolPositionThread wc rc pc 
-	loop s
-	closeSerial s
+	loop serial
+	closeSerial serial
 	exitInterface
