@@ -61,14 +61,13 @@ interface = do
 	s <- openSerial port defaultSerialSettings { commSpeed = CS115200 }
 	initInterface 
 	putStrLn "Serial port opened."
-	chanRead <- newChan
-	chanWrite <- newChan
-	chanPrint <- newChan
-	forkIO $ printerThread chanPrint
-	forkIO $ serialReader chanRead s [] chanPrint
-	forkIO $ serialWriter chanWrite s chanPrint
-	forkIO $ toolPositionThread chanWrite chanRead chanPrint
-	writeChan chanPrint $ putStrLn "Test !!!!"
+	rc <- newChan
+	wc <- newChan
+	pc <- newChan
+	forkIO $ printerThread pc 
+	forkIO $ serialReader rc pc s []
+	forkIO $ serialWriter wc pc s 
+	forkIO $ toolPositionThread wc rc pc 
 	loop s
 	closeSerial s
 	exitInterface

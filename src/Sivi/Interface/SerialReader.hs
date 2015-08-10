@@ -56,16 +56,16 @@ splitLine xs | not ('\n' `elem` xs) = ([], xs)
 splitLine xs = mapSnd tail . break (=='\n') $ xs
 	where mapSnd f (a, b) = (a, f b)
 
-serialReader :: Chan ReadCommand -> SerialPort -> String -> Chan (IO ()) -> IO () 
-serialReader chan serial buffer pc = do
+serialReader :: Chan ReadCommand -> Chan (IO ()) -> SerialPort -> String -> IO () 
+serialReader rc pc serial buffer = do
 	msg <- recv serial 100
 	let msgString = B.unpack msg
 	let (newMsg, newBuf) = splitLine (buffer ++ msgString)
 	if length newMsg > 0 then
 		case parseOnly pReadCommand (B.pack newMsg) of
 			Left err -> return ()
-			Right rc -> writeChan chan rc >> writeChan pc (putStrLn ("Received : " ++ show rc))
+			Right readCommand -> writeChan rc readCommand >> writeChan pc (putStrLn ("Received : " ++ show readCommand))
 	else
 		return ()
-	serialReader chan serial newBuf pc -- looping recursively
+	serialReader rc pc serial newBuf -- looping recursively
 

@@ -21,8 +21,8 @@ import Control.Monad(forever)
 toolPositionThread :: Chan WriteCommand -> Chan ReadCommand -> Chan (IO ()) -> IO ()
 toolPositionThread wc rc pc = forever $ do
 	writeChan wc GetPosition
-	msg <- readChan rc
-	case msg of
+	readCommand <- readChan rc
+	case readCommand of
 		Position (x, y, z) -> writeChan pc (setCursorPosition 1 60 >> (putStrLn $ "X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z))
 		_ -> return ()
 	threadDelay (10^6)
