@@ -27,6 +27,8 @@ toGRBLCommand (GCode s) = s ++ "\n"
 serialWriter :: Chan WriteCommand -> Chan (IO ()) -> SerialPort -> IO ()
 serialWriter wc pc serial = forever $ do
 	writeCommand <- readChan wc
-	send serial (B.pack (toGRBLCommand writeCommand))
+	let grblCommand = toGRBLCommand writeCommand
+	bytes <- send serial (B.pack grblCommand)
+	if bytes /= length grblCommand then error "serialWriter : 'send' did not send all the data. Better 'send' not implemented yet." else return ()
 	writeChan pc (putStrLn $ "Sent : " ++ show writeCommand)
 
