@@ -55,6 +55,7 @@ loop s = do
 		Exit -> return ()
 		_ -> putStrLn (show i) >> loop s	
 
+-- | Text mode interface for GRBL.
 interface :: IO ()
 interface = do
 	let port = "/dev/ttyACM0"

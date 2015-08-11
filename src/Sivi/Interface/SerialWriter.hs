@@ -13,18 +13,24 @@ module Sivi.Interface.SerialWriter
 	, WriteCommand(..)
 ) where
 
-import Control.Concurrent
+import Control.Concurrent.Chan
 import System.Hardware.Serialport
 import qualified Data.ByteString.Char8 as B
 import Control.Monad(forever)
 
+-- | Commands sent to the 'serialWriter' thread. The data constructors represent GRBL commands.
 data WriteCommand = GetPosition | GCode String deriving (Eq, Show)
 
+-- | Transforms a 'WriteCommand' data to a GRBL command.
 toGRBLCommand :: WriteCommand -> String
 toGRBLCommand GetPosition = "?"
 toGRBLCommand (GCode s) = s ++ "\n"
 
-serialWriter :: Chan WriteCommand -> Chan (IO ()) -> SerialPort -> IO ()
+-- | Waits for commands on a Chan, and sends them over the serial port. To be used with 'forkIO'.
+serialWriter :: Chan WriteCommand 	-- ^ wc : The Chan where the incoming commands come from
+		-> Chan (IO ()) 	-- ^ pc : The Chan to send IO commands (putStrLn, ...) to the 'Sivi.Interface.PrinterThread.printerThread'
+		-> SerialPort 		-- ^ serial : The serial port
+		-> IO ()
 serialWriter wc pc serial = forever $ do
 	writeCommand <- readChan wc
 	let grblCommand = toGRBLCommand writeCommand

@@ -18,7 +18,11 @@ import Sivi.Interface.SerialWriter
 import Sivi.Interface.SerialReader
 import Control.Monad(forever)
 
-toolPositionThread :: Chan WriteCommand -> Chan ReadCommand -> Chan (IO ()) -> IO ()
+-- | This thread sends commands to GRBL to get the current working position, then waits for the response and prints it at some location on the screen.
+toolPositionThread :: 	Chan WriteCommand 	-- ^ The channel communicating with serialWriter (to send data to the serial port)
+			-> Chan ReadCommand 	-- ^ The channel communicating with serialReader (to read dat a from the serial port)
+			-> Chan (IO ()) 	-- ^ The channel communicating with printerThread (to perform IO actions safely)
+			-> IO ()
 toolPositionThread wc rc pc = forever $ do
 	writeChan wc GetPosition
 	readCommand <- readChan rc
