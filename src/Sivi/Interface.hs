@@ -34,6 +34,7 @@ initInterface = do
 	hSetBuffering stdin NoBuffering
 	hSetBuffering stdout NoBuffering
 	clearScreen
+	hideCursor
 	setTitle "Sivi"
 
 exitInterface :: IO ()
