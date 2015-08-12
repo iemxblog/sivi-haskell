@@ -35,18 +35,18 @@ programThread wc rc pc ptc (x:xs) Running = do
 	if not iec then
 		programThread wc rc pc ptc (x:xs) Paused
 	else do
+		writeChan pc (setCursorPosition 0 0)
+		writeChan pc (putStr "   -> ")
+		writeChan pc (putStr $ show x)
+		writeChan pc (setCursorPosition 1 0)
+		writeChan pc (mapM_ print $ take 10 xs)
 		case x of
-			GComment s -> writeChan pc (setCursorPosition 25 1 >> putStrLn s)
+			GComment s -> writeChan pc (setCursorPosition 24 0 >> putStrLn s)
 			M00 -> programThread wc rc pc ptc xs Paused
 			_ -> do 
-				writeChan pc (setCursorPosition 1 1)
-				writeChan pc (putStr "   -> ")
-				writeChan pc (putStr $ show x)
-				writeChan pc (setCursorPosition 2 1)
-				writeChan pc (mapM_ print $ take 10 xs)
 				writeChan wc (SendProgram $ show x) 
 				waitFor rc Ok 
-				writeChan pc (setCursorPosition 1 1)
+				writeChan pc (setCursorPosition 0 0)
 				writeChan pc (putStr "ok")
 		--threadDelay (10^6*2)
 		programThread wc rc pc ptc xs Running

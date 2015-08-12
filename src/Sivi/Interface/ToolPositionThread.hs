@@ -14,9 +14,10 @@ module Sivi.Interface.ToolPositionThread
 
 import System.Console.ANSI
 import Control.Concurrent
+import Control.Monad(forever)
 import Sivi.Interface.SerialWriter
 import Sivi.Interface.SerialReader
-import Control.Monad(forever)
+import Sivi.Interface.Misc
 
 -- | This thread sends commands to GRBL to get the current working position, then waits for the response and prints it at some location on the screen.
 toolPositionThread :: 	Chan WriteCommand 	-- ^ The channel communicating with serialWriter (to send data to the serial port)
@@ -24,10 +25,6 @@ toolPositionThread :: 	Chan WriteCommand 	-- ^ The channel communicating with se
 			-> Chan (IO ()) 	-- ^ The channel communicating with printerThread (to perform IO actions safely)
 			-> IO ()
 toolPositionThread wc rc pc = forever $ do
-	writeChan wc GetPosition
-	readCommand <- readChan rc
-	case readCommand of
-		Position (x, y, z) -> writeChan pc (setCursorPosition 1 60 >> (putStrLn $ "X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z))
-		_ -> return ()
-	threadDelay (10^6)
-	toolPositionThread wc rc pc
+	(x, y, z) <- getCurrentPosition wc rc
+	writeChan pc (setCursorPosition 1 60 >> (putStrLn $ "X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z))
+	threadDelay (10^5)
