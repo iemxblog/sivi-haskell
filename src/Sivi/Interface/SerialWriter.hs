@@ -19,12 +19,12 @@ import qualified Data.ByteString.Char8 as B
 import Control.Monad(forever)
 
 -- | Commands sent to the 'serialWriter' thread. The data constructors represent GRBL commands.
-data WriteCommand = GetPosition | GCode String deriving (Eq, Show)
+data WriteCommand = GetPosition | SendProgram String deriving (Eq, Show)
 
 -- | Transforms a 'WriteCommand' data to a GRBL command.
 toGRBLCommand :: WriteCommand -> String
 toGRBLCommand GetPosition = "?"
-toGRBLCommand (GCode s) = s ++ "\n"
+toGRBLCommand (SendProgram s) = s ++ "\n"
 
 -- | Waits for commands on a Chan, and sends them over the serial port. To be used with 'forkIO'.
 serialWriter :: Chan WriteCommand 	-- ^ wc : The Chan where the incoming commands come from
@@ -36,5 +36,5 @@ serialWriter wc pc serial = forever $ do
 	let grblCommand = toGRBLCommand writeCommand
 	bytes <- send serial (B.pack grblCommand)
 	if bytes /= length grblCommand then error "serialWriter : 'send' did not send all the data. Better 'send' not implemented yet." else return ()
-	writeChan pc (putStrLn $ "Sent : " ++ show writeCommand)
+	--writeChan pc (putStrLn $ "Sent : " ++ show writeCommand)
 

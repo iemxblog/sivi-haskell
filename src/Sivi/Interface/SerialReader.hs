@@ -12,6 +12,7 @@ module Sivi.Interface.SerialReader
 (
 	serialReader
 	, ReadCommand(..)
+	, waitFor
 ) where
 
 import Control.Concurrent.Chan
@@ -69,8 +70,12 @@ serialReader rc pc serial buffer = do
 	if length newMsg > 0 then
 		case parseOnly pReadCommand (B.pack newMsg) of
 			Left err -> return ()
-			Right readCommand -> writeChan rc readCommand >> writeChan pc (putStrLn ("Received : " ++ show readCommand))
+			Right readCommand -> writeChan rc readCommand -- >> writeChan pc (putStrLn ("Received : " ++ show readCommand))
 	else
 		return ()
 	serialReader rc pc serial newBuf -- looping recursively
 
+waitFor :: Chan ReadCommand -> ReadCommand -> IO ()
+waitFor rc readcommand = do
+	msg <- readChan rc
+	if msg == readcommand then return () else waitFor rc readcommand

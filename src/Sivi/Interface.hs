@@ -20,8 +20,13 @@ import Sivi.Interface.SerialWriter
 import Sivi.Interface.SerialReader
 import Sivi.Interface.ToolPositionThread
 import Sivi.Interface.PrinterThread
+import Sivi.Interface.ProgramThread
+import Sivi.GCode
 
-data Input = XMinus | XPlus | YMinus | YPlus | ZMinus | ZPlus | Exit deriving (Eq, Show)
+data Input = 	XMinus | XPlus | YMinus | YPlus | ZMinus | ZPlus 
+		| StartProgram | PauseProgram | StopProgram
+		| Exit
+		deriving (Eq, Show)
 
 initInterface :: IO ()
 initInterface = do
@@ -46,18 +51,24 @@ getInput = do
 		'l' -> return XPlus
 		'b' -> return ZMinus
 		'n' -> return ZPlus
+		's' -> return StartProgram
+		'p' -> return PauseProgram
+		'd' -> return StopProgram
 		'q' -> return Exit	
 		_ -> getInput
 
-loop s = do
+loop ptc = do
 	i <- getInput
 	case i of
+		StartProgram -> writeChan ptc Start >> loop ptc
+		PauseProgram -> writeChan ptc Pause >> loop ptc
+		StopProgram -> writeChan ptc Stop >> loop ptc
 		Exit -> return ()
-		_ -> putStrLn (show i) >> loop s	
+		_ -> putStrLn (show i) >> loop ptc
 
 -- | Text mode interface for GRBL.
-interface :: IO ()
-interface = do
+interface :: [GCode] -> IO ()
+interface gcode = do
 	let port = "/dev/ttyACM0"
 	serial <- openSerial port defaultSerialSettings { commSpeed = CS115200 }
 	initInterface 
@@ -65,10 +76,13 @@ interface = do
 	rc <- newChan
 	wc <- newChan
 	pc <- newChan
+	ptc <- newChan
+	rc2 <- dupChan rc
 	forkIO $ printerThread pc 
 	forkIO $ serialReader rc pc serial []
 	forkIO $ serialWriter wc pc serial 
 	forkIO $ toolPositionThread wc rc pc 
-	loop serial
+	forkIO $ programThread wc rc2 pc ptc gcode Paused
+	loop ptc
 	closeSerial serial
 	exitInterface
