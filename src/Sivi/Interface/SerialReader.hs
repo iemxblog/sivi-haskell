@@ -27,7 +27,10 @@ data ReadCommand = Position (Double, Double, Double) | Ok deriving (Eq, Show)
 -- | Parses a position message and returns the current working position.
 pPosition :: Parser ReadCommand
 pPosition = do
-	string "<Idle,MPos:"
+	char '<'
+	many1 (notChar ',')
+	char ','
+	string "MPos:"
 	double
 	char ','
 	double
