@@ -26,5 +26,7 @@ toolPositionThread :: 	Chan WriteCommand 	-- ^ The channel communicating with se
 			-> IO ()
 toolPositionThread wc rc pc = forever $ do
 	(x, y, z) <- getCurrentPosition wc rc
+	writeChan pc ( setSGR [ SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Blue ])
 	writeChan pc (setCursorPosition 1 60 >> (putStrLn $ "X" ++ show x ++ " Y" ++ show y ++ " Z" ++ show z))
+	writeChan pc ( setSGR [ SetConsoleIntensity NormalIntensity, SetColor Foreground Vivid White ])
 	threadDelay (10^5)
