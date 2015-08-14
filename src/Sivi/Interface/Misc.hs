@@ -10,9 +10,13 @@ Portability	: POSIX
 module Sivi.Interface.Misc
 (
 	getCurrentPosition
+	, withColor
+	, showLine
+	, showLines
 ) where
 
 import Control.Concurrent.Chan
+import System.Console.ANSI
 import Sivi.Interface.SerialWriter
 import Sivi.Interface.SerialReader
 
@@ -27,3 +31,19 @@ getCurrentPosition :: Chan WriteCommand -> Chan ReadCommand -> IO (Double, Doubl
 getCurrentPosition wc rc = do
 	writeChan wc GetPosition
 	waitPosition rc
+
+withColor :: Color -> IO () -> IO ()
+withColor c a = do 
+	setSGR [ SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid c]
+	a
+	setSGR [ SetConsoleIntensity NormalIntensity, SetColor Foreground Vivid White ]
+
+cutFill :: Int -> a -> [a] -> [a]
+cutFill n x xs = take n $ xs ++ repeat x
+
+showLine :: Int -> String -> String
+showLine w xs = cutFill w ' ' xs
+
+showLines :: Int -> Int -> [String] -> [String]
+showLines w h xs = cutFill h (replicate w ' ') (map (showLine w) xs)
+
