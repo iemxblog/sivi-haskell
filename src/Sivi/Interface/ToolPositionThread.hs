@@ -10,6 +10,7 @@ Portability	: POSIX
 module Sivi.Interface.ToolPositionThread
 (
 	toolPositionThread
+	, getCurrentPosition
 ) where
 
 import System.Console.ANSI
@@ -35,3 +36,16 @@ toolPositionThread wc rc pc = forever $ do
 				putStr . showLine 8 $ "Z" ++ show z
 			)
 	threadDelay (10^5)
+
+waitPosition :: Chan ReadCommand -> IO (Double, Double, Double)
+waitPosition rc = do
+	readCommand <- readChan rc
+	case readCommand of
+		Position (x, y, z) -> return (x, y, z)	
+		_ -> waitPosition rc
+
+getCurrentPosition :: Chan WriteCommand -> Chan ReadCommand -> IO (Double, Double, Double)
+getCurrentPosition wc rc = do
+	writeChan wc GetPosition
+	waitPosition rc
+

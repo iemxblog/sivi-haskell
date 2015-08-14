@@ -9,28 +9,13 @@ Portability	: POSIX
 -}
 module Sivi.Interface.Misc
 (
-	getCurrentPosition
-	, withColor
+	withColor
 	, showLine
 	, showLines
 ) where
 
-import Control.Concurrent.Chan
 import System.Console.ANSI
-import Sivi.Interface.SerialWriter
-import Sivi.Interface.SerialReader
 
-waitPosition :: Chan ReadCommand -> IO (Double, Double, Double)
-waitPosition rc = do
-	readCommand <- readChan rc
-	case readCommand of
-		Position (x, y, z) -> return (x, y, z)	
-		_ -> waitPosition rc
-
-getCurrentPosition :: Chan WriteCommand -> Chan ReadCommand -> IO (Double, Double, Double)
-getCurrentPosition wc rc = do
-	writeChan wc GetPosition
-	waitPosition rc
 
 withColor :: Color -> IO () -> IO ()
 withColor c a = do 

@@ -20,6 +20,8 @@ import System.Hardware.Serialport
 import qualified Data.ByteString.Char8 as B
 import Data.Attoparsec.ByteString.Char8
 import Control.Applicative
+import System.Console.ANSI
+import Sivi.Interface.Misc
 
 -- | Data returned by the serialRead thread. The data constructors represent GRBL response messages.
 data ReadCommand = Position (Double, Double, Double) | Ok deriving (Eq, Show)
@@ -72,7 +74,9 @@ serialReader rc pc serial buffer = do
 	let (newMsg, newBuf) = splitLine (buffer ++ msgString)
 	if length newMsg > 0 then
 		case parseOnly pReadCommand (B.pack newMsg) of
-			Left err -> return ()
+			Left err -> writeChan pc $ do
+				setCursorPosition 5 60
+				withColor Red (putStr $ showLine 20 newMsg)
 			Right readCommand -> writeChan rc readCommand -- >> writeChan pc (putStrLn ("Received : " ++ show readCommand))
 	else
 		return ()
