@@ -59,8 +59,7 @@ programThread wc rc pc ptc (x:xs) Running = do
 				programThread wc rc pc ptc xs Running
 			M00 -> programThread wc rc pc ptc xs Paused
 			_ -> do 
-				writeChan wc (SendProgram $ show x) 
-				waitFor rc Ok 
+				sendProgram wc rc (show x)
 				writeChan pc (setCursorPosition 0 0)
 				writeChan pc (putStr "ok")
 				writeChan pc clearInstruction
