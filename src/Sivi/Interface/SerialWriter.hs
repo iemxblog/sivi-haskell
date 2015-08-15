@@ -11,12 +11,14 @@ module Sivi.Interface.SerialWriter
 (
 	serialWriter
 	, WriteCommand(..)
+	, sendProgram
 ) where
 
 import Control.Concurrent.Chan
 import System.Hardware.Serialport
 import qualified Data.ByteString.Char8 as B
 import Control.Monad(forever)
+import Sivi.Interface.SerialReader
 
 -- | Commands sent to the 'serialWriter' thread. The data constructors represent GRBL commands.
 data WriteCommand = GetPosition | SendProgram String deriving (Eq, Show)
@@ -25,6 +27,9 @@ data WriteCommand = GetPosition | SendProgram String deriving (Eq, Show)
 toGRBLCommand :: WriteCommand -> String
 toGRBLCommand GetPosition = "?"
 toGRBLCommand (SendProgram s) = s ++ "\n"
+
+sendProgram :: Chan WriteCommand -> Chan ReadCommand -> String -> IO ()
+sendProgram wc rc s = writeChan wc (SendProgram s) >> waitFor rc Ok
 
 -- | Waits for commands on a Chan, and sends them over the serial port. To be used with 'forkIO'.
 serialWriter :: Chan WriteCommand 	-- ^ wc : The Chan where the incoming commands come from

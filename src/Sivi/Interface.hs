@@ -58,14 +58,21 @@ getInput = do
 		'q' -> return Exit	
 		_ -> getInput
 
-loop ptc = do
+
+loop wc rc ptc = do
 	i <- getInput
 	case i of
-		StartProgram -> writeChan ptc Start >> loop ptc
-		PauseProgram -> writeChan ptc Pause >> loop ptc
-		StopProgram -> writeChan ptc Stop >> loop ptc
+		StartProgram -> writeChan ptc Start >> loop wc rc ptc
+		PauseProgram -> writeChan ptc Pause >> loop wc rc ptc
+		StopProgram -> writeChan ptc Stop >> loop wc rc ptc
+		XMinus -> sendProgram wc rc "G91 G00 X-1" >> sendProgram wc rc "G90" >> loop wc rc ptc
+		YMinus -> sendProgram wc rc "G91 G00 Y-1" >> sendProgram wc rc "G90" >> loop wc rc ptc 
+		YPlus -> sendProgram wc rc "G91 G00 Y1" >> sendProgram wc rc "G90" >> loop wc rc ptc 
+		XPlus -> sendProgram wc rc "G91 G00 X1" >> sendProgram wc rc "G90" >> loop wc rc ptc
+		ZMinus -> sendProgram wc rc "G91 G00 Z-1" >> sendProgram wc rc "G90" >> loop wc rc ptc
+		ZPlus -> sendProgram wc rc "G91 G00 Z1" >> sendProgram wc rc "G90" >> loop wc rc ptc
 		Exit -> return ()
-		_ -> putStrLn (show i) >> loop ptc
+		_ -> putStrLn (show i) >> loop wc rc ptc
 
 -- | Text mode interface for GRBL.
 interface :: [GCode] -> IO ()
@@ -84,6 +91,6 @@ interface gcode = do
 	forkIO $ serialWriter wc pc serial 
 	forkIO $ toolPositionThread wc rc pc 
 	forkIO $ programThread wc rc2 pc ptc gcode Paused
-	loop ptc
+	loop wc rc2 ptc
 	closeSerial serial
 	exitInterface
