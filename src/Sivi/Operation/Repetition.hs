@@ -56,15 +56,15 @@ gridRepetition nx ny space_x space_y z_safe = repetition pos_list z_safe
 
 -- | Repeats an operation on the z axis (possible to add a tool retraction between each pass)
 zRepetition :: Double			-- ^ depth : Depth of the final pass (relative to the first)
-		-> Double		-- ^ step : Depth of cut	
 		-> Maybe Double		-- ^ m_z_safe : Adds tool retraction to z_safe between each pass (if provided)
 		-> Operation IR		-- ^ op : Operation to repeat
 		-> Operation IR		-- ^ Resulting operation
-zRepetition depth step m_z_safe op = case m_z_safe of
-					Just z_safe -> repetition pos_list z_safe op
-					Nothing -> repetitionWithoutRetract pos_list op
-					where
-						pos_list = map (V3 0 0) $ zRange step depth step
+zRepetition depth m_z_safe op = do
+	step <- getDepthOfCut
+	let pos_list = map (V3 0 0) $ zRange step depth step
+	case m_z_safe of
+		Just z_safe -> repetition pos_list z_safe op
+		Nothing -> repetitionWithoutRetract pos_list op
 
 -- | Helper function for zRepetition.
 -- Generates a list of depths (on the Z axis) for each iteration of the repetition.
