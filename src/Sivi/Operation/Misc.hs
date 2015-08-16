@@ -17,8 +17,9 @@ import Sivi.IR
 import Linear
 import Sivi.Operation.Base
 
-saw_left :: Double
-	-> Operation IR
+-- | Sawing operation. Cuts in the Y direction.
+saw_left :: Double	-- ^ w : Width of the cut (tool radius compensation is automatic)
+	-> Operation IR	-- ^ Resulting operation
 saw_left w = do
 		df <- getToolDiameter
 		op1 <- approach $ V3 (-df/2) (-df/2) 0 
