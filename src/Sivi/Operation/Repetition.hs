@@ -11,7 +11,6 @@ module Sivi.Operation.Repetition (
 	circularRepetition
 	, gridRepetition
 	, zRepetition
-	, zRange 
 ) where
 
 import Sivi.Operation.Base
