@@ -278,5 +278,5 @@ withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 --	* Tool : EndMill : name="01" diameter=3 length=42
 runOperation :: Operation IR	-- ^ o : The operation to run
 		-> IR		-- ^ The resulting program in Intermediate Representation
-runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30, 0.5))  (V3 0 0 0, EndMill {name="01", diameter=3, len=42})
+runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30, (-0.5)))  (V3 0 0 0, EndMill {name="01", diameter=3, len=42})
 
