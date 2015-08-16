@@ -56,30 +56,37 @@ import Control.Applicative
 --
 -- * Double : Plunge rate
 --
+-- * Double : Depth of cut
+--
 -- * Double (in the State Monad) : The current machine position
 --
 -- * Tool (in the State Monad) : The current tool
-type Operation a = ReaderT (V3 Double, Double, Double) (State (V3 Double, Tool)) a
+type Operation a = ReaderT (V3 Double, Double, Double, Double) (State (V3 Double, Tool)) a
 
 -- | Returns the origin of an operation
 getOrigin :: Operation (V3 Double)
 getOrigin = do 
-		(or, _, _) <- ask
+		(or, _, _, _) <- ask
 		return or
 
 -- | Returns the current feed rate
 getFeedRate :: Operation Double
 getFeedRate = do
-		(_, fr, _) <- ask
+		(_, fr, _, _) <- ask
 		return fr
 
 -- | Returns the current plunge rate
 getPlungeRate :: Operation Double
 getPlungeRate = do
-		(_, _, pr) <- ask
+		(_, _, pr, _) <- ask
 		return pr
 
-		
+-- | Returns the current depth of cut
+getDepthOfCut :: Operation Double
+getDepthOfCut = do
+		(_, _, _, dc) <- ask
+		return dc
+	
 -- | Returns the machine's current position (from the State monad)
 getCurrentPosition :: Operation (V3 Double)
 getCurrentPosition = liftM fst (lift get)
@@ -184,7 +191,7 @@ approach_rapid dst = rapid_xy dst +++ rapid dst
 translate :: V3 Double		-- ^ v : Translation vector
 	-> Operation IR		-- ^ o : Operation to translate
 	-> Operation IR		-- Resulting operation
-translate v = local (\(or, fr, pr)->(or+v, fr, pr))
+translate v = local (\(or, fr, pr, dc)->(or+v, fr, pr, dc))
 
 -- | Chain two operations (without tool retraction between operations)
 (+++) :: Operation IR	-- ^ o1 : Operation 1
@@ -242,5 +249,5 @@ withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 --	* Tool : EndMill : name="01" diameter=3 length=42
 runOperation :: Operation IR	-- ^ o : The operation to run
 		-> IR		-- ^ The resulting program in Intermediate Representation
-runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30))  (V3 0 0 0, EndMill {name="01", diameter=3, len=42})
+runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30, 0.5))  (V3 0 0 0, EndMill {name="01", diameter=3, len=42})
 
