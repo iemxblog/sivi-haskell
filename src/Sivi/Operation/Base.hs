@@ -13,6 +13,11 @@ module Sivi.Operation.Base (
 	, getOrigin
 	, getFeedRate
 	, getPlungeRate
+	, getDepthOfCut
+	, withOrigin
+	, withFeedRate
+	, withPlungeRate
+	, withDepthOfCut
 	, getCurrentPosition
 	, putCurrentPosition
 	, getTool
@@ -86,6 +91,30 @@ getDepthOfCut :: Operation Double
 getDepthOfCut = do
 		(_, _, _, dc) <- ask
 		return dc
+
+-- | Calls an operation with the specified origin
+withOrigin :: 	V3 Double 		-- ^ no : The new origin
+		-> Operation IR 	-- ^ The operation to call with the specified origin
+		-> Operation IR		-- ^ The resulting operation
+withOrigin no = local (\(_, fr, pr, dc) -> (no, fr, pr, dc))
+
+-- | Calls an operation with the specified feed rate
+withFeedRate :: Double 			-- ^ nfr : The new feed rate
+		-> Operation IR 	-- ^ The operation to call with the new feed rate
+		-> Operation IR		-- ^ The resulting operation
+withFeedRate nfr = local (\(or, _, pr, dc) -> (or, nfr, pr, dc))
+
+-- | Calls an operation with the specified plunge rate
+withPlungeRate :: Double 		-- ^ npr : The new plunge rate
+		-> Operation IR 	-- ^ The operation to call with the new plunge rate
+		-> Operation IR		-- ^ The resulting operation
+withPlungeRate npr = local (\(or, fr, _, dc) -> (or, fr, npr, dc))
+
+-- | Calls an operation with the specified depth of cut
+withDepthOfCut :: Double 		-- ^ ndc : The new depth of cut
+		-> Operation IR 	-- ^ The operation to call with the new depth of cut
+		-> Operation IR		-- ^ The resulting operation
+withDepthOfCut ndc = local (\(or, fr, pr, _) -> (or, fr, pr, ndc))
 	
 -- | Returns the machine's current position (from the State monad)
 getCurrentPosition :: Operation (V3 Double)
@@ -191,7 +220,7 @@ approach_rapid dst = rapid_xy dst +++ rapid dst
 translate :: V3 Double		-- ^ v : Translation vector
 	-> Operation IR		-- ^ o : Operation to translate
 	-> Operation IR		-- Resulting operation
-translate v = local (\(or, fr, pr, dc)->(or+v, fr, pr, dc))
+translate v op = getOrigin >>= \or -> withOrigin (or + v) op
 
 -- | Chain two operations (without tool retraction between operations)
 (+++) :: Operation IR	-- ^ o1 : Operation 1
