@@ -206,12 +206,19 @@ rapid_xy dst = do
 			let V3 xd yd _ = dst 
 			move (V3 (xo+xd) (yo+yd) z) Rapid
 
--- | Rapid in the xy plane + plunge to destination
+-- | Rapid in the xy plane + rapid plunge with margin (2 * depth of cut above destination) + plunge (with plunge rate) to destination
 approach :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- ^ Resulting operation
-approach dst = rapid_xy dst +++ plunge dst
+approach dst = do
+	V3 _ _ zo <- getOrigin
+	V3 _ _ z <- getCurrentPosition	
+	dc <- getDepthOfCut
+	op1 <- rapid_xy dst 
+	op2 <- if (z-zo) > 2*(abs dc) then rapid (dst + V3 0 0 (2* (abs dc))) else noOp
+	op3 <- plunge dst
+	return (op1 ++ op2 ++ op3)
 
--- | Same as approach, but plunge with rapid move
+-- | Same as approach, but plunge with rapid move only
 approach_rapid :: V3 Double	-- ^ dst : Destination
 		-> Operation IR -- ^ Resulting operation
 approach_rapid dst = rapid_xy dst +++ rapid dst
