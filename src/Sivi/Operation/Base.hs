@@ -51,6 +51,7 @@ import Linear
 import Control.Monad.State
 import Control.Monad.Reader
 import Control.Applicative
+import Data.List
 
 -- | The Operation type.
 -- Parameters are :
@@ -240,6 +241,9 @@ o1 +++ o2 = do
 
 opsequence :: [Operation IR] -> Operation IR
 opsequence = foldr (+++) noOp
+
+chain :: Double -> [Operation IR] -> Operation IR
+chain zSafe = opsequence . intersperse (retract zSafe) 
 
 -- | Pause operation, takes no arguments
 pause :: Operation IR
