@@ -239,10 +239,14 @@ o1 +++ o2 = do
 		ir2 <- o2
 		return $ ir1 ++ ir2
 
+-- | Chains a list of operations.
 opsequence :: [Operation IR] -> Operation IR
 opsequence = foldr (+++) noOp
 
-chain :: Double -> [Operation IR] -> Operation IR
+-- | Chains a list of operations, and intersperses tool retractions between them.
+chain :: Double 		-- ^ zSafe : The altitude of tool retractions
+	-> [Operation IR] 	-- ^ The list of operations
+	-> Operation IR		-- ^ The resulting operation
 chain zSafe = opsequence . intersperse (retract zSafe) 
 
 -- | Pause operation, takes no arguments
