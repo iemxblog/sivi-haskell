@@ -36,6 +36,7 @@ module Sivi.Operation.Base (
 	, translate
 	, (+++)
 	, opsequence
+	, chain
 	, runOperation
 	, pause
 	, probe
