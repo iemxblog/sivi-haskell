@@ -17,13 +17,6 @@ import Sivi.Operation.Base
 import Sivi.IR
 import Linear
 
--- | Chains two operations, and adds a tool rectraction before each operation
-next :: Double 			-- ^ z_safe : Tool retraction 
-	-> Operation IR		-- ^ op1 : First operation
-	 -> Operation IR	-- ^ op2 : Second operation
-	 -> Operation IR	-- Rectraction + Operation 1 + Retraction + Operation 2
-next z_safe o1 o2 = retract z_safe +++ o1 +++ retract z_safe +++ o2 
-
 repetition :: [V3 Double] -> Double -> Operation IR -> Operation IR
 repetition xs z_safe op = opsequence $ map (\v -> retract z_safe +++ translate v op) xs
 
