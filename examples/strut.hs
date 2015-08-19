@@ -42,5 +42,5 @@ op :: Operation IR
 op = strut 8 30
 		
 main :: IO ()
-main = putStr . (++"M2\n") . toString . runOperationWithDefaultParams $ op
---main = interface . toGCode . runOperation $ op
+--main = putStr . (++"M2\n") . toString . runOperationWithDefaultParams $ op
+main = interface . toGCode . runOperationWithDefaultParams $ op
