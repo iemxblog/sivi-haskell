@@ -18,7 +18,7 @@ import Sivi.IR
 import Linear
 
 repetition :: [V3 Double] -> Double -> Operation IR -> Operation IR
-repetition xs z_safe op = opsequence $ map (\v -> retract z_safe +++ translate v op) xs
+repetition xs z_safe op = chain z_safe $ map (\v -> translate v op) xs
 
 repetitionWithoutRetract :: [V3 Double] -> Operation IR -> Operation IR
 repetitionWithoutRetract xs op = opsequence $ map (\v -> translate v op) xs
