@@ -21,9 +21,9 @@ import Linear
 -- | Tool data type.
 -- Used for tool changes, radius compensation.
 data Tool = 
-	EndMill { name :: String, diameter :: Double, len :: Double }
-	| BallEndMill { name :: String, diameter :: Double, shankDiameter :: Double, len :: Double } 
-	| ProbeTool { name :: String, diameter :: Double, len :: Double }
+	EndMill { diameter :: Double, len :: Double }
+	| BallEndMill { diameter :: Double, shankDiameter :: Double, len :: Double } 
+	| ProbeTool { diameter :: Double, len :: Double }
 	deriving (Eq, Show)
 
 type Coordinate = Double
