@@ -37,7 +37,7 @@ module Sivi.Operation.Base (
 	, (+++)
 	, opsequence
 	, chain
-	, runOperation
+	, runOperationWithDefaultParams
 	, pause
 	, probe
 	, defCurPos
@@ -282,7 +282,6 @@ withTool :: 	Tool 		-- ^ t : The tool to use for the operation
 withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 	
 	
-
 -- | Runs an operation with default starting position, feed rate, plunge rate and tool.
 --
 -- 	* Starting position : V3 0 0 0
@@ -291,8 +290,8 @@ withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 --
 -- 	* Plunge rate : 30 mm/min
 --
---	* Tool : EndMill : name="01" diameter=3 length=42
-runOperation :: Operation IR	-- ^ o : The operation to run
+--	* Tool : EndMill : diameter=3 length=42
+runOperationWithDefaultParams :: Operation IR	-- ^ o : The operation to run
 		-> IR		-- ^ The resulting program in Intermediate Representation
-runOperation o = evalState (runReaderT o (V3 0 0 0, 100, 30, (-0.5)))  (V3 0 0 0, EndMill {name="01", diameter=3, len=42})
+runOperationWithDefaultParams o = evalState (runReaderT o (V3 0 0 0, 100, 30, (-0.5)))  (V3 0 0 0, EndMill {diameter=3, len=42})
 
