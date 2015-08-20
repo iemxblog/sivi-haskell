@@ -16,7 +16,7 @@ import Sivi.IR
 import Sivi.Operation.Base
 
 -- | Rotates an operation in the XY plane.
-rotate :: Double			-- ^ angle : The rotation angle
+rotate :: Double			-- ^ angle : The rotation angle in degrees
 	-> Operation IR			-- ^ op : The operation to rotate
 	-> Operation IR			-- ^ The transformed operation
 rotate angle op = op >>= (return . rotateIR angle)

@@ -40,7 +40,7 @@ applyMatrix :: V3 (V3 Double)		-- ^ The transformation matrix
 applyMatrix m = map (applyMatrix' m)
 
 -- | Rotates 'IR' in the XY plane.
-rotateIR :: 	Double 		-- ^ angle : The rotation angle
+rotateIR :: 	Double 		-- ^ angle : The rotation angle in degrees
 		-> IR		-- ^ The intermediate representation to rotate
 		-> IR		-- ^ The transformed intermediate representation
 rotateIR angle = applyMatrix m
