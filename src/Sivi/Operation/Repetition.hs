@@ -14,8 +14,9 @@ module Sivi.Operation.Repetition (
 ) where
 
 import Sivi.Operation.Base
+import Sivi.Operation.Transformation
 import Sivi.IR
-import Linear
+import Linear hiding (rotate)
 
 repetition :: [V3 Double] -> Double -> Operation IR -> Operation IR
 repetition xs z_safe op = chain z_safe $ map (\v -> translate v op) xs
@@ -28,12 +29,13 @@ circularRepetition :: Double			-- ^ d : Diameter
 			-> Int			-- ^ n : Number of repetitions
 			-> Double		-- ^ start_angle : Start angle
 			-> Double		-- ^ z_safe : Tool retraction 
-			-> Operation IR		-- ^ Operation to repeat
-			-> Operation IR		-- ^ Retraction + Operation 1 on circle + Retraction + Operation 2 on circle + ...
-circularRepetition d n start_angle z_safe = repetition pos_list z_safe
+			-> Operation IR		-- ^ op : Operation to repeat
+			-> Operation IR		-- ^ Operation 1 on circle + Retraction + Operation 2 on circle + ...
+circularRepetition d n start_angle z_safe op = chain z_safe . map (\(a, p) -> translate p . rotate a $ op) $ zip angles pos_list
 	where
-		pos_list = [V3 (d/2*cos(f i)) (d/2*sin(f i)) 0 | i <- [0..n-1]]
-		f a = fromIntegral a * 2*pi/fromIntegral n + start_angle*pi/180
+		angles = [fromIntegral i * 360/fromIntegral n + start_angle | i <- [0..n-1]]
+		angles_rad = [a * pi / 180 | a <- angles]
+		pos_list = [V3 (d/2*cos(angle_rad)) (d/2*sin(angle_rad)) 0 | angle_rad <- angles_rad]
 
 -- | Repeats an operation on a grid (and adds a tool retraction each time)
 gridRepetition :: Int			-- ^ nx : Number of repetitions on X axis
@@ -42,7 +44,7 @@ gridRepetition :: Int			-- ^ nx : Number of repetitions on X axis
 		 -> Double		-- ^ space_y : Space between each operation on Y axis
 		 -> Double		-- ^ z_safe : Tool retraction
 		 -> Operation IR	-- ^ Operation to repeat
-		 -> Operation IR	-- ^ Retraction + Operation 1 on grid + Retraction + Operation 2 on grid + ...
+		 -> Operation IR	-- ^ Operation 1 on grid + Retraction + Operation 2 on grid + ...
 gridRepetition nx ny space_x space_y z_safe = repetition pos_list z_safe
 	where
 		pos_list = [V3 (fromIntegral x * space_x) (fromIntegral y * space_y) 0 | x <- [1..nx-1], y <- [1..ny-1]]
