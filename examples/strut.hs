@@ -14,7 +14,7 @@ probeStrut d l margin probetool =
 		+++ chain 5 [
 			probeZMinus (V3 l (d/2) 0) margin
 			, probeXMinus (V3 l (d/2) (-d/2)) margin
-			, probeYPlus (V3 0 0 (-d/2)) margin
+			, probeYPlus (V3 0 0 (-3*d/4)) margin
 		]
 	)
 	+++ comment "Don't forget to put the probe connectors for tool length measurement."
@@ -26,20 +26,20 @@ probeStrut d l margin probetool =
 strut' :: Double -> Double -> Operation IR
 strut' d l = 
 	chain 5 [
-		probeStrut d l 5 (ProbeTool 3 42)
+		withFeedRate 10 (probeStrut d l 5 (ProbeTool 3 42))
 		, zRepetition (-d) (Just 1) (saw_left d)
 	]
 
 strut :: Double -> Double -> Operation IR
 strut d l = 
-	strut' (d+2) l
+	strut' d (l+2)
 	+++ retract 30
 	+++ comment "Please rotate the strut to machine the other side"
 	+++ pause
 	+++ strut' d l 
 
 op :: Operation IR
-op = strut 8 30
+op = strut 10 47.1
 		
 main :: IO ()
 --main = putStr . (++"M2\n") . toString . runOperationWithDefaultParams $ op
