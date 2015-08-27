@@ -8,11 +8,7 @@ Stability	: experimental
 Portability	: POSIX
 -}
 module Sivi.Operation.Probing.Cylinder (
-	probeXMinus
-	, probeXPlus
-	, probeYMinus
-	, probeYPlus
-	, probeZMinus
+	probeOuterCylinder
 ) where
 
 import Linear
