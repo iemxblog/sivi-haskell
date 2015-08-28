@@ -40,7 +40,7 @@ probeHorizontalCylinderRight d l margin probetool =
 	+++ comment "Remove the probe connectors"
 	+++ pause
 
--- | Probes a vertical cylinder.
+-- | Probes a vertical cylinder. Touches the outside surface.
 probeOuterCylinder :: 	Double 			-- ^ d : Diameter of the cylinder
 			-> Double 		-- ^ margin : Probing margin
 			-> Tool 		-- ^ probeTool : Tool used to probe the part
