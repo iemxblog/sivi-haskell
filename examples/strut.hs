@@ -8,7 +8,7 @@ import Linear
 strut' :: Double -> Double -> Operation IR
 strut' d l = 
 	chain 5 [
-		withFeedRate 10 (probeHorizontalCylinderRight d l 5 (ProbeTool 3 42))
+		probeHorizontalCylinderRight d l 5 (ProbeTool 3 42)
 		, zRepetition (-d) (Just 1) (saw_left d)
 	]
 

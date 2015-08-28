@@ -13,6 +13,7 @@ module Sivi.Operation.Base (
 	, getOrigin
 	, getFeedRate
 	, getPlungeRate
+	, getProbeRate
 	, getDepthOfCut
 	, withOrigin
 	, withFeedRate
@@ -63,60 +64,69 @@ import Data.List
 --
 -- * Double : Plunge rate
 --
+-- * Double : Probe rate
+--
 -- * Double : Depth of cut
 --
 -- * Double (in the State Monad) : The current machine position
 --
 -- * Tool (in the State Monad) : The current tool
-type Operation a = ReaderT (V3 Double, Double, Double, Double) (State (V3 Double, Tool)) a
+type Operation a = ReaderT (V3 Double, Double, Double, Double, Double) (State (V3 Double, Tool)) a
 
 -- | Returns the origin of an operation
 getOrigin :: Operation (V3 Double)
 getOrigin = do 
-		(or, _, _, _) <- ask
+		(or, _, _, _, _) <- ask
 		return or
 
 -- | Returns the current feed rate
 getFeedRate :: Operation Double
 getFeedRate = do
-		(_, fr, _, _) <- ask
+		(_, fr, _, _, _) <- ask
 		return fr
 
 -- | Returns the current plunge rate
 getPlungeRate :: Operation Double
 getPlungeRate = do
-		(_, _, pr, _) <- ask
+		(_, _, pr, _, _) <- ask
 		return pr
+
+-- | Returns the current probe rate
+getProbeRate :: Operation Double
+getProbeRate = do
+		(_, _, _, pbr, _) <- ask
+		return pbr
+
 
 -- | Returns the current depth of cut
 getDepthOfCut :: Operation Double
 getDepthOfCut = do
-		(_, _, _, dc) <- ask
+		(_, _, _, _, dc) <- ask
 		return dc
 
 -- | Calls an operation with the specified origin
 withOrigin :: 	V3 Double 		-- ^ no : The new origin
 		-> Operation IR 	-- ^ The operation to call with the specified origin
 		-> Operation IR		-- ^ The resulting operation
-withOrigin no = local (\(_, fr, pr, dc) -> (no, fr, pr, dc))
+withOrigin no = local (\(_, fr, pr, pbr, dc) -> (no, fr, pr, pbr, dc))
 
 -- | Calls an operation with the specified feed rate
 withFeedRate :: Double 			-- ^ nfr : The new feed rate
 		-> Operation IR 	-- ^ The operation to call with the new feed rate
 		-> Operation IR		-- ^ The resulting operation
-withFeedRate nfr = local (\(or, _, pr, dc) -> (or, nfr, pr, dc))
+withFeedRate nfr = local (\(or, _, pr, pbr, dc) -> (or, nfr, pr, pbr, dc))
 
 -- | Calls an operation with the specified plunge rate
 withPlungeRate :: Double 		-- ^ npr : The new plunge rate
 		-> Operation IR 	-- ^ The operation to call with the new plunge rate
 		-> Operation IR		-- ^ The resulting operation
-withPlungeRate npr = local (\(or, fr, _, dc) -> (or, fr, npr, dc))
+withPlungeRate npr = local (\(or, fr, _, pbr, dc) -> (or, fr, npr, pbr, dc))
 
 -- | Calls an operation with the specified depth of cut
 withDepthOfCut :: Double 		-- ^ ndc : The new depth of cut
 		-> Operation IR 	-- ^ The operation to call with the new depth of cut
 		-> Operation IR		-- ^ The resulting operation
-withDepthOfCut ndc = local (\(or, fr, pr, _) -> (or, fr, pr, ndc))
+withDepthOfCut ndc = local (\(or, fr, pr, pbr, _) -> (or, fr, pr, pbr, ndc))
 	
 -- | Returns the machine's current position (from the State monad)
 getCurrentPosition :: Operation (V3 Double)
@@ -257,8 +267,8 @@ pause = return [Pause]
 probe :: V3 Double -> Operation IR
 probe dst = do
 		or <- getOrigin
-		fr <- getFeedRate
-		move (or+dst) (Probe fr)	
+		pbr <- getProbeRate
+		move (or+dst) (Probe pbr)	
 
 defCurPos :: V3 Double -> Operation IR
 defCurPos p = do
@@ -290,8 +300,12 @@ withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 --
 -- 	* Plunge rate : 30 mm/min
 --
+-- 	* Probe rate : 10 mm/min
+--
+-- 	* Depth of cut : -0.5 mm
+--
 --	* Tool : EndMill : diameter=3 length=42
 runOperationWithDefaultParams :: Operation IR	-- ^ o : The operation to run
 		-> IR		-- ^ The resulting program in Intermediate Representation
-runOperationWithDefaultParams o = evalState (runReaderT o (V3 0 0 0, 100, 30, (-0.5)))  (V3 0 0 0, EndMill {diameter=3, len=42})
+runOperationWithDefaultParams o = evalState (runReaderT o (V3 0 0 0, 100, 30, 10, (-0.5)))  (V3 0 0 0, EndMill {diameter=3, len=42})
 
