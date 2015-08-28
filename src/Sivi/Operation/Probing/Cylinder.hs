@@ -8,7 +8,8 @@ Stability	: experimental
 Portability	: POSIX
 -}
 module Sivi.Operation.Probing.Cylinder (
-	probeOuterCylinder
+	probeHorizontalCylinderRight
+	, probeOuterCylinder
 ) where
 
 import Linear
@@ -16,7 +17,34 @@ import Sivi.IR.Base
 import Sivi.Operation.Base
 import Sivi.Operation.Probing.Base
 
-probeOuterCylinder :: Double -> Double -> Tool -> Operation IR
+-- | Probes a laying cylinder (placed horizontally in a vise). Probes on the right side for the X axis.
+probeHorizontalCylinderRight :: Double 		-- ^ d : Diameter of the cylinder
+			-> Double 		-- ^ l : Length of the cylinder
+			-> Double 		-- ^ margin : Probing margin
+			-> Tool 		-- ^ probetool : Tool used to probe the part
+			-> Operation IR		-- ^ Resulting operation
+probeHorizontalCylinderRight d l margin probetool = 
+	withTool probetool (
+		comment "Place the probe 5mm above the right side of the strut, centered on the axis of the cylinder"	
+		+++ pause
+		+++ defCurPos (V3 l (d/2) 5)
+		+++ chain 5 [
+			probeZMinus (V3 l (d/2) 0) margin
+			, probeXMinus (V3 l (d/2) (-d/2)) margin
+			, probeYPlus (V3 0 0 (-3*d/4)) margin
+		]
+	)
+	+++ comment "Don't forget to put the probe connectors for tool length measurement."
+	+++ pause
+	+++ probeZMinus (V3 0 (d/2) 0) margin
+	+++ comment "Remove the probe connectors"
+	+++ pause
+
+-- | Probes a vertical cylinder.
+probeOuterCylinder :: 	Double 			-- ^ d : Diameter of the cylinder
+			-> Double 		-- ^ margin : Probing margin
+			-> Tool 		-- ^ probeTool : Tool used to probe the part
+			-> Operation IR		-- ^ Resulting operation
 probeOuterCylinder d margin probeTool = 
 	withTool probeTool (
 		comment "Place the probe 5mm above the center of the cylinder"

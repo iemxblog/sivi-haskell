@@ -5,28 +5,10 @@ module Main (
 import Sivi
 import Linear
 
-probeStrut :: Double -> Double -> Double -> Tool -> Operation IR
-probeStrut d l margin probetool = 
-	withTool probetool (
-		comment "Place the probe 5mm above the right side of the strut, centered on the axis of the cylinder"	
-		+++ pause
-		+++ defCurPos (V3 l (d/2) 5)
-		+++ chain 5 [
-			probeZMinus (V3 l (d/2) 0) margin
-			, probeXMinus (V3 l (d/2) (-d/2)) margin
-			, probeYPlus (V3 0 0 (-3*d/4)) margin
-		]
-	)
-	+++ comment "Don't forget to put the probe connectors for tool length measurement."
-	+++ pause
-	+++ probeZMinus (V3 0 (d/2) 0) margin
-	+++ comment "Remove the probe connectors"
-	+++ pause
-
 strut' :: Double -> Double -> Operation IR
 strut' d l = 
 	chain 5 [
-		withFeedRate 10 (probeStrut d l 5 (ProbeTool 3 42))
+		withFeedRate 10 (probeHorizontalCylinderRight d l 5 (ProbeTool 3 42))
 		, zRepetition (-d) (Just 1) (saw_left d)
 	]
 
