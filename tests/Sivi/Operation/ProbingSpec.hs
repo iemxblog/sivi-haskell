@@ -22,4 +22,4 @@ spec = describe "probeXMinus" $ do
 		depth = -10
 		margin = 5
 		td = 3 -- defined in runOperation, not very clean....
-		f = 100 -- idem
+		f = 10 -- idem
