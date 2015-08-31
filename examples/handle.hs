@@ -17,7 +17,7 @@ drillings :: Double -> Double -> Double -> Double -> Operation IR
 drillings d l d1 d2 = 
 	withTool (EndMill 2 42) $
 		chain 5 [
-			probeZMinus (V3 d1 0 0) 5
+			probeZMinus (V3 d1 (d/2) 0) 5
 			, comment "Start the spindle" +++ pause
 			, translate (V3 d1 (d/2) 0) (zRepetition (-d) (Just 10) drill)
 			, translate (V3 (l-d2) (d/2) 0) (zRepetition (-d) (Just 10) drill)
