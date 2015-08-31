@@ -42,10 +42,10 @@ handle =
 	]
 	+++ axial_drilling d 4.5 l
 	where
-		l = 15
+		l = 12
 		d = 10
-		d1 = 5
-		d2 = 5
+		d1 = 7.2
+		d2 = 3
 
 main :: IO ()
 --main = putStr . (++"M2\n") . toString . runOperationWithDefaultParams $ handle
