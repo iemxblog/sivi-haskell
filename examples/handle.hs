@@ -19,8 +19,8 @@ drillings d l d1 d2 =
 		chain 5 [
 			probeZMinus (V3 d1 (d/2) 0) 5
 			, comment "Start the spindle" +++ pause
-			, translate (V3 d1 (d/2) 0) (zRepetition (-(d+1) (Just 10) drill))
-			, translate (V3 (l-d2) (d/2) 0) (zRepetition (-(d+1)) (Just 10) drill)
+			, translate (V3 d1 (d/2) 0) (zRepetition (-d-1) (Just 10) drill)
+			, translate (V3 (l-d2) (d/2) 0) (zRepetition (-d-1) (Just 10) drill)
 		]
 
 axial_drilling :: Double -> Double -> Double -> Operation IR
