@@ -9,6 +9,8 @@ Portability	: POSIX
 -}
 module Sivi.Operation.BasicShape (
 	circle
+	, circleInner
+	, circleOuter
 	, circleFromHere
 	, rectangle
 	, square
@@ -28,6 +30,17 @@ circle :: Double 		-- ^ d : Diameter of the circle
 circle d = approach startingPoint +++ arc CCW (V3 0 0 0) startingPoint
 	where startingPoint = V3 (d/2) 0 0
 
+-- | Circle with tool radius compensation on the inner side. Does not cut the inside of the circle, but just the contour.
+circleInner :: 	Double 		-- ^ d : Diameter of the circle
+		-> Operation IR -- ^ Resulting operation
+circleInner d = getToolDiameter >>= \td -> circle (d-td)
+
+-- | Circle with tool radius compensation on the outer side. Does not cut the inside of the circle, but just the contour.
+circleOuter :: 	Double 		-- ^ d : Diameter of the circle
+		-> Operation IR	-- ^ Resulting operation
+circleOuter d = getToolDiameter >>= \td -> circle (d+td)
+
+-- | Circle that starts form the current tool position. The diameter is automatically defined by the distance between the origin and the tool position.
 circleFromHere :: Operation IR
 circleFromHere = do
 			or <- getOrigin
