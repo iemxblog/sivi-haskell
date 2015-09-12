@@ -44,7 +44,6 @@ circleOuter d = getToolDiameter >>= \td -> circle (d+td)
 circleFromHere :: Operation IR
 circleFromHere = do
 			or <- getOrigin
-			fr <- getFeedRate
 			cp <- getCurrentPosition
 			arcNT CCW or cp
 
