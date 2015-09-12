@@ -10,12 +10,13 @@ Portability	: POSIX
 
 module Sivi.Operation.Base (
 	Operation
+	, getTransformation
 	, getOrigin
 	, getFeedRate
 	, getPlungeRate
 	, getProbeRate
 	, getDepthOfCut
-	, withOrigin
+	, withTransformation
 	, withFeedRate
 	, withPlungeRate
 	, withDepthOfCut
@@ -25,16 +26,17 @@ module Sivi.Operation.Base (
 	, putTool
 	, getToolDiameter
 	, noOp	
-	, move
 	, rapid
 	, feed
 	, arc
+	, arcNT
 	, plunge
 	, retract
 	, rapid_xy
 	, approach
 	, approach_rapid
 	, translate
+	, rotate
 	, (+++)
 	, opsequence
 	, chain
@@ -49,16 +51,19 @@ module Sivi.Operation.Base (
 where
 
 import Sivi.IR
-import Linear
+import Linear hiding (rotate)
+import qualified Linear (rotate)
 import Control.Monad.State
 import Control.Monad.Reader
 import Control.Applicative
 import Data.List
 
+type Transformation = V3 Double -> V3 Double
+
 -- | The Operation type.
 -- Parameters are :
 --
--- * V3 Double : the operation's origin (for example, 'translate' moves the origin)
+-- * Transformation : the current 'Transformation'
 --
 -- * Double : Feed rate
 --
@@ -71,13 +76,18 @@ import Data.List
 -- * Double (in the State Monad) : The current machine position
 --
 -- * Tool (in the State Monad) : The current tool
-type Operation a = ReaderT (V3 Double, Double, Double, Double, Double) (State (V3 Double, Tool)) a
+type Operation a = ReaderT (Transformation, Double, Double, Double, Double) (State (V3 Double, Tool)) a
+
+getTransformation :: Operation Transformation
+getTransformation = do
+			(tr, _, _, _, _) <- ask
+			return tr
 
 -- | Returns the origin of an operation
 getOrigin :: Operation (V3 Double)
 getOrigin = do 
-		(or, _, _, _, _) <- ask
-		return or
+		tr <- getTransformation
+		return $ tr (V3 0 0 0)
 
 -- | Returns the current feed rate
 getFeedRate :: Operation Double
@@ -104,29 +114,29 @@ getDepthOfCut = do
 		(_, _, _, _, dc) <- ask
 		return dc
 
--- | Calls an operation with the specified origin
-withOrigin :: 	V3 Double 		-- ^ no : The new origin
-		-> Operation IR 	-- ^ The operation to call with the specified origin
-		-> Operation IR		-- ^ The resulting operation
-withOrigin no = local (\(_, fr, pr, pbr, dc) -> (no, fr, pr, pbr, dc))
+-- | Calls an operation with the specified transformation
+withTransformation :: 	Transformation 		-- ^ ntr : The new transformation
+			-> Operation IR 	-- ^ The operation to call with the specified transformation
+			-> Operation IR		-- ^ The resulting operation
+withTransformation ntr = local (\(tr, fr, pr, pbr, dc) -> (tr . ntr, fr, pr, pbr, dc))
 
 -- | Calls an operation with the specified feed rate
 withFeedRate :: Double 			-- ^ nfr : The new feed rate
 		-> Operation IR 	-- ^ The operation to call with the new feed rate
 		-> Operation IR		-- ^ The resulting operation
-withFeedRate nfr = local (\(or, _, pr, pbr, dc) -> (or, nfr, pr, pbr, dc))
+withFeedRate nfr = local (\(tr, _, pr, pbr, dc) -> (tr, nfr, pr, pbr, dc))
 
 -- | Calls an operation with the specified plunge rate
 withPlungeRate :: Double 		-- ^ npr : The new plunge rate
 		-> Operation IR 	-- ^ The operation to call with the new plunge rate
 		-> Operation IR		-- ^ The resulting operation
-withPlungeRate npr = local (\(or, fr, _, pbr, dc) -> (or, fr, npr, pbr, dc))
+withPlungeRate npr = local (\(tr, fr, _, pbr, dc) -> (tr, fr, npr, pbr, dc))
 
 -- | Calls an operation with the specified depth of cut
 withDepthOfCut :: Double 		-- ^ ndc : The new depth of cut
 		-> Operation IR 	-- ^ The operation to call with the new depth of cut
 		-> Operation IR		-- ^ The resulting operation
-withDepthOfCut ndc = local (\(or, fr, pr, pbr, _) -> (or, fr, pr, pbr, ndc))
+withDepthOfCut ndc = local (\(tr, fr, pr, pbr, _) -> (tr, fr, pr, pbr, ndc))
 	
 -- | Returns the machine's current position (from the State monad)
 getCurrentPosition :: Operation (V3 Double)
@@ -158,30 +168,36 @@ getToolDiameter = do
 noOp :: Operation IR
 noOp = lift $ return []
 
--- | Helper function to avoid duplicate code
+-- | Helper function to avoid duplicate code. Sets the current position in the State monad, and returns a 'Move'. The current transformation is NOT applied to the parameters.
 move :: V3 Double -> MoveParams -> Operation IR
 move dst params = putCurrentPosition dst >> return [Move dst params] 
 
 -- Variables :
 -- dst : destination
--- or : origin
+-- tr : transformation
 -- fr : feed rate
 -- pr : plunge rate
+-- dc : depth of cut
 
 -- | Rapid positioning
 rapid :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- Resulting operation
 rapid dst = do
-		or <- getOrigin
-		move (or+dst) Rapid
+		tr <- getTransformation
+		move (tr dst) Rapid
+
+-- | Rapid positioning, but does not apply the current transformation. Not meant to be exported, only used as an internal helper function. (NT means "no transformation")
+rapidNT :: V3 Double		-- ^ dst : Destination
+	-> Operation IR		-- ^ Resulting operation
+rapidNT dst = move dst Rapid
 
 -- | Linear interpolation (with the default feedrate)
 feed :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- Resulting operation
 feed dst = do
-		or <- getOrigin
+		tr <- getTransformation
 		fr <- getFeedRate	
-		move (or+dst) (LinearInterpolation fr)
+		move (tr dst) (LinearInterpolation fr)
 
 -- | Circular interpolation
 arc :: ArcDirection 		-- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
@@ -189,17 +205,27 @@ arc :: ArcDirection 		-- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
 	-> V3 Double		-- ^ dst : The destination point
 	-> Operation IR		-- ^ Resulting operation
 arc dir center dst = do
-			or <- getOrigin
+			tr <- getTransformation
 			fr <- getFeedRate
-			move (or+dst) Arc { direction=dir, center=or+center, feedRate=fr}
+			move (tr dst) Arc { direction=dir, center=(tr center), feedRate=fr}
+
+-- | Circular interpolation, but does not apply the current transformation. Exported only for 'circleFromHere'. Only used as an internal helper function. (NT means "no transformation")
+arcNT :: ArcDirection 		-- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
+	-> V3 Double		-- ^ center : The center of the arc (relative to the origin of the operation)
+	-> V3 Double		-- ^ dst : The destination point
+	-> Operation IR		-- ^ Resulting operation
+arcNT dir center dst = do
+			fr <- getFeedRate
+			move dst Arc { direction=dir, center=center, feedRate=fr}
+
 
 -- | Linear interpolation (with the plunge feedrate)
 plunge :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- ^ Resulting operation
 plunge dst = do
-		or <- getOrigin
+		tr <- getTransformation
 		pr <- getPlungeRate
-		move (or+dst) (LinearInterpolation pr)
+		move (tr dst) (LinearInterpolation pr)
 
 -- | Tool retraction
 retract :: Double 		-- ^ z_safe : destination on the Z axis
@@ -213,20 +239,21 @@ retract z_safe = do
 rapid_xy :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- ^ Resulting operation
 rapid_xy dst = do
-			V3 xo yo _ <- getOrigin
+			tr <- getTransformation
 			V3 _ _ z <- getCurrentPosition	
-			let V3 xd yd _ = dst 
-			move (V3 (xo+xd) (yo+yd) z) Rapid
+			let V3 xd yd _ = tr dst 
+			move (V3 xd yd z) Rapid
 
 -- | Rapid in the xy plane + rapid plunge with margin (2 * depth of cut above destination) + plunge (with plunge rate) to destination
 approach :: V3 Double		-- ^ dst : Destination
 	 -> Operation IR	-- ^ Resulting operation
 approach dst = do
-	V3 _ _ zo <- getOrigin
+	tr <- getTransformation
+	let V3 _ _ zd = tr dst
 	V3 _ _ z <- getCurrentPosition	
 	dc <- getDepthOfCut
 	op1 <- rapid_xy dst 
-	op2 <- if (z-zo) > 2*(abs dc) then rapid (dst + V3 0 0 (2* (abs dc))) else noOp
+	op2 <- if (z-zd) > 2*(abs dc) then rapidNT (tr dst + V3 0 0 (2* (abs dc))) else noOp
 	op3 <- plunge dst
 	return (op1 ++ op2 ++ op3)
 
@@ -239,7 +266,14 @@ approach_rapid dst = rapid_xy dst +++ rapid dst
 translate :: V3 Double		-- ^ v : Translation vector
 	-> Operation IR		-- ^ o : Operation to translate
 	-> Operation IR		-- Resulting operation
-translate v op = getOrigin >>= \or -> withOrigin (or + v) op
+translate v = withTransformation (+v)
+
+-- | Rotates an operation in the XY plane.
+rotate :: Double		-- ^ a : angle (in degrees)
+	-> Operation IR		-- ^ Operation to rotate
+	-> Operation IR		-- ^ Resulting operation
+rotate a = withTransformation (Linear.rotate (axisAngle (V3 0 0 1) ar))
+	where ar = a * pi / 180
 
 -- | Chain two operations (without tool retraction between operations)
 (+++) :: Operation IR	-- ^ o1 : Operation 1
@@ -264,17 +298,19 @@ chain zSafe = opsequence . intersperse (retract zSafe)
 pause :: Operation IR
 pause = return [Pause]
 
-probe :: V3 Double -> Operation IR
+-- | Basic probing operation.
+probe :: V3 Double 		-- ^ dst : The destination of the probing move
+	-> Operation IR		-- ^ The resulting operation.
 probe dst = do
-		or <- getOrigin
+		tr <- getTransformation
 		pbr <- getProbeRate
-		move (or+dst) (Probe pbr)	
+		move (tr dst) (Probe pbr)	
 
 defCurPos :: V3 Double -> Operation IR
 defCurPos p = do
-		or <- getOrigin
-		putCurrentPosition (or+p) 
-		return [DefCurPos (or+p)]
+		tr <- getTransformation
+		putCurrentPosition (tr p) 
+		return [DefCurPos (tr p)]
 
 comment :: String -> Operation IR
 comment s = return [Comment s]
@@ -294,7 +330,7 @@ withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 	
 -- | Runs an operation with default starting position, feed rate, plunge rate and tool.
 --
--- 	* Starting position : V3 0 0 0
+-- 	* Starting transformation : id
 --
 -- 	* Feed rate : 100mm/min
 --
@@ -307,5 +343,5 @@ withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 --	* Tool : EndMill : diameter=3 length=42
 runOperationWithDefaultParams :: Operation IR	-- ^ o : The operation to run
 		-> IR		-- ^ The resulting program in Intermediate Representation
-runOperationWithDefaultParams o = evalState (runReaderT o (V3 0 0 0, 100, 30, 10, (-0.5)))  (V3 0 0 0, EndMill {diameter=3, len=42})
+runOperationWithDefaultParams o = evalState (runReaderT o (id, 100, 30, 10, (-0.5)))  (V3 0 0 0, EndMill {diameter=3, len=42})
 

@@ -14,7 +14,6 @@ module Sivi.Operation.Repetition (
 ) where
 
 import Sivi.Operation.Base
-import Sivi.Operation.Transformation
 import Sivi.IR
 import Linear hiding (rotate)
 
@@ -31,11 +30,9 @@ circularRepetition :: Double			-- ^ d : Diameter
 			-> Double		-- ^ z_safe : Tool retraction 
 			-> Operation IR		-- ^ op : Operation to repeat
 			-> Operation IR		-- ^ Operation 1 on circle + Retraction + Operation 2 on circle + ...
-circularRepetition d n start_angle z_safe op = chain z_safe . map (\(a, p) -> translate p . rotate a $ op) $ zip angles pos_list
+circularRepetition d n start_angle z_safe op = chain z_safe . map (\a -> rotate a . translate (V3 (d/2) 0 0) $ op) $ angles 
 	where
 		angles = [fromIntegral i * 360/fromIntegral n + start_angle | i <- [0..n-1]]
-		angles_rad = [a * pi / 180 | a <- angles]
-		pos_list = [V3 (d/2*cos(angle_rad)) (d/2*sin(angle_rad)) 0 | angle_rad <- angles_rad]
 
 -- | Repeats an operation on a grid (and adds a tool retraction each time)
 gridRepetition :: Int			-- ^ nx : Number of repetitions on X axis

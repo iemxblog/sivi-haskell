@@ -14,7 +14,6 @@ module Sivi.Operation(
 	, module Sivi.Operation.Misc
 	, module Sivi.Operation.BasicShape
 	, module Sivi.Operation.Contour
-	, module Sivi.Operation.Transformation
 	, module Sivi.Operation.Probing
 ) where
 
@@ -24,5 +23,4 @@ import Sivi.Operation.Pocket
 import Sivi.Operation.Misc
 import Sivi.Operation.BasicShape
 import Sivi.Operation.Contour
-import Sivi.Operation.Transformation
 import Sivi.Operation.Probing
