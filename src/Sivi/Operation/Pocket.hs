@@ -15,6 +15,7 @@ where
 
 import Sivi.Operation.Base
 import Sivi.Operation.BasicShape
+import Sivi.Operation.Repetition
 import Sivi.IR
 import Linear
 
@@ -33,17 +34,23 @@ archimedeanSpiral d step_over =
 		sp <- opsequence [feed (V3 (r*cos a) (r*sin a) 0) | (r, a) <- zip radius angle ++ [lastPoint]]
 		return (a ++ sp)
 
--- | Generates a circular pocket.
--- To be used with 'Operation.Repetition.zRepetition' for the depth.
-circularPocket :: Double			-- ^ d : Diameter of the pocket
+-- | Generates a single pass of a circular pocket.
+circularPocketP :: Double			-- ^ d : Diameter of the pocket
 		-> Double			-- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
 		-> Operation IR			-- ^ Resulting operation
-circularPocket d step_over = do
+circularPocketP d step_over = do
 				a <- approach (V3 0 0 0)
 				df <- getToolDiameter
 				sp <- archimedeanSpiral d step_over
 				c <- circleFromHere -- the spiral ends at radius = d-df/2, so we start a circle from here
 				return (a ++ sp ++ c)
+
+-- | Generates a circular pocket.
+circularPocket :: Double			-- ^ d : Diameter of the pocker
+		-> Double			-- ^ depth : Depth of the pocket
+		-> Double			-- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
+		-> Operation IR			-- ^ Resulting operation
+circularPocket d depth step_over = zRepetition depth Nothing (circularPocketP d step_over)
 				
 
 -- | Generates the coordinates of a rectangular spiral (in 2D).
@@ -65,13 +72,12 @@ rectangularSpiral :: Num a =>
 			-> [(a, a)]			-- ^ Resulting rectangular spiral
 rectangularSpiral = rectangularSpiralR (0, 0) 1
 
--- | Generates a rectangular pocket.
--- To be used with 'Operation.Repetition.zRepetition' for the depth.
-rectangularPocket :: 	Double 				-- ^ lx : Size of the pocket on the x axis
+-- | Generates a single pass of a rectangular pocket. The P means pass.
+rectangularPocketP :: 	Double 				-- ^ lx : Size of the pocket on the x axis
 			-> Double 			-- ^ ly : Size of the pocket on the y axis
 			-> Double 			-- ^ step_over : The end mill covers step_over mm of the precedent turn
 			-> Operation IR			-- Resulting operation
-rectangularPocket lx ly step_over = do
+rectangularPocketP lx ly step_over = do
 			a <- approach (V3 0 0 0)
 			df <- getToolDiameter		
 			let initial_spacing = df - step_over
@@ -84,4 +90,11 @@ rectangularPocket lx ly step_over = do
 			sp <- opsequence [feed (V3 x y 0) | (x, y) <- sp']
 			r <- centeredRectangle (lx-df) (ly-df)
 			return (a ++ sp ++ r)
-						
+
+-- | Generates a rectangular pocket.
+rectangularPocket :: 	Double				-- ^ lx : Size of the pocket on the x axis
+			-> Double			-- ^ ly : Size of the pocket on the y axis
+			-> Double			-- ^ depth : Depth of the pocket
+			-> Double			-- ^ step_over : Then end mill covers step_over mm of the precedent turn
+			-> Operation IR			-- ^ Resulting operation
+rectangularPocket lx ly depth step_over = zRepetition depth Nothing (rectangularPocketP lx ly step_over)

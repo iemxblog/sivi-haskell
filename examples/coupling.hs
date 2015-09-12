@@ -8,7 +8,7 @@ import Linear
 coupling :: Operation IR
 coupling = 	chain 5 [
 			probeOuterCylinder 20 5 (ProbeTool 3 42)
-			, zRepetition (-7) Nothing (circleInner 4.5)
+			, cylinderInner 4.5 7
 		]
 
 main :: IO ()

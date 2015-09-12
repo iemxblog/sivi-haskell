@@ -6,11 +6,11 @@ import Sivi
 import Linear
 
 
-bigPocket = zRepetition (-10) Nothing (circularPocket 50 0.5)
+bigPocket = circularPocket 50 10 0.5
 
 rectanglePlusCircle = chain 1 [
-		zRepetition (-10) Nothing (rectangularPocket 15 10 0.5)
-		, translate (V3 12 0 0) (zRepetition (-10) Nothing (circularPocket 10 0.5))
+		rectangularPocket 15 10 10 0.5
+		, translate (V3 12 0 0) (circularPocket 10 10 0.5)
 	]
 
 complexOp :: Operation IR

@@ -12,6 +12,8 @@ module Sivi.Operation.BasicShape (
 	, circleInner
 	, circleOuter
 	, circleFromHere
+	, cylinderInner
+	, cylinderOuter
 	, rectangle
 	, square
 	, centeredRectangle
@@ -21,6 +23,7 @@ where
 
 import Sivi.IR
 import Sivi.Operation.Base
+import Sivi.Operation.Repetition
 import Linear
 
 -- | Circle (does not cut the inside of the circle, but just the contour).
@@ -46,6 +49,19 @@ circleFromHere = do
 			or <- getOrigin
 			cp <- getCurrentPosition
 			arcNT CCW or cp
+
+-- | Cylinder with tool radius compensation on the inner side. Does not cut the inside of the cylinder, but just the contour.
+cylinderInner :: Double		-- ^ d : Diameter of the cylinder
+		-> Double	-- ^ depth : Depth of the cylinder
+		-> Operation IR	-- ^ Resulting operation
+cylinderInner d depth = zRepetition depth Nothing (circleInner d)
+
+-- | Cylinder with tool radius compensation on the outer side. Does not cut the inside of the cylinder, but just the contour.
+cylinderOuter :: Double		-- ^ d : Diameter of the cylinder
+		-> Double	-- ^ depth : Depth of the cylinder
+		-> Operation IR	-- ^ Resulting operation
+cylinderOuter d depth = zRepetition depth Nothing (circleOuter d)
+
 
 -- | Rectangle (does not cut the inside of the rectangle, but just the contour).
 -- The origin is the bottom left corner.

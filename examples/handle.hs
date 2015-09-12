@@ -10,7 +10,7 @@ cut :: Double -> Double -> Operation IR
 cut d l = 
 	chain 5 [
 		probeHorizontalCylinderRight d l 5 (ProbeTool 3 42)
-		, zRepetition (-d) (Just 1) (saw_left d)
+		, saw_left d d 1
 	]
 
 drillings :: Double -> Double -> Double -> Double -> Operation IR
@@ -19,15 +19,15 @@ drillings d l d1 d2 =
 		chain 5 [
 			probeZMinus (V3 d1 (d/2) 0) 5
 			, comment "Start the spindle" +++ pause
-			, translate (V3 d1 (d/2) 0) (zRepetition (-d-1) (Just 10) drill)
-			, translate (V3 (l-d2) (d/2) 0) (zRepetition (-d-1) (Just 10) drill)
+			, translate (V3 d1 (d/2) 0) (drill (d+1) 10)
+			, translate (V3 (l-d2) (d/2) 0) (drill (d+1) 10)
 		]
 
 axial_drilling :: Double -> Double -> Double -> Operation IR
 axial_drilling dc dd l = 
 	chain 5 [
 		probeOuterCylinder dc 5 (ProbeTool 3 42)
-		+++ zRepetition (-l) Nothing (circularPocket dd 0.5)
+		+++ circularPocket dd l 0.5
 	]
 
 handle :: Operation IR
