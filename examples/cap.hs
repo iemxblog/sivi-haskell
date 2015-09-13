@@ -5,9 +5,9 @@ module Main (
 import Sivi
 import Linear
 
-d1 = 10
-d2 = 14
-d3 = 20
+d1 = 10 + 0.3
+d2 = 14 + 0.4
+d3 = 20 - 0.2
 d4 = 26
 h = 10
 e1 = 1
