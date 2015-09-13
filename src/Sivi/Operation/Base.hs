@@ -78,6 +78,7 @@ type Transformation = V3 Double -> V3 Double
 -- * Tool (in the State Monad) : The current tool
 type Operation a = ReaderT (Transformation, Double, Double, Double, Double) (State (V3 Double, Tool)) a
 
+-- | Returns the current transformation
 getTransformation :: Operation Transformation
 getTransformation = do
 			(tr, _, _, _, _) <- ask
