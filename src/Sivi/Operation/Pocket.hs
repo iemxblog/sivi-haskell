@@ -40,7 +40,6 @@ circularPocketP :: Double			-- ^ d : Diameter of the pocket
 		-> Operation IR			-- ^ Resulting operation
 circularPocketP d step_over = do
 				a <- approach (V3 0 0 0)
-				df <- getToolDiameter
 				sp <- archimedeanSpiral d step_over
 				c <- circleFromHere -- the spiral ends at radius = d-df/2, so we start a circle from here
 				return (a ++ sp ++ c)

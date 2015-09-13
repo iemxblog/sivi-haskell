@@ -13,17 +13,12 @@ module Sivi.Backlash
 ) where
 
 import Linear
-import Data.List
 import Sivi.IR
-
-diff :: Num a => [a] -> [a]
-diff xs = [b-a | (a,b) <- zip xs (tail xs)]
-
 
 mem :: (Eq a, Num a) => a -> a -> a
 mem a 0 = a
 mem 0 b = b
-mem a b = b
+mem _ b = b
 
 dirc :: (Eq a, Num a) => a -> a -> a
 dirc (-1) 1 = 1
@@ -35,7 +30,7 @@ onV3 f (V3 x y z) (V3 x' y' z') = V3 (f x x') (f y y') (f z z')
 
 backlash2 :: IR -> V3 Double -> V3 Double -> V3 Double -> V3 Double -> IR
 backlash2 [] _ _ _ _ = []
-backlash2 (Move _ (Arc _ _ _) : xs) _ _ _ _ = error "Backlash compensation not implemented for arcs."
+backlash2 (Move _ (Arc{}) : _) _ _ _ _ = error "Backlash compensation not implemented for arcs."
 backlash2 (Move pos mp : xs) backlash ppos pdir pcomp = 
 	if extraMove == V3 0 0 0 then Move compensatedPos mp : backlash2 xs backlash pos newdir compensation
 	else Move extraMove mp : Move compensatedPos mp : backlash2 xs backlash pos newdir compensation

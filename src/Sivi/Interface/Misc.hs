@@ -27,7 +27,7 @@ cutFill :: Int -> a -> [a] -> [a]
 cutFill n x xs = take n $ xs ++ repeat x
 
 showLine :: Int -> String -> String
-showLine w xs = cutFill w ' ' xs
+showLine w = cutFill w ' '
 
 showLines :: Int -> Int -> [String] -> [String]
 showLines w h xs = cutFill h (replicate w ' ') (map (showLine w) xs)

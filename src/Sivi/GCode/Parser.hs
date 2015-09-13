@@ -35,6 +35,7 @@ token :: Parser a 			-- ^ p : The parser to tokenize
 token p = many (satisfy (==' ')) *> p <* many (satisfy (==' '))
 
 -- | Skips spaces before and after a string
+symbol :: B.ByteString -> Parser B.ByteString
 symbol xs = token (string xs)
 
 -- | Parses parameters of a GCode command
@@ -96,11 +97,13 @@ pG92 = do
 		return $ G92 x y z
 
 -- | Parses a line with only parameters, and no command
+pCLine :: Parser GCode
 pCLine = do
 		[x, y, z, i, j, k, f] <- pParams "XYZIJKF"
 		return $ CLine x y z i j k f
 
 -- | Parses a GCode command
+pGCode :: Parser GCode
 pGCode = pG00 <|> pG01 <|> pG02 <|> pG03 <|> pComment <|> pM00 <|> pG38d2 <|> pG92 <|> pCLine 
 
 -- | Parses a GCode program (list of commands)

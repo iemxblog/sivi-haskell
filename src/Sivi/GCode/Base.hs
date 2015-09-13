@@ -34,7 +34,7 @@ showDouble d = showFFloat (Just 3) d ""
 -- | Shows a GCode word (with Maybe value)
 gword :: Char -> Maybe Double -> String
 gword w (Just v) = w : showDouble v
-gword w Nothing = ""
+gword _ Nothing = ""
 
 -- | Compiles parameters of a GCode command
 compileParams :: [Char] 		-- ^ List of parameter names
@@ -53,14 +53,3 @@ instance Show GCode where
 	show (G38d2 mx my mz mf) = "G38.2 " ++ compileParams "XYZF" [mx, my, mz, mf]
 	show (G92 mx my mz) = "G92 " ++ compileParams "XYZ" [mx, my, mz]
 
-
-example :: [GCode]
-example = [	G00 (Just 1) (Just 2) (Just 3), 
-		G01 (Just 10) (Just 0) Nothing (Just 100), 
-		G02 (Just 10) (Just 0) Nothing (Just (-1)) (Just (-2)) Nothing Nothing,
-		G03 (Just 10) (Just 0) Nothing (Just (-1)) (Just (-2)) Nothing Nothing,
-		GComment "comment",
-		M00,
-		CLine (Just 20) (Just 30) Nothing Nothing Nothing Nothing (Just 30)
-	]
-	

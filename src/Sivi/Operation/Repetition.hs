@@ -39,10 +39,10 @@ gridRepetition :: Int			-- ^ nx : Number of repetitions on X axis
 		 -> Int			-- ^ ny : Number of repetitions on Y axis
 		 -> Double		-- ^ space_x : Space between each operation on X axis
 		 -> Double		-- ^ space_y : Space between each operation on Y axis
-		 -> Double		-- ^ z_safe : Tool retraction
+		 -> Double		-- ^ Tool retraction
 		 -> Operation IR	-- ^ Operation to repeat
 		 -> Operation IR	-- ^ Operation 1 on grid + Retraction + Operation 2 on grid + ...
-gridRepetition nx ny space_x space_y z_safe = repetition pos_list z_safe
+gridRepetition nx ny space_x space_y = repetition pos_list
 	where
 		pos_list = [V3 (fromIntegral x * space_x) (fromIntegral y * space_y) 0 | x <- [1..nx-1], y <- [1..ny-1]]
 

@@ -18,7 +18,7 @@ import Linear
 import Sivi.IR.Base
 import Sivi.GCode
 
--- | Monadic datatype to memorize GCode commandsi (as String) and parameters (as Data.Map.Map Char Double)
+-- | Monadic datatype to memorize GCode commands (as String) and parameters (as Data.Map.Map Char Double)
 type GCodeTransformer a = State (String, Map.Map Char Double) a
 
 getParamsMap :: GCodeTransformer (Map.Map Char Double)
@@ -49,7 +49,7 @@ getParam pn = do
 			Just pv -> return pv
 
 getParams :: [Char] -> GCodeTransformer [Double]
-getParams pns = mapM getParam pns
+getParams = mapM getParam
 			
 
 -- | Transforms a 'GCode' instruction to an 'IR' instruction

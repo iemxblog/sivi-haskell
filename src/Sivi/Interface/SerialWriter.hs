@@ -17,7 +17,7 @@ module Sivi.Interface.SerialWriter
 import Control.Concurrent.Chan
 import System.Hardware.Serialport
 import qualified Data.ByteString.Char8 as B
-import Control.Monad(forever)
+import Control.Monad
 import Sivi.Interface.SerialReader
 
 -- | Commands sent to the 'serialWriter' thread. The data constructors represent GRBL commands.
@@ -40,6 +40,6 @@ serialWriter wc pc serial = forever $ do
 	writeCommand <- readChan wc
 	let grblCommand = toGRBLCommand writeCommand
 	bytes <- send serial (B.pack grblCommand)
-	if bytes /= length grblCommand then error "serialWriter : 'send' did not send all the data. Better 'send' not implemented yet." else return ()
+	when (bytes /= length grblCommand) $ error "serialWriter : 'send' did not send all the data. Better 'send' not implemented yet."
 	--writeChan pc (putStrLn $ "Sent : " ++ show writeCommand)
 

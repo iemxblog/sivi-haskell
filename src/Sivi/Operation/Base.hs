@@ -207,7 +207,7 @@ arc :: ArcDirection 		-- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
 arc dir center dst = do
 			tr <- getTransformation
 			fr <- getFeedRate
-			move (tr dst) Arc { direction=dir, center=(tr center), feedRate=fr}
+			move (tr dst) Arc { direction = dir, center = tr center, feedRate = fr}
 
 -- | Circular interpolation, but does not apply the current transformation. Exported only for 'circleFromHere'. Only used as an internal helper function. (NT means "no transformation")
 arcNT :: ArcDirection 		-- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
@@ -253,7 +253,7 @@ approach dst = do
 	V3 _ _ z <- getCurrentPosition	
 	dc <- getDepthOfCut
 	op1 <- rapid_xy dst 
-	op2 <- if (z-zd) > 2*(abs dc) then rapidNT (tr dst + V3 0 0 (2* (abs dc))) else noOp
+	op2 <- if (z-zd) > 2 * abs dc then rapidNT (tr dst + V3 0 0 (2 * abs dc)) else noOp
 	op3 <- plunge dst
 	return (op1 ++ op2 ++ op3)
 
@@ -343,5 +343,5 @@ withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 --	* Tool : EndMill : diameter=3 length=42
 runOperationWithDefaultParams :: Operation IR	-- ^ o : The operation to run
 		-> IR		-- ^ The resulting program in Intermediate Representation
-runOperationWithDefaultParams o = evalState (runReaderT o (id, 100, 30, 10, (-0.5)))  (V3 0 0 0, EndMill {diameter=3, len=42})
+runOperationWithDefaultParams o = evalState (runReaderT o (id, 100, 30, 10, -0.5))  (V3 0 0 0, EndMill {diameter=3, len=42})
 

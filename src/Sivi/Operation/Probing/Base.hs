@@ -31,7 +31,7 @@ probeHelper dir compFlag dst margin =
 		let comp = case compFlag of
 			True -> td/2
 			False -> 0
-		let initPos = ((-1)*(margin+comp) *^ dir)
+		let initPos = (-1)*(margin+comp) *^ dir
 		o1 <- approach_rapid initPos
 		o2 <- probe ((margin+comp) *^ dir)
 		o3 <- defCurPos (((-1) * comp) *^ dir)

@@ -20,6 +20,7 @@ import System.Hardware.Serialport
 import qualified Data.ByteString.Char8 as B
 import Data.Attoparsec.ByteString.Char8
 import Control.Applicative
+import Control.Monad
 import System.Console.ANSI
 import Sivi.Interface.Misc
 
@@ -58,7 +59,7 @@ pReadCommand = pPosition <|> pOk
 -- | Takes a 'String' as parameter, and returns a tuple of the first line and the remaining of the string.
 splitLine :: 	String
 		-> (String, String)
-splitLine xs | not ('\n' `elem` xs) = ([], xs)
+splitLine xs | '\n' `notElem` xs = ([], xs)
 splitLine xs = mapSnd tail . break (=='\n') $ xs
 	where mapSnd f (a, b) = (a, f b)
 
@@ -72,17 +73,15 @@ serialReader rc pc serial buffer = do
 	msg <- recv serial 100
 	let msgString = B.unpack msg
 	let (newMsg, newBuf) = splitLine (buffer ++ msgString)
-	if length newMsg > 0 then
+	when (not (null newMsg)) $
 		case parseOnly pReadCommand (B.pack newMsg) of
-			Left err -> writeChan pc $ do
+			Left _ -> writeChan pc $ do
 				setCursorPosition 5 60
 				withColor Red (putStr $ showLine 20 newMsg)
 			Right readCommand -> writeChan rc readCommand -- >> writeChan pc (putStrLn ("Received : " ++ show readCommand))
-	else
-		return ()
 	serialReader rc pc serial newBuf -- looping recursively
 
 waitFor :: Chan ReadCommand -> ReadCommand -> IO ()
 waitFor rc readcommand = do
 	msg <- readChan rc
-	if msg == readcommand then return () else waitFor rc readcommand
+	unless (msg == readcommand) $ waitFor rc readcommand

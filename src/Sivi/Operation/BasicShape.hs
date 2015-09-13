@@ -46,9 +46,9 @@ circleOuter d = getToolDiameter >>= \td -> circle (d+td)
 -- | Circle that starts form the current tool position. The diameter is automatically defined by the distance between the origin and the tool position.
 circleFromHere :: Operation IR
 circleFromHere = do
-			or <- getOrigin
+			org <- getOrigin
 			cp <- getCurrentPosition
-			arcNT CCW or cp
+			arcNT CCW org cp
 
 -- | Cylinder with tool radius compensation on the inner side. Does not cut the inside of the cylinder, but just the contour.
 cylinderInner :: Double		-- ^ d : Diameter of the cylinder

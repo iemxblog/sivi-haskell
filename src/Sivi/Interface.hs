@@ -43,6 +43,7 @@ exitInterface = do
 	setCursorPosition 0 0
 	showCursor
 
+getInput :: IO Input
 getInput = do
 	char <- getChar
 	case char of
@@ -58,7 +59,7 @@ getInput = do
 		'q' -> return Exit	
 		_ -> getInput
 
-
+loop :: Chan WriteCommand -> Chan ReadCommand -> Chan ProgramThreadCommand -> IO ()
 loop wc rc ptc = do
 	i <- getInput
 	case i of
@@ -72,7 +73,6 @@ loop wc rc ptc = do
 		ZMinus -> sendProgram wc rc "G91 G00 Z-1" >> sendProgram wc rc "G90" >> loop wc rc ptc
 		ZPlus -> sendProgram wc rc "G91 G00 Z1" >> sendProgram wc rc "G90" >> loop wc rc ptc
 		Exit -> return ()
-		_ -> putStrLn (show i) >> loop wc rc ptc
 
 -- | Text mode interface for GRBL.
 interface :: [GCode] -> IO ()

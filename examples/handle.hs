@@ -23,8 +23,8 @@ drillings d l d1 d2 =
 			, translate (V3 (l-d2) (d/2) 0) (drill (d+1) 10)
 		]
 
-axial_drilling :: Double -> Double -> Double -> Operation IR
-axial_drilling dc dd l = 
+axialDrilling :: Double -> Double -> Double -> Operation IR
+axialDrilling dc dd l = 
 	chain 5 [
 		probeOuterCylinder dc 5 (ProbeTool 3 42)
 		+++ circularPocket dd l 0.5
@@ -40,7 +40,7 @@ handle =
 		+++ cut d l
 		, drillings d l d1 d2
 	]
-	+++ axial_drilling d 4.5 l
+	+++ axialDrilling d 4.5 l
 	where
 		l = 12
 		d = 10
