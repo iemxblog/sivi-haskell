@@ -23,5 +23,5 @@ cap hole = chain 1 [
 
 
 main :: IO ()
-main = putStr . (++"M2\n") . toString . runOperationWithDefaultParams $ cap True
---main = interface . toGCode . runOperationWithDefaultParams $ cap True
+main = putStr . (++"M2\n") . toString . runOperation (100, 30, 10, (-1)) EndMill{diameter=3, len=42} $ cap True
+--main = interface . toGCode . runOperation (100, 30, 10, (-1)) EndMill{diameter=3, len=42} $ cap True
