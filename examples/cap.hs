@@ -21,7 +21,9 @@ cap hole = chain 1 [
 		, translate (V3 0 0 (-h+e2)) (cylinderOuter d4 e2)
 	]
 
+caps :: Bool -> Operation IR
+caps = gridRepetition 3 1 (d4+3) 0 1 . cap
 
 main :: IO ()
-main = putStr . (++"M2\n") . toString . runOperation (100, 30, 10, (-1)) (V3 0 0 0) EndMill{diameter=3, len=42} $ cap True
---main = interface . toGCode . runOperation (100, 30, 10, (-1)) (V3 0 0 0) EndMill{diameter=3, len=42} $ cap True
+main = putStr . (++"M2\n") . toString . runOperation (100, 30, 10, (-1)) (V3 0 0 0) EndMill{diameter=3, len=42} $ caps True
+--main = interface . toGCode . runOperation (100, 30, 10, (-1)) (V3 0 0 0) EndMill{diameter=3, len=42} $ caps True
