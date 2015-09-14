@@ -10,10 +10,10 @@ import Sivi
 
 spec = describe "probeXMinus" $ 
 	it "makes a simple probing operation" $ 
-		runOperationWithDefaultParams  (probeXMinus (V3 l 0 depth) margin) `shouldBe`
+		runOperation (100, 30, pbr, (-0.5)) (V3 0 0 0) EndMill{diameter=td, len=42} (probeXMinus (V3 l 0 depth) margin) `shouldBe`
 			[ Move (V3 (l+td/2+margin) 0 0) Rapid
 			, Move (V3 (l+td/2+margin) 0 depth) Rapid
-			, Move (V3 (l-td/2-margin) 0 depth) (Probe f)
+			, Move (V3 (l-td/2-margin) 0 depth) (Probe pbr)
 			, DefCurPos (V3 (l+td/2) 0 depth)
 			, Move (V3 (l+td/2+margin) 0 depth) Rapid
 			]
@@ -21,5 +21,5 @@ spec = describe "probeXMinus" $
 		l = 10	
 		depth = -10
 		margin = 5
-		td = 3 -- defined in runOperation, not very clean....
-		f = 10 -- idem
+		td = 3 -- tool diameter
+		pbr = 10 -- probe rate

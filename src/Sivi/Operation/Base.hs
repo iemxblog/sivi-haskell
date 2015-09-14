@@ -40,6 +40,7 @@ module Sivi.Operation.Base (
 	, (+++)
 	, opsequence
 	, chain
+	, runOperation
 	, runOperationWithDefaultParams
 	, pause
 	, probe
@@ -327,9 +328,16 @@ withTool :: 	Tool 		-- ^ t : The tool to use for the operation
 		-> Operation IR -- ^ op : The operation to run with the given tool.
 		-> Operation IR -- ^ The resulting operation.
 withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
+
+-- | Runs an operation with the specified parameters.
+runOperation ::	(Double, Double, Double, Double) 	-- ^ (fr, pr, pbr, dc) : Feed rate, plunge rate, probe rate, depth of cut (depth of cut must be a negative number)
+		-> V3 Double				-- ^ spos : Starting position of the tool	
+		-> Tool					-- ^ tool : Default tool 
+		-> Operation IR 			-- ^ op : Operation to run
+		-> IR					-- ^ The resulting program in intermediate representation
+runOperation (fr, pr, pbr, dc) spos tool op = evalState (runReaderT op (id, fr, pr, pbr, dc))  (spos, tool)
 	
-	
--- | Runs an operation with default starting position, feed rate, plunge rate and tool.
+-- | Runs an operation with default starting transformation, feed rate, plunge rate, probe rate, depth of cut, position and tool.
 --
 -- 	* Starting transformation : id
 --
@@ -342,7 +350,7 @@ withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 -- 	* Depth of cut : -0.5 mm
 --
 --	* Tool : EndMill : diameter=3 length=42
-runOperationWithDefaultParams :: Operation IR	-- ^ o : The operation to run
+runOperationWithDefaultParams :: Operation IR	-- ^ The operation to run
 		-> IR		-- ^ The resulting program in Intermediate Representation
-runOperationWithDefaultParams o = evalState (runReaderT o (id, 100, 30, 10, -0.5))  (V3 0 0 0, EndMill {diameter=3, len=42})
+runOperationWithDefaultParams = runOperation (100, 30, 10, -0.5) (V3 0 0 0) EndMill{diameter=3, len=42}
 
