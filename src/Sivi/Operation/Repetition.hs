@@ -44,7 +44,7 @@ gridRepetition :: Int			-- ^ nx : Number of repetitions on X axis
 		 -> Operation IR	-- ^ Operation 1 on grid + Retraction + Operation 2 on grid + ...
 gridRepetition nx ny space_x space_y = repetition pos_list
 	where
-		pos_list = [V3 (fromIntegral x * space_x) (fromIntegral y * space_y) 0 | x <- [1..nx-1], y <- [1..ny-1]]
+		pos_list = [V3 (fromIntegral x * space_x) (fromIntegral y * space_y) 0 | x <- [0..nx-1], y <- [0..ny-1]]
 
 -- | Ensures that a number is negative. Used for 'zRepetition' depth.
 negative :: (Num a, Ord a) => a -> a
