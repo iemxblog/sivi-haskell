@@ -45,7 +45,7 @@ circularPocketP d step_over = do
 				return (a ++ sp ++ c)
 
 -- | Generates a circular pocket.
-circularPocket :: Double			-- ^ d : Diameter of the pocker
+circularPocket :: Double			-- ^ d : Diameter of the pocket
 		-> Double			-- ^ depth : Depth of the pocket
 		-> Double			-- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
 		-> Operation IR			-- ^ Resulting operation
