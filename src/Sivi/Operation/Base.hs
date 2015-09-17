@@ -37,6 +37,8 @@ module Sivi.Operation.Base (
 	, approach_rapid
 	, translate
 	, rotate
+	, symmetryX
+	, symmetryY
 	, (+++)
 	, opsequence
 	, chain
@@ -276,6 +278,16 @@ rotate :: Double		-- ^ a : angle (in degrees)
 	-> Operation IR		-- ^ Resulting operation
 rotate a = withTransformation (Linear.rotate (axisAngle (V3 0 0 1) ar))
 	where ar = a * pi / 180
+
+-- | Symmetry about the X axis.
+symmetryX :: 	Operation IR
+		-> Operation IR
+symmetryX = withTransformation (\(V3 x y z) -> V3 x (-y) z)
+
+-- | Symmetry about the Y axis.
+symmetryY :: 	Operation IR
+		-> Operation IR
+symmetryY = withTransformation (\(V3 x y z) -> V3 (-x) y z)
 
 -- | Chain two operations (without tool retraction between operations)
 (+++) :: Operation IR	-- ^ o1 : Operation 1
