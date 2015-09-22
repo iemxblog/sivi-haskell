@@ -15,17 +15,24 @@ module Sivi.Backlash
 import Linear
 import Sivi.IR
 
+-- | Memorization of direction.
 mem :: (Eq a, Num a) => a -> a -> a
 mem a 0 = a
 mem 0 b = b
 mem _ b = b
 
+-- | Direction change.
 dirc :: (Eq a, Num a) => a -> a -> a
 dirc (-1) 1 = 1
 dirc 1 (-1) = -1
 dirc _ _ = 0
 
-onV3 :: (a -> a -> a) -> V3 a -> V3 a -> V3 a
+
+-- | Applies a function on pairs of coordinates of two V3 vectors.
+onV3 :: (a -> a -> a) 	-- ^ f : Function to apply
+	-> V3 a 	-- ^ First vector
+	-> V3 a 	-- ^ Second vector
+	-> V3 a
 onV3 f (V3 x y z) (V3 x' y' z') = V3 (f x x') (f y y') (f z z')
 
 backlash2 :: IR -> V3 Double -> V3 Double -> V3 Double -> V3 Double -> IR
