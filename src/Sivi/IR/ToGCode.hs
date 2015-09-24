@@ -18,7 +18,7 @@ import Numeric
 import Sivi.IR.Base
 import Sivi.GCode 
 
--- | Helper function for "compile"
+-- | Helper function for 'toGCode'
 toGCode' :: IR		-- ^ The program to compile 
 	-> V3 Double 	-- ^ The current position of the tool (needed for arcs, because i j k are relative to current position)
 	-> [GCode]	-- ^ The resulting 'GCode'
