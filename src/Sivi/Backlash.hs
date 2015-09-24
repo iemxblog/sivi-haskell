@@ -37,7 +37,7 @@ onV3 f (V3 x y z) (V3 x' y' z') = V3 (f x x') (f y y') (f z z')
 
 backlash2 :: IR -> V3 Double -> V3 Double -> V3 Double -> V3 Double -> IR
 backlash2 [] _ _ _ _ = []
-backlash2 (Move _ (Arc{}) : _) _ _ _ _ = error "Backlash compensation not implemented for arcs."
+backlash2 (Move _ (Arc{}) : _) _ _ _ _ = error "Backlash compensation not implemented for arcs. Use arcInterpolation before."
 backlash2 (Move pos mp : xs) backlash ppos pdir pcomp = 
 	if extraMove == V3 0 0 0 then Move compensatedPos mp : backlash2 xs backlash pos newdir compensation
 	else Move extraMove mp' : Move compensatedPos mp : backlash2 xs backlash pos newdir compensation
