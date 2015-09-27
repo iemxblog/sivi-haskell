@@ -16,6 +16,7 @@ module Sivi.Interface.ProgramThread
 
 import Control.Concurrent
 import System.Console.ANSI
+import Control.Monad
 import Sivi.GCode
 import Sivi.Interface.SerialWriter
 import Sivi.Interface.SerialReader
@@ -55,8 +56,9 @@ programThread wc rc pc ptc (x:xs) Running = do
 		writeChan pc (mapM_ putStrLn $ showLines 58 22 (map show xs))
 		case x of
 			GComment s -> do
-				writeChan pc (withColor Green $ putInstruction s)
-				programThread wc rc pc ptc xs Running
+				when (take 4 s == "MSG,") $ do
+					writeChan pc (withColor Green $ putInstruction (drop 5 s))
+					programThread wc rc pc ptc xs Running
 			M00 -> programThread wc rc pc ptc xs Paused
 			_ -> do 
 				sendProgram wc rc (show x)

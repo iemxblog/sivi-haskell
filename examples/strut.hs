@@ -16,8 +16,7 @@ strut :: Double -> Double -> Operation IRTree
 strut d l = 
 	strut' d (l+2)
 	+++ retract 30
-	+++ comment "Please rotate the strut to machine the other side"
-	+++ pause
+	+++ message "Please rotate the strut to machine the other side"
 	+++ strut' d l 
 
 op :: Operation IRTree

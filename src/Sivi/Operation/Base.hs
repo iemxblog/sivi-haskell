@@ -51,6 +51,7 @@ module Sivi.Operation.Base (
 	, changeTool
 	, withTool
 	, name
+	, message
 )
 where
 
@@ -349,6 +350,11 @@ name :: String
 name s op = do
 		tree <- op
 		return $ Node s [tree]	
+
+-- | Displays a message and makes a pause (M00). Compatible with LinuxCNC.
+message :: String
+	-> Operation IRTree
+message s = comment ("MSG, " ++ s) +++ pause
 
 -- | Runs an operation with the specified parameters.
 runOperation ::	(Double, Double, Double, Double) 	-- ^ (fr, pr, pbr, dc) : Feed rate, plunge rate, probe rate, depth of cut (depth of cut must be a negative number)

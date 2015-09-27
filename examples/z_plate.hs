@@ -20,15 +20,12 @@ makeProbePocket = translate (V3 (-25) 0 0) $ rectangularPocket 10 10 10 0.5
 makeAlignmentPocket = translate (V3 70 0 0) $ rectangularPocket 10 10 10 0.5
 
 back = chain 1 [ 
-		comment "Place the tool above the location of the bearing and start the spindle"
-		, pause
+		message "Place the tool above the location of the bearing and start the spindle"
 		, makeProbePocket
 		, makeAlignmentPocket
-		, comment "Stop the spindle"
-		, pause
+		, message "Stop the spindle"
 		, translate corner $ probeInnerCornerNE 5 (ProbeTool 3 42)
-		, comment "Start the spindle"
-		, pause
+		, message "Start the spindle"
 		, bearing
 	]
 
@@ -54,17 +51,13 @@ front3 = chain 1 [
 	]
 
 zPlate = chain 1 [
-	comment "Begin with the back side of the plate"
-	, pause
+	message "Begin with the back side of the plate"
 	, back
-	, comment "Place the front side face up"
-	, pause
+	, message "Place the front side face up"
 	, front1
-	, comment "Place the part to machine the second part of the front side"
-	, pause
+	, message "Place the part to machine the second part of the front side"
 	, front2
-	, comment "Place the part to machine the third part of the front side"
-	, pause
+	, message "Place the part to machine the third part of the front side"
 	, front3
 	]
 

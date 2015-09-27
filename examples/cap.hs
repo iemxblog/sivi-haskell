@@ -24,11 +24,10 @@ cap hole = chain 1 [
 
 caps :: Int -> Bool -> Operation IRTree
 caps n hole =
-	comment "Please place the tool above the center of the first cap"
-	+++ pause
+	message "Please place the tool above the center of the first cap"
 	+++ defCurPos (V3 0 0 0) 
 	+++ gridRepetition n 1 (d4+3) 0 1 (cap hole)
 
 main :: IO ()
-main = putStr . (++"M2\n") . toString . flatten . runOperation (100, 30, 10, (-1)) (V3 0 0 0) EndMill{diameter=3, len=42} $ caps 1 True
---main = interface . toGCode . flatten . runOperation (100, 30, 10, (-1)) (V3 0 0 0) EndMill{diameter=3, len=42} $ caps 1 True
+--main = putStr . (++"M2\n") . toString . flatten . runOperation (100, 30, 10, (-1)) (V3 0 0 0) EndMill{diameter=3, len=42} $ caps 1 True
+main = interface . toGCode . flatten . runOperation (100, 30, 10, (-1)) (V3 0 0 0) EndMill{diameter=3, len=42} $ caps 1 True
