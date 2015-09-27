@@ -50,6 +50,7 @@ module Sivi.Operation.Base (
 	, comment
 	, changeTool
 	, withTool
+	, name
 )
 where
 
@@ -120,26 +121,26 @@ getDepthOfCut = do
 
 -- | Calls an operation with the specified transformation
 withTransformation :: 	Transformation 		-- ^ ntr : The new transformation
-			-> Operation IR 	-- ^ The operation to call with the specified transformation
-			-> Operation IR		-- ^ The resulting operation
+			-> Operation a	 	-- ^ The operation to call with the specified transformation
+			-> Operation a		-- ^ The resulting operation
 withTransformation ntr = local (\(tr, fr, pr, pbr, dc) -> (tr . ntr, fr, pr, pbr, dc))
 
 -- | Calls an operation with the specified feed rate
 withFeedRate :: Double 			-- ^ nfr : The new feed rate
-		-> Operation IR 	-- ^ The operation to call with the new feed rate
-		-> Operation IR		-- ^ The resulting operation
+		-> Operation a 		-- ^ The operation to call with the new feed rate
+		-> Operation a		-- ^ The resulting operation
 withFeedRate nfr = local (\(tr, _, pr, pbr, dc) -> (tr, nfr, pr, pbr, dc))
 
 -- | Calls an operation with the specified plunge rate
 withPlungeRate :: Double 		-- ^ npr : The new plunge rate
-		-> Operation IR 	-- ^ The operation to call with the new plunge rate
-		-> Operation IR		-- ^ The resulting operation
+		-> Operation a		-- ^ The operation to call with the new plunge rate
+		-> Operation a		-- ^ The resulting operation
 withPlungeRate npr = local (\(tr, fr, _, pbr, dc) -> (tr, fr, npr, pbr, dc))
 
 -- | Calls an operation with the specified depth of cut
 withDepthOfCut :: Double 		-- ^ ndc : The new depth of cut
-		-> Operation IR 	-- ^ The operation to call with the new depth of cut
-		-> Operation IR		-- ^ The resulting operation
+		-> Operation a	 	-- ^ The operation to call with the new depth of cut
+		-> Operation a		-- ^ The resulting operation
 withDepthOfCut ndc = local (\(tr, fr, pr, pbr, _) -> (tr, fr, pr, pbr, ndc))
 	
 -- | Returns the machine's current position (from the State monad)
@@ -169,12 +170,12 @@ getToolDiameter = do
 			return $ diameter tool
 
 -- | Do-nothing operation
-noOp :: Operation IR
-noOp = lift $ return []
+noOp :: Operation IRTree
+noOp = lift $ return (Node "" [])
 
 -- | Helper function to avoid duplicate code. Sets the current position in the State monad, and returns a 'Move'. The current transformation is NOT applied to the parameters.
-move :: V3 Double -> MoveParams -> Operation IR
-move dst params = putCurrentPosition dst >> return [Move dst params] 
+move :: V3 Double -> MoveParams -> Operation IRTree
+move dst params = putCurrentPosition dst >> return (Leaf (Move dst params))
 
 -- Variables :
 -- dst : destination
@@ -185,19 +186,19 @@ move dst params = putCurrentPosition dst >> return [Move dst params]
 
 -- | Rapid positioning
 rapid :: V3 Double		-- ^ dst : Destination
-	 -> Operation IR	-- Resulting operation
+	 -> Operation IRTree	-- Resulting operation
 rapid dst = do
 		tr <- getTransformation
 		move (tr dst) Rapid
 
 -- | Rapid positioning, but does not apply the current transformation. Not meant to be exported, only used as an internal helper function. (NT means "no transformation")
 rapidNT :: V3 Double		-- ^ dst : Destination
-	-> Operation IR		-- ^ Resulting operation
+	-> Operation IRTree		-- ^ Resulting operation
 rapidNT dst = move dst Rapid
 
 -- | Linear interpolation (with the default feedrate)
 feed :: V3 Double		-- ^ dst : Destination
-	 -> Operation IR	-- Resulting operation
+	 -> Operation IRTree	-- Resulting operation
 feed dst = do
 		tr <- getTransformation
 		fr <- getFeedRate	
@@ -207,7 +208,7 @@ feed dst = do
 arc :: ArcDirection 		-- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
 	-> V3 Double		-- ^ center : The center of the arc (relative to the origin of the operation)
 	-> V3 Double		-- ^ dst : The destination point
-	-> Operation IR		-- ^ Resulting operation
+	-> Operation IRTree	-- ^ Resulting operation
 arc dir center dst = do
 			tr <- getTransformation
 			fr <- getFeedRate
@@ -217,7 +218,7 @@ arc dir center dst = do
 arcNT :: ArcDirection 		-- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
 	-> V3 Double		-- ^ center : The center of the arc (relative to the origin of the operation)
 	-> V3 Double		-- ^ dst : The destination point
-	-> Operation IR		-- ^ Resulting operation
+	-> Operation IRTree	-- ^ Resulting operation
 arcNT dir center dst = do
 			fr <- getFeedRate
 			move dst Arc { direction=dir, center=center, feedRate=fr}
@@ -225,7 +226,7 @@ arcNT dir center dst = do
 
 -- | Linear interpolation (with the plunge feedrate)
 plunge :: V3 Double		-- ^ dst : Destination
-	 -> Operation IR	-- ^ Resulting operation
+	 -> Operation IRTree	-- ^ Resulting operation
 plunge dst = do
 		tr <- getTransformation
 		pr <- getPlungeRate
@@ -233,7 +234,7 @@ plunge dst = do
 
 -- | Tool retraction
 retract :: Double 		-- ^ z_safe : destination on the Z axis
-	-> Operation IR		-- ^ Resulting operation
+	-> Operation IRTree		-- ^ Resulting operation
 retract z_safe = do 
 			V3 _ _ zo <- getOrigin
 			V3 x y _ <- getCurrentPosition
@@ -241,7 +242,7 @@ retract z_safe = do
 
 -- | Rapid in the XY plane (helper function for 'approach')
 rapid_xy :: V3 Double		-- ^ dst : Destination
-	 -> Operation IR	-- ^ Resulting operation
+	 -> Operation IRTree	-- ^ Resulting operation
 rapid_xy dst = do
 			tr <- getTransformation
 			V3 _ _ z <- getCurrentPosition	
@@ -250,7 +251,7 @@ rapid_xy dst = do
 
 -- | Rapid in the xy plane + rapid plunge with margin (2 * depth of cut above destination) + plunge (with plunge rate) to destination
 approach :: V3 Double		-- ^ dst : Destination
-	 -> Operation IR	-- ^ Resulting operation
+	 -> Operation IRTree	-- ^ Resulting operation
 approach dst = do
 	tr <- getTransformation
 	let V3 _ _ zd = tr dst
@@ -259,94 +260,102 @@ approach dst = do
 	op1 <- rapid_xy dst 
 	op2 <- if (z-zd) > 2 * abs dc then rapidNT (tr dst + V3 0 0 (2 * abs dc)) else noOp
 	op3 <- plunge dst
-	return (op1 ++ op2 ++ op3)
+	return $ Node "" [op1, op2, op3]
 
 -- | Same as approach, but plunge with rapid move only
-approach_rapid :: V3 Double	-- ^ dst : Destination
-		-> Operation IR -- ^ Resulting operation
+approach_rapid :: V3 Double		-- ^ dst : Destination
+		-> Operation IRTree	-- ^ Resulting operation
 approach_rapid dst = rapid_xy dst +++ rapid dst
 
 -- | Translate an operation
 translate :: V3 Double		-- ^ v : Translation vector
-	-> Operation IR		-- ^ o : Operation to translate
-	-> Operation IR		-- Resulting operation
+	-> Operation a		-- ^ o : Operation to translate
+	-> Operation a		-- Resulting operation
 translate v = withTransformation (+v)
 
 -- | Rotates an operation in the XY plane.
 rotate :: Double		-- ^ a : angle (in degrees)
-	-> Operation IR		-- ^ Operation to rotate
-	-> Operation IR		-- ^ Resulting operation
+	-> Operation a		-- ^ Operation to rotate
+	-> Operation a		-- ^ Resulting operation
 rotate a = withTransformation (Linear.rotate (axisAngle (V3 0 0 1) ar))
 	where ar = a * pi / 180
 
 -- | Symmetry about the X axis.
-symmetryX :: 	Operation IR
-		-> Operation IR
+symmetryX :: 	Operation a
+		-> Operation a
 symmetryX = withTransformation (\(V3 x y z) -> V3 x (-y) z)
 
 -- | Symmetry about the Y axis.
-symmetryY :: 	Operation IR
-		-> Operation IR
+symmetryY :: 	Operation a
+		-> Operation a
 symmetryY = withTransformation (\(V3 x y z) -> V3 (-x) y z)
 
 -- | Chain two operations (without tool retraction between operations)
-(+++) :: Operation IR	-- ^ o1 : Operation 1
-	-> Operation IR	-- ^ o2 : Operation 2
-	-> Operation IR	-- ^ Operation 1 followed by operation 2
+(+++) :: Operation IRTree	-- ^ o1 : Operation 1
+	-> Operation IRTree	-- ^ o2 : Operation 2
+	-> Operation IRTree	-- ^ Operation 1 followed by operation 2
 o1 +++ o2 = do 
-		ir1 <- o1 
-		ir2 <- o2
-		return $ ir1 ++ ir2
+		tree1 <- o1 
+		tree2 <- o2
+		return $ Node "" [tree1, tree2]
 
 -- | Chains a list of operations.
-opsequence :: [Operation IR] -> Operation IR
+opsequence :: [Operation IRTree] -> Operation IRTree
 opsequence = foldr (+++) noOp
 
 -- | Chains a list of operations, and intersperses tool retractions between them.
 chain :: Double 		-- ^ zSafe : The altitude of tool retractions
-	-> [Operation IR] 	-- ^ The list of operations
-	-> Operation IR		-- ^ The resulting operation
+	-> [Operation IRTree] 	-- ^ The list of operations
+	-> Operation IRTree	-- ^ The resulting operation
 chain zSafe = opsequence . intersperse (retract zSafe) 
 
 -- | Pause operation, takes no arguments
-pause :: Operation IR
-pause = return [Pause]
+pause :: Operation IRTree
+pause = return $ Leaf Pause
 
 -- | Basic probing operation.
 probe :: V3 Double 		-- ^ dst : The destination of the probing move
-	-> Operation IR		-- ^ The resulting operation.
+	-> Operation IRTree	-- ^ The resulting operation.
 probe dst = do
 		tr <- getTransformation
 		pbr <- getProbeRate
 		move (tr dst) (Probe pbr)	
 
-defCurPos :: V3 Double -> Operation IR
+defCurPos :: V3 Double -> Operation IRTree
 defCurPos p = do
 		tr <- getTransformation
 		putCurrentPosition (tr p) 
-		return [DefCurPos (tr p)]
+		return $ Leaf (DefCurPos (tr p))
 
-comment :: String -> Operation IR
-comment s = return [Comment s]
+comment :: String -> Operation IRTree
+comment s = return $ Leaf (Comment s)
 
-changeTool :: Tool -> Operation IR
+changeTool :: Tool -> Operation IRTree
 changeTool t = retract 30
 		+++ comment ("Please place the tool " ++ show t ++ " in the spindle.")
 		+++ pause
 		<* putTool t
 
 -- | Do an operation with a temporary tool.
-withTool :: 	Tool 		-- ^ t : The tool to use for the operation
-		-> Operation IR -- ^ op : The operation to run with the given tool.
-		-> Operation IR -- ^ The resulting operation.
+withTool :: 	Tool 			-- ^ t : The tool to use for the operation
+		-> Operation IRTree	-- ^ op : The operation to run with the given tool.
+		-> Operation IRTree	-- ^ The resulting operation.
 withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
+
+
+name :: String
+	-> Operation IRTree
+	-> Operation IRTree
+name s op = do
+		tree <- op
+		return $ Node s [tree]	
 
 -- | Runs an operation with the specified parameters.
 runOperation ::	(Double, Double, Double, Double) 	-- ^ (fr, pr, pbr, dc) : Feed rate, plunge rate, probe rate, depth of cut (depth of cut must be a negative number)
 		-> V3 Double				-- ^ spos : Starting position of the tool	
 		-> Tool					-- ^ tool : Default tool 
-		-> Operation IR 			-- ^ op : Operation to run
-		-> IR					-- ^ The resulting program in intermediate representation
+		-> Operation IRTree 			-- ^ op : Operation to run
+		-> IRTree				-- ^ The resulting program in intermediate representation
 runOperation (fr, pr, pbr, dc) spos tool op = evalState (runReaderT op (id, fr, pr, pbr, dc))  (spos, tool)
 	
 -- | Runs an operation with default starting transformation, feed rate, plunge rate, probe rate, depth of cut, position and tool.
@@ -362,7 +371,7 @@ runOperation (fr, pr, pbr, dc) spos tool op = evalState (runReaderT op (id, fr, 
 -- 	* Depth of cut : -0.5 mm
 --
 --	* Tool : EndMill : diameter=3 length=42
-runOperationWithDefaultParams :: Operation IR	-- ^ The operation to run
-		-> IR		-- ^ The resulting program in Intermediate Representation
+runOperationWithDefaultParams :: Operation IRTree	-- ^ The operation to run
+				-> IRTree		-- ^ The resulting program in Intermediate Representation
 runOperationWithDefaultParams = runOperation (100, 30, 10, -0.5) (V3 0 0 0) EndMill{diameter=3, len=42}
 
