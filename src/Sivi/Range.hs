@@ -14,7 +14,7 @@ module Sivi.Range (
 
 
 -- | Range which ends exactly at the end value : last (range start end step) == end
--- Used in 'zRepetition' and 'arcInterpolation'.
+-- Used in 'Sivi.Operation.Repetition.zRepetition' and 'Sivi.ArcInterpolation.arcInterpolation'.
 range :: (Eq a, Num a) => a 		-- ^ start (also the accumulator used for recursion)
 			-> a		-- ^ end
 			-> a		-- ^ step
