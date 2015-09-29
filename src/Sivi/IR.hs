@@ -12,10 +12,10 @@ module Sivi.IR
 	module Sivi.IR.Base
 	, module Sivi.IR.ToGCode
 	, module Sivi.IR.FromGCode
+	, module Sivi.IR.PositionTracking
 ) where
 
 import Sivi.IR.Base
 import Sivi.IR.ToGCode
 import Sivi.IR.FromGCode
-
-
+import Sivi.IR.PositionTracking
