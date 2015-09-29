@@ -15,6 +15,7 @@ module Sivi.Operation.Repetition (
 
 import Sivi.Operation.Base
 import Sivi.IR
+import Sivi.Range
 import Linear hiding (rotate)
 
 repetition :: [V3 Double] -> Double -> Operation IR -> Operation IR
@@ -57,19 +58,7 @@ zRepetition :: Double			-- ^ depth : Depth of the final pass (relative to the fi
 		-> Operation IR		-- ^ Resulting operation
 zRepetition depth m_z_safe op = do
 	step <- getDepthOfCut
-	let pos_list = map (V3 0 0) $ zRange step (negative depth) step
+	let pos_list = map (V3 0 0) $ range step (negative depth) step
 	case m_z_safe of
 		Just z_safe -> repetition pos_list z_safe op
 		Nothing -> repetitionWithoutRetract pos_list op
-
--- | Helper function for zRepetition.
--- Generates a list of depths (on the Z axis) for each iteration of the repetition.
--- It is close to a haskell range like [0,step..depth], but the last element is equal to depth.
--- Which is not the case for the range syntax.
-zRange :: (Eq a, Num a) => a 		-- ^ acc : Accumulator used for recursion (it is also the starting depth)
-			-> a		-- ^ depth
-			-> a		-- ^ step : depth of each cutting pass
-			-> [a]		-- ^ Resulting list of depths
-zRange acc depth step 	| signum (depth - acc) == signum step = acc : zRange (acc+step) depth step 
-			| otherwise = [depth]
-
