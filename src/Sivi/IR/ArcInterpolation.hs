@@ -1,5 +1,5 @@
 {-|
-Module		: Sivi.ArcInterpolation
+Module		: Sivi.IR.ArcInterpolation
 Description	: Interpolation of arcs
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,13 +7,14 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module Sivi.ArcInterpolation
+module Sivi.IR.ArcInterpolation
 (
 	arcInterpolation
 ) where
 
 import Linear
-import Sivi.IR
+import Sivi.IR.Base
+import Sivi.IR.PositionTracking
 import Sivi.Range
 
 -- | Function that interpolates a single 'Sivi.IR.Base.Instruction'
