@@ -47,5 +47,6 @@ trackPosition f i = do
 -- | Maps a function over a list of instructions, with automatic tool position tracking.
 -- Position tracking is needed because I J K parameters for arcs are relative to the current position of the tool.
 -- When the position is needed in the function, use 'getPosition' to retrieve it.
+-- Used in 'Sivi.IR.ArcInterpolation.arcInterpolation' and 'Sivi.IR.ToGCode.toGCode'.
 mapTrackPosition :: (Instruction -> TrackedPosition a) -> [Instruction] -> [a]
 mapTrackPosition f is = evalState (mapM (trackPosition f) is) (V3 0 0 0)
