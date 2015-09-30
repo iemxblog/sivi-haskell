@@ -26,6 +26,7 @@ data GCode = 	G00 { x :: Maybe Double, y :: Maybe Double, z :: Maybe Double }
 			i :: Maybe Double, j :: Maybe Double, k :: Maybe Double, f :: Maybe Double }
 		| G38d2 { x:: Maybe Double, y :: Maybe Double, z :: Maybe Double, f :: Maybe Double }
 		| G92 { x:: Maybe Double, y :: Maybe Double, z :: Maybe Double }
+		deriving Eq
 
 -- | Helper function used to show a Double with 3 decimals
 showDouble :: Double -> String
