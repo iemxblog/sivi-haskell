@@ -18,7 +18,7 @@ import Sivi.IR.PositionTracking
 import Sivi.Range
 
 -- | Function that interpolates a single 'Sivi.IR.Base.Instruction'
-arcInterpolation' :: 	Double 			-- ^ ai : Angle increment
+arcInterpolation' :: 	Double 			-- ^ ai : Angle increment (in degrees)
 			-> Instruction 		-- ^ Instruction to interpolate
 			-> TrackedPosition [Instruction]
 arcInterpolation' ai (Move dst (Arc dir cen f)) = do
@@ -41,7 +41,7 @@ arcInterpolation' ai (Move dst (Arc dir cen f)) = do
 arcInterpolation' _ i = return [i]
 
 -- | Interpolates arcs (transforms them into a list of linear interpolations)
-arcInterpolation :: Double		-- ^ ai : Angle increment
+arcInterpolation :: Double		-- ^ ai : Angle increment (in degrees)
 		-> [Instruction]	-- ^ List of instructions
 		-> [Instruction]
 arcInterpolation ai = concat . mapTrackPosition (arcInterpolation' ai)
