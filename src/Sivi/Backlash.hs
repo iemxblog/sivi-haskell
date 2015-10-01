@@ -9,7 +9,7 @@ Portability	: POSIX
 -}
 module Sivi.Backlash
 (
-	backlashCompensation
+	backlash
 ) where
 
 import Linear
@@ -35,17 +35,17 @@ onV3 :: (a -> a -> a) 	-- ^ f : Function to apply
 	-> V3 a
 onV3 f (V3 x y z) (V3 x' y' z') = V3 (f x x') (f y y') (f z z')
 
-backlash2 :: IR -> V3 Double -> V3 Double -> V3 Double -> V3 Double -> IR
-backlash2 [] _ _ _ _ = []
-backlash2 (Move _ (Arc{}) : _) _ _ _ _ = error "Backlash compensation not implemented for arcs. Use arcInterpolation before."
-backlash2 (Move pos mp : xs) backlash ppos pdir pcomp = 
-	if extraMove == V3 0 0 0 then Move compensatedPos mp : backlash2 xs backlash pos newdir compensation
-	else Move extraMove mp' : Move compensatedPos mp : backlash2 xs backlash pos newdir compensation
+backlash' :: IR -> V3 Double -> V3 Double -> V3 Double -> V3 Double -> IR
+backlash' [] _ _ _ _ = []
+backlash' (Move _ (Arc{}) : _) _ _ _ _ = error "Backlash compensation not implemented for arcs. Use arcInterpolation before."
+backlash' (Move pos mp : xs) backlashValues ppos pdir pcomp = 
+	if extraMove == V3 0 0 0 then Move compensatedPos mp : backlash' xs backlashValues pos newdir compensation
+	else Move extraMove mp' : Move compensatedPos mp : backlash' xs backlashValues pos newdir compensation
 	where 
 		sgn = signum (pos-ppos)
 		newdir = onV3 mem pdir sgn
 		dirChange = onV3 dirc pdir newdir
-		compensation = pcomp + backlash * dirChange
+		compensation = pcomp + backlashValues * dirChange
 		compensatedPos = pos + compensation
 		extraMove = if dirChange == V3 0 0 0 then V3 0 0 0 else ppos + compensation
 		mp' = case mp of
@@ -53,12 +53,13 @@ backlash2 (Move pos mp : xs) backlash ppos pdir pcomp =
 			LinearInterpolation f -> LinearInterpolation f
 			Arc d c f -> Arc d c f
 			Probe f -> LinearInterpolation f
-backlash2 (DefCurPos pos : xs) backlash _ pdir pcomp = DefCurPos (pos + pcomp) : backlash2 xs backlash pos pdir pcomp
-backlash2 (x : xs) backlash ppos pdir pcomp = x : backlash2 xs backlash ppos pdir pcomp
+backlash' (DefCurPos pos : xs) backlashValues _ pdir pcomp = DefCurPos (pos + pcomp) : backlash' xs backlashValues pos pdir pcomp
+backlash' (x : xs) backlashValues ppos pdir pcomp = x : backlash' xs backlashValues ppos pdir pcomp
 
-backlashCompensation :: IR		-- ^ The program to modifiy
-			-> V3 Double 	-- ^ The position where to make backlash initialization (to put the machine in a known backlash)
-			-> V3 Double 	-- ^ The backlash measured on the machine
-			-> IR		-- ^ The modified program
-backlashCompensation p initPos backlash = backlash2 (initMoves ++ p) backlash initPos (V3 (-1) (-1) (-1)) (V3 0 0 0)
+-- | Modifies a program to compensate the backlash of the machine.
+backlash :: V3 Double 	-- ^ Position where to make backlash initialization (to put the machine in a known backlash)
+			-> V3 Double 	-- ^ Backlash measured on the machine
+			-> IR		-- ^ Program to modify
+			-> IR		-- ^ Modified program
+backlash initPos backlashValues p = backlash' (initMoves ++ p) backlashValues initPos (V3 (-1) (-1) (-1)) (V3 0 0 0)
 	where initMoves = [Move (V3 0 0 0 + initPos) Rapid, Move (V3 1 1 1 + initPos) Rapid]

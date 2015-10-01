@@ -60,8 +60,8 @@ expectedPos2 =
 initPos :: V3 Double
 initPos = V3 0 0 0
 
-backlash :: V3 Double
-backlash = V3 0.2 0.3 0.4
+backlashValues :: V3 Double
+backlashValues = V3 0.2 0.3 0.4
 
 withProbe :: IR
 withProbe = [
@@ -103,10 +103,10 @@ spec = describe "backlashCompensation" $ do
 		let fRapid = map (\x -> Move x Rapid)
 		let fLinearInterpolation = map (\x -> Move x (LinearInterpolation 100))
 		it "compensates backlash for rapid moves" $ 
-			backlashCompensation (fRapid pos) initPos backlash  `shouldBe` fRapid (expectedPos1 ++ expectedPos2)
+			backlash initPos backlashValues (fRapid pos)  `shouldBe` fRapid (expectedPos1 ++ expectedPos2)
 
 		it "compensates backlash for linear interpolations" $ 
-			backlashCompensation (fLinearInterpolation pos) initPos backlash  `shouldBe` fRapid expectedPos1 ++ fLinearInterpolation expectedPos2
+			backlash initPos backlashValues (fLinearInterpolation pos)  `shouldBe` fRapid expectedPos1 ++ fLinearInterpolation expectedPos2
 
 		it "compensates backlash for probing motions (G38.2) and offsets (G92)" $
-			backlashCompensation withProbe initPos backlash `shouldBe` expectedWithProbe
+			backlash initPos backlashValues withProbe `shouldBe` expectedWithProbe
