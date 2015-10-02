@@ -25,8 +25,7 @@ probeHorizontalCylinderRight :: Double 		-- ^ d : Diameter of the cylinder
 			-> Operation IRTree	-- ^ Resulting operation
 probeHorizontalCylinderRight d l margin probetool = 
 	withTool probetool (
-		comment "Place the probe 5mm above the right side of the strut, centered on the axis of the cylinder"	
-		+++ pause
+		message "Place the probe 5mm above the right side of the strut, centered on the axis of the cylinder"	
 		+++ defCurPos (V3 l (d/2) 5)
 		+++ chain 5 [
 			probeZMinus (V3 l (d/2) 0) margin
@@ -34,11 +33,9 @@ probeHorizontalCylinderRight d l margin probetool =
 			, probeYPlus (V3 0 0 (-3*d/4)) margin
 		]
 	)
-	+++ comment "Don't forget to put the probe connectors for tool length measurement."
-	+++ pause
+	+++ message "Don't forget to put the probe connectors for tool length measurement."
 	+++ probeZMinus (V3 0 (d/2) 0) margin
-	+++ comment "Remove the probe connectors"
-	+++ pause
+	+++ message "Remove the probe connectors"
 
 -- | Probes a vertical cylinder. Touches the outside surface.
 probeOuterCylinder :: 	Double 			-- ^ d : Diameter of the cylinder
@@ -47,8 +44,7 @@ probeOuterCylinder :: 	Double 			-- ^ d : Diameter of the cylinder
 			-> Operation IRTree	-- ^ Resulting operation
 probeOuterCylinder d margin probeTool = 
 	withTool probeTool (
-		comment "Place the probe 5mm above the center of the cylinder"
-		+++ pause
+		message "Place the probe 5mm above the center of the cylinder"
 		+++ defCurPos (V3 0 0 5)
 		+++ chain 5 [
 			probeZMinus (V3 (d/4) 0 0) margin
@@ -56,8 +52,6 @@ probeOuterCylinder d margin probeTool =
 			, probeYPlus (V3 0 (-d/2) (-5)) margin
 		]
 	)
-	+++ comment "Tool length measurement"
-	+++ pause
+	+++ message "Tool length measurement"
 	+++ probeZMinus (V3 (d/4) 0 0) margin
-	+++ comment "Finished probing."
-	+++ pause
+	+++ message "Finished probing."

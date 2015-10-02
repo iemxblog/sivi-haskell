@@ -25,8 +25,7 @@ probeInnerCornerNE :: 	Double 			-- ^ margin : Probing margin
 			-> Operation IRTree
 probeInnerCornerNE margin probeTool = 
 	withTool probeTool (
-		comment "Place the probe 5mm above the corner"
-		+++ pause
+		message "Place the probe 5mm above the corner"
 		+++ defCurPos (V3 0 0 5)
 		+++ chain 5 [
 			probeZMinus (V3 margin margin 0) margin
@@ -34,11 +33,9 @@ probeInnerCornerNE margin probeTool =
 			, probeYPlus (V3 (-margin) 0 (-5)) margin
 		]
 	)
-	+++ comment "Tool length measurement"
-	+++ pause
+	+++ message "Tool length measurement"
 	+++ probeZMinus (V3 margin margin 0) margin
-	+++ comment "Finished probing"
-	+++ pause
+	+++ message "Finished probing"
 
 
 -- | Probes a corner inside a rectangular pocket, in the North-West direction.

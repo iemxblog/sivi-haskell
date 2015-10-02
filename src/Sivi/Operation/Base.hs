@@ -333,8 +333,7 @@ comment s = return $ Leaf (Comment s)
 
 changeTool :: Tool -> Operation IRTree
 changeTool t = retract 30
-		+++ comment ("Please place the tool " ++ show t ++ " in the spindle.")
-		+++ pause
+		+++ message ("Please place the tool " ++ show t ++ " in the spindle.")
 		<* putTool t
 
 -- | Do an operation with a temporary tool.
