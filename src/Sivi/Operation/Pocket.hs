@@ -23,7 +23,7 @@ import Linear
 -- Increment in angle is +1 degree. 
 archimedeanSpiral :: 	Double			-- ^ d : External diameter of the spiral
 			-> Double		-- ^ step_over : the end mill covers step_over mm of the precedent turn
-			-> Operation IR		-- ^ Resulting operation
+			-> Operation IRTree	-- ^ Resulting operation
 archimedeanSpiral d step_over = 
 	do
 		a <- approach (V3 0 0 0) 
@@ -32,23 +32,23 @@ archimedeanSpiral d step_over =
 		let radius = takeWhile (\r -> r+df/2 < d/2) [a * (df - step_over) / (2 * pi) | a <- angle]
 		let lastPoint = ((d-df)/2, pi*(d-df)/(df-step_over))  -- So at the end we are at the exact radius (d-df)/2
 		sp <- opsequence [feed (V3 (r*cos a) (r*sin a) 0) | (r, a) <- zip radius angle ++ [lastPoint]]
-		return (a ++ sp)
+		return $ Node "" [a, sp]
 
 -- | Generates a single pass of a circular pocket.
 circularPocketP :: Double			-- ^ d : Diameter of the pocket
 		-> Double			-- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
-		-> Operation IR			-- ^ Resulting operation
+		-> Operation IRTree		-- ^ Resulting operation
 circularPocketP d step_over = do
 				a <- approach (V3 0 0 0)
 				sp <- archimedeanSpiral d step_over
 				c <- circleFromHere -- the spiral ends at radius = d-df/2, so we start a circle from here
-				return (a ++ sp ++ c)
+				return $ Node "" [a, sp, c]
 
 -- | Generates a circular pocket.
 circularPocket :: Double			-- ^ d : Diameter of the pocket
 		-> Double			-- ^ depth : Depth of the pocket
 		-> Double			-- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
-		-> Operation IR			-- ^ Resulting operation
+		-> Operation IRTree		-- ^ Resulting operation
 circularPocket d depth step_over = zRepetition depth Nothing (circularPocketP d step_over)
 				
 
@@ -75,7 +75,7 @@ rectangularSpiral = rectangularSpiralR (0, 0) 1
 rectangularPocketP :: 	Double 				-- ^ lx : Size of the pocket on the x axis
 			-> Double 			-- ^ ly : Size of the pocket on the y axis
 			-> Double 			-- ^ step_over : The end mill covers step_over mm of the precedent turn
-			-> Operation IR			-- Resulting operation
+			-> Operation IRTree		-- Resulting operation
 rectangularPocketP lx ly step_over = do
 			a <- approach (V3 0 0 0)
 			df <- getToolDiameter		
@@ -88,12 +88,12 @@ rectangularPocketP lx ly step_over = do
 			let sp' = takeWhile (\(x,y) -> abs x <= lx/2 && abs y <= ly/2) $ rectangularSpiral spacing_x spacing_y
 			sp <- opsequence [feed (V3 x y 0) | (x, y) <- sp']
 			r <- centeredRectangle (lx-df) (ly-df)
-			return (a ++ sp ++ r)
+			return $ Node "" [a, sp, r]
 
 -- | Generates a rectangular pocket.
 rectangularPocket :: 	Double				-- ^ lx : Size of the pocket on the x axis
 			-> Double			-- ^ ly : Size of the pocket on the y axis
 			-> Double			-- ^ depth : Depth of the pocket
 			-> Double			-- ^ step_over : Then end mill covers step_over mm of the precedent turn
-			-> Operation IR			-- ^ Resulting operation
+			-> Operation IRTree		-- ^ Resulting operation
 rectangularPocket lx ly depth step_over = zRepetition depth Nothing (rectangularPocketP lx ly step_over)

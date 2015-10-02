@@ -22,7 +22,7 @@ probeHorizontalCylinderRight :: Double 		-- ^ d : Diameter of the cylinder
 			-> Double 		-- ^ l : Length of the cylinder
 			-> Double 		-- ^ margin : Probing margin
 			-> Tool 		-- ^ probetool : Tool used to probe the part
-			-> Operation IR		-- ^ Resulting operation
+			-> Operation IRTree	-- ^ Resulting operation
 probeHorizontalCylinderRight d l margin probetool = 
 	withTool probetool (
 		comment "Place the probe 5mm above the right side of the strut, centered on the axis of the cylinder"	
@@ -44,7 +44,7 @@ probeHorizontalCylinderRight d l margin probetool =
 probeOuterCylinder :: 	Double 			-- ^ d : Diameter of the cylinder
 			-> Double 		-- ^ margin : Probing margin
 			-> Tool 		-- ^ probeTool : Tool used to probe the part
-			-> Operation IR		-- ^ Resulting operation
+			-> Operation IRTree	-- ^ Resulting operation
 probeOuterCylinder d margin probeTool = 
 	withTool probeTool (
 		comment "Place the probe 5mm above the center of the cylinder"

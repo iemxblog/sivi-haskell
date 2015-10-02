@@ -22,7 +22,7 @@ import Sivi.Operation.Probing.Base
 -- | Probes a corner inside a rectangular pocket, in the North-East direction.
 probeInnerCornerNE :: 	Double 			-- ^ margin : Probing margin
 			-> Tool 		-- ^ probeTool : Tool used to probe the part
-			-> Operation IR
+			-> Operation IRTree
 probeInnerCornerNE margin probeTool = 
 	withTool probeTool (
 		comment "Place the probe 5mm above the corner"
@@ -44,17 +44,17 @@ probeInnerCornerNE margin probeTool =
 -- | Probes a corner inside a rectangular pocket, in the North-West direction.
 probeInnerCornerNW :: 	Double 			-- ^ margin : Probing margin
 			-> Tool 		-- ^ probeTool : Tool used to probe the part
-			-> Operation IR
+			-> Operation IRTree
 probeInnerCornerNW margin probeTool = rotate 90 $ probeInnerCornerNE margin probeTool
 
 -- | Probes a corner inside a rectangular pocket, in the South-West direction.
 probeInnerCornerSW :: 	Double 			-- ^ margin : Probing margin
 			-> Tool 		-- ^ probeTool : Tool used to probe the part
-			-> Operation IR
+			-> Operation IRTree
 probeInnerCornerSW margin probeTool = rotate 180 $ probeInnerCornerNE margin probeTool
 
 -- | Probes a corner inside a rectangular pocket, in the South-East direction.
 probeInnerCornerSE :: 	Double 			-- ^ margin : Probing margin
 			-> Tool 		-- ^ probeTool : Tool used to probe the part
-			-> Operation IR
+			-> Operation IRTree
 probeInnerCornerSE margin probeTool = rotate 270 $ probeInnerCornerNE margin probeTool

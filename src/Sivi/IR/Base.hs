@@ -14,6 +14,9 @@ module Sivi.IR.Base
 	, MoveParams(..)
 	, Instruction(..)
 	, IR
+	, Tree(..)
+	, IRTree
+	, flatten
 ) where
 
 import Linear
@@ -49,5 +52,20 @@ data Instruction =
 	| DefCurPos (V3 Coordinate)		-- ^ Define current position
 	deriving (Eq, Show)
 
--- | A program is a list of instructions in intermediate representation.
 type IR = [Instruction]
+
+data Tree v a = 
+	Leaf a
+	| Node v [Tree v a]
+
+-- | Tree of instructions
+type IRTree = Tree String Instruction
+
+-- | Transforms a tree of intructions to a list of instructions. Annotations are transformed into comments.
+-- It could be possible to make a more general function which accepts more types, but would probably be overkill ??
+flatten :: IRTree-> [Instruction]
+flatten (Leaf i) = [i]
+flatten (Node v ts) = opening ++ concatMap flatten ts ++ closing
+	where
+		opening = if v == "" then [] else [Comment ("> " ++ v)] 
+		closing = if v == "" then [] else [Comment ("< " ++ v)]

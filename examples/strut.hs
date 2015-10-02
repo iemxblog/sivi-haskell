@@ -5,24 +5,23 @@ module Main (
 import Sivi
 import Linear
 
-strut' :: Double -> Double -> Operation IR
+strut' :: Double -> Double -> Operation IRTree
 strut' d l = 
 	chain 5 [
 		probeHorizontalCylinderRight d l 5 (ProbeTool 3 42)
 		, saw_left d d 1
 	]
 
-strut :: Double -> Double -> Operation IR
+strut :: Double -> Double -> Operation IRTree
 strut d l = 
 	strut' d (l+2)
 	+++ retract 30
-	+++ comment "Please rotate the strut to machine the other side"
-	+++ pause
+	+++ message "Please rotate the strut to machine the other side"
 	+++ strut' d l 
 
-op :: Operation IR
+op :: Operation IRTree
 op = strut 10 47.1
 		
 main :: IO ()
---main = putStr . (++"M2\n") . toString . runOperationWithDefaultParams $ op
-main = interface . toGCode . runOperationWithDefaultParams $ op
+--main = putStr . (++"M2\n") . toString . flatten . runOperationWithDefaultParams $ op
+main = interface . toGCode . flatten . runOperationWithDefaultParams $ op

@@ -48,7 +48,7 @@ instance Show GCode where
 	show (G01 mx my mz mf) = "G01 " ++ compileParams "XYZF" [mx, my, mz, mf]
 	show (G02 mx my mz mi mj mk mf) = "G02 " ++ compileParams "XYZIJKF" [mx, my, mz, mi, mj, mk, mf]
 	show (G03 mx my mz mi mj mk mf) = "G03 " ++ compileParams "XYZIJKF" [mx, my, mz, mi, mj, mk, mf]
-	show (GComment c) = "( " ++ c ++ " )"
+	show (GComment c) = "(" ++ c ++ ")"
 	show M00 = "M00"
 	show (CLine mx my mz mi mj mk mf) = compileParams "XYZIJKF" [mx, my, mz, mi, mj, mk, mf]
 	show (G38d2 mx my mz mf) = "G38.2 " ++ compileParams "XYZF" [mx, my, mz, mf]
