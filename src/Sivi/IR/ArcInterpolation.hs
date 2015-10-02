@@ -17,7 +17,7 @@ import Sivi.IR.Base
 import Sivi.IR.PositionTracking
 import Sivi.Range
 
--- | Function that interpolates a single 'Sivi.IR.Base.Instruction'
+-- | Function that interpolates an arc. Circles are possible only in the XY plane (quick fix), because it is not possible to know in which plane they are (the 3 points used to define them are colinear). Arcs are possible in 3D if the starting, ending and center are not colinear.
 arcInterpolation' :: 	Double 			-- ^ ai : Angle increment (in degrees)
 			-> Instruction 		-- ^ Instruction to interpolate
 			-> TrackedPosition [Instruction]
@@ -28,14 +28,19 @@ arcInterpolation' ai (Move dst (Arc dir cen f)) = do
 		let o = cen
 		let oa = a - o
 		let ob = b - o
-		let axis = cross oa ob
+		let axisTmp = cross oa ob	-- temporary fix for circles...
+		let axis = case axisTmp of
+			V3 0 0 0 -> V3 0 0 1
+			_ -> axisTmp
 		let alpha = atan2 (norm (cross oa ob)) (dot oa ob)
 		let alpha' = case dir of
 			CW -> -2 * pi - alpha
-			CCW -> alpha
+			CCW -> case alpha of
+					0 -> 2*pi
+					_ -> alpha
 		let step = case dir of
-			CW -> ai
-			CCW -> negate ai
+			CW -> (negate ai) * pi / 180
+			CCW -> ai * pi / 180
 		let angles = range 0 alpha' step
 		return [Move (o + rotate (axisAngle axis angle) oa) (LinearInterpolation f) | angle <- angles]
 arcInterpolation' _ i = return [i]
