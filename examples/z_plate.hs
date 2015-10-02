@@ -5,6 +5,7 @@ module Main (
 
 import Sivi
 import Linear hiding (rotate)
+import ScrewHoles
 
 corner = V3 (-20) 5 0
 
@@ -46,6 +47,7 @@ front1 = chain 1 [
 front2 = chain 1 [
 		translate corner $ probeInnerCornerNE 5 (ProbeTool 3 42)
 		, bearing
+		, rotate (-90) screwHoles
 	]
 
 front3 = chain 1 [
