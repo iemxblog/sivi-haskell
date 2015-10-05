@@ -58,7 +58,7 @@ programThread wc rc pc ptc (x:xs) Running = do
 			GComment s -> do
 				when (take 4 s == "MSG,") $ do
 					writeChan pc (withColor Green $ putInstruction (drop 5 s))
-					programThread wc rc pc ptc xs Running
+				programThread wc rc pc ptc xs Running
 			M00 -> programThread wc rc pc ptc xs Paused
 			_ -> do 
 				sendProgram wc rc (show x)
