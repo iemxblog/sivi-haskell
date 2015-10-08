@@ -15,7 +15,7 @@ module Sivi.IR.ArcInterpolation
 import Linear
 import Sivi.IR.Base
 import Sivi.IR.PositionTracking
-import Sivi.Range
+import Sivi.Misc.Range
 
 -- | Function that interpolates an arc. Circles are possible only in the XY plane (quick fix), because it is not possible to know in which plane they are (the 3 points used to define them are colinear). Arcs are possible in 3D if the starting, ending and center are not colinear.
 arcInterpolation' :: 	Double 			-- ^ ai : Angle increment (in degrees)

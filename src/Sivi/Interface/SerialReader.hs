@@ -7,7 +7,6 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-{-# LANGUAGE OverloadedStrings #-}
 module Sivi.Interface.SerialReader
 (
 	serialReader
@@ -18,20 +17,20 @@ module Sivi.Interface.SerialReader
 import Control.Concurrent.Chan
 import System.Hardware.Serialport
 import qualified Data.ByteString.Char8 as B
-import Data.Attoparsec.ByteString.Char8
-import Control.Applicative
 import Control.Monad
 import System.Console.ANSI
+import Text.Parsec hiding (Ok)
 import Sivi.Interface.Misc
+import Sivi.Misc.SharedParsers
 
 -- | Data returned by the serialRead thread. The data constructors represent GRBL response messages.
 data ReadCommand = Position (Double, Double, Double) | Ok deriving (Eq, Show)
 
 -- | Parses a position message and returns the current working position.
-pPosition :: Parser ReadCommand
+pPosition :: Parsec String () ReadCommand
 pPosition = do
 	char '<'
-	many1 (notChar ',')
+	many1 (satisfy (/=','))
 	char ','
 	string "MPos:"
 	double
@@ -49,11 +48,11 @@ pPosition = do
 	return $ Position (x, y, z)
 
 -- | Parses ok messages.
-pOk :: Parser ReadCommand
+pOk :: Parsec String () ReadCommand
 pOk = string "ok" >> return Ok
 
 -- | Parses GRBL response messages.
-pReadCommand :: Parser ReadCommand
+pReadCommand :: Parsec String () ReadCommand
 pReadCommand = pPosition <|> pOk
 
 -- | Takes a 'String' as parameter, and returns a tuple of the first line and the remaining of the string.
@@ -74,7 +73,7 @@ serialReader rc pc serial buffer = do
 	let msgString = B.unpack msg
 	let (newMsg, newBuf) = splitLine (buffer ++ msgString)
 	when (not (null newMsg)) $
-		case parseOnly pReadCommand (B.pack newMsg) of
+		case parse pReadCommand "(grbl commands)" newMsg of
 			Left _ -> writeChan pc $ do
 				setCursorPosition 5 60
 				withColor Red (putStr $ showLine 20 newMsg)

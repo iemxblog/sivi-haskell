@@ -15,7 +15,7 @@ module Sivi.Operation.Repetition (
 
 import Sivi.Operation.Base
 import Sivi.IR
-import Sivi.Range
+import Sivi.Misc.Range
 import Linear hiding (rotate)
 
 repetition :: [V3 Double] -> Double -> Operation IRTree -> Operation IRTree

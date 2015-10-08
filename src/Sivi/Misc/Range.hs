@@ -1,5 +1,5 @@
 {-|
-Module		: Sivi.Range
+Module		: Sivi.Misc.Range
 Description	: Custom range function
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
@@ -7,8 +7,7 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-
-module Sivi.Range (
+module Sivi.Misc.Range (
 	range
 ) where
 

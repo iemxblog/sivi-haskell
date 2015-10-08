@@ -14,7 +14,7 @@ module Sivi
 	, module Sivi.IR
 	, module Sivi.Operation
 	, module Sivi.Interface
-	, module Sivi.Range
+	, module Sivi.Misc
 ) where
 
 import Sivi.Backlash
@@ -22,4 +22,4 @@ import Sivi.GCode
 import Sivi.IR
 import Sivi.Operation
 import Sivi.Interface
-import Sivi.Range
+import Sivi.Misc

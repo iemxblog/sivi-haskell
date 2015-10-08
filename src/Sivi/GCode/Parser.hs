@@ -15,43 +15,21 @@ module Sivi.GCode.Parser
 import Text.Parsec
 import Text.Parsec ((<?>))
 import Sivi.GCode.Base
+import Sivi.Misc.SharedParsers
 import Control.Applicative((<*), (*>))
-import Data.Char
 
-double :: Parsec String () Double
-double = do
-		sign <- option "" (string "-")
-		integerPart <- many1 (satisfy isDigit)
-		decimalPart <- option "" $ do
-			p <- char '.' 
-			d <- many1 (satisfy isDigit)
-			return (p:d)
-		return (read (sign++integerPart++decimalPart) :: Double)
-			
-
-word :: Char 
-	-> Parsec String () (Maybe Double)
+-- | Parses a GCode word.
+word :: Char 					-- ^ Name of the word (X or Y or Z, ...)
+	-> Parsec String () (Maybe Double)	-- ^ Result is Nothing if word is not mentioned, or (Just value)
 word wn = (optionMaybe $ do
 		char wn
 		double
 	   ) <?> "GCode word"
 
--- | Custom version of 'Text.Parsec.Token.lexeme'. (This custom version doesn't parse newlines).
-lexeme :: Parsec String () a -> Parsec String () a
-lexeme p = many (satisfy (==' ')) *> p <* many (satisfy (==' '))
 
-symbol :: String -> Parsec String () String
-symbol xs = lexeme (string xs)
-
-condition :: (a -> Bool) -> Parsec String () a -> Parsec String () a
-condition f p  = do
-	r <- p
-	case f r of
-		True -> return r
-		False -> parserFail ""
-
-pParams :: [Char]
-	-> Parsec String () [Maybe Double]
+-- | Parses a list of GCode words. Fails if all words are absent.
+pParams :: [Char]				-- ^ The names of the words
+	-> Parsec String () [Maybe Double]	-- ^ The list of word values
 pParams =  (condition (not . all (==Nothing))) . mapM (lexeme . word)
 
 -- | Parses a G00 (rapid move)
@@ -101,6 +79,7 @@ pG38d2 = do
 		[x, y, z, f] <- pParams "XYZF"
 		return $ G38d2 x y z f
 
+-- | Parses a G92
 pG92 :: Parsec String () GCode
 pG92 = do
 		symbol "G92"
@@ -118,10 +97,10 @@ pGCode :: Parsec String () GCode
 pGCode = try pG00 <|> try pG01 <|> try pG02 <|> try pG03 <|> try pComment <|> try pM00 <|> try pG38d2 <|> try pG92 <|> pCLine 
 
 -- | Parses a GCode program (list of commands)
---pProgram :: Parsec String () [GCode]
---pProgram = trace "pProgram" $ (pGCode `sepBy1` endOfLine) <* eof
-
 pProgram = pGCode `sepBy` (many endOfLine) <* eof
 
+-- | Parses a GCode program.
+parseGCode :: String				-- ^ The GCode program
+		-> Either ParseError [GCode]	-- ^ The resulting GCode data structure (or parse error)
 parseGCode text = parse pProgram "(gcode)" text
 
