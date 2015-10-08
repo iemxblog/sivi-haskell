@@ -10,10 +10,6 @@ Portability	: POSIX
 module Sivi.GCode.Parser
 (
 	parseGCode
-	, pG00
-	, pG01
-	, pComment
-	, pGCode
 ) where
 
 import Text.Parsec
