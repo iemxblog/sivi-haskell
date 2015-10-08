@@ -9,12 +9,13 @@ import Sivi.IR.Base
 import Sivi.GCode.Base
 import Sivi.GCode.Parser
 import Sivi.IR.FromGCode
+import Text.Parsec.Error
 
-spec = describe "fromGCode" $ 
+spec = describe "fromGCode" $ do
 	it "transforms a basic program into IR" $ do
 		let prg = "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-1\nG38.2 X-10 F10\nY-10\nG92 X0 Y0\nZ-10"
-		case parse prg of
-			Left err -> expectationFailure $ "Parse error : " ++ err
+		case parseGCode prg of
+			Left err -> expectationFailure $ "Parse error : " ++ show err
 			Right gcode -> fromGCode gcode `shouldBe` 
 				[ Move (V3 1 0 2) Rapid
 				, Move (V3 1 2 2) (LinearInterpolation 100)
@@ -27,3 +28,8 @@ spec = describe "fromGCode" $
 				, DefCurPos (V3 0 0 0)
 				, Move (V3 0 0 (-10)) Probe{feedRate = 10}
 				]
+	it "fails when no parameters are provided for a G00" $ 
+		case parseGCode "G00\nG01 X10" of
+			Left pe -> show pe `shouldBe` "\"(gcode)\" (line 1, column 4):\nunexpected \"\\n\"\nexpecting GCode word"
+			Right _ -> expectationFailure $ "Parsing should have failed."
+
