@@ -7,7 +7,7 @@ import Linear
 import Sivi
 
 
-
+spec :: SpecWith ()
 spec = describe "probeXMinus" $ 
 	it "makes a simple probing operation" $ 
 		flatten (runOperation (100, 30, pbr, (-0.5)) (V3 0 0 0) EndMill{diameter=td, len=42} (probeXMinus (V3 l 0 depth) margin)) `shouldBe`

@@ -8,6 +8,7 @@ import Sivi.IR.Base
 import Sivi.IR.ToGCode
 import Sivi.GCode
 
+spec :: SpecWith ()
 spec = describe "toGCode" $ do
 	it "transforms rapid moves into G00" $ 
 		toGCode [Move (V3 1 2 3) Rapid, Move (V3 4 5 6) Rapid] `shouldBe` 

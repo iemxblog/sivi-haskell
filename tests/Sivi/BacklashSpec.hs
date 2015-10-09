@@ -98,7 +98,7 @@ expectedWithProbe = [
 	, Move (V3 (-2) 2.3 0) Rapid
 	]
 	
-
+spec :: SpecWith ()
 spec = describe "backlashCompensation" $ do
 		let fRapid = map (\x -> Move x Rapid)
 		let fLinearInterpolation = map (\x -> Move x (LinearInterpolation 100))
