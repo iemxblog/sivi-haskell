@@ -25,6 +25,6 @@ spec = describe "fromGCode" $ do
 				]
 	it "fails when no parameters are provided for a G00" $ 
 		case parseGCode "G00\nG01 X10" of
-			Left pe -> show pe `shouldBe` "\"(gcode)\" (line 1, column 4):\nunexpected \"\\n\"\nexpecting GCode word"
+			Left pe -> pe `shouldBe` "\"(gcode)\" (line 1, column 4):\nunexpected \"\\n\"\nexpecting GCode word"
 			Right _ -> expectationFailure $ "Parsing should have failed."
 

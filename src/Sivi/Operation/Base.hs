@@ -19,6 +19,7 @@ module Sivi.Operation.Base (
 	, withTransformation
 	, withFeedRate
 	, withPlungeRate
+	, withProbeRate
 	, withDepthOfCut
 	, getCurrentPosition
 	, putCurrentPosition
@@ -137,6 +138,12 @@ withPlungeRate :: Double 		-- ^ npr : The new plunge rate
 		-> Operation a		-- ^ The operation to call with the new plunge rate
 		-> Operation a		-- ^ The resulting operation
 withPlungeRate npr = local (\(tr, fr, _, pbr, dc) -> (tr, fr, npr, pbr, dc))
+
+-- | Calls an operation with the specified probe rate
+withProbeRate :: Double 		-- ^ npbr : The new probe rate
+		-> Operation a		-- ^ The operation to call with the new probe rate
+		-> Operation a		-- ^ The resulting operation
+withProbeRate npbr = local (\(tr, fr, pr, _, dc) -> (tr, fr, pr, npbr, dc))
 
 -- | Calls an operation with the specified depth of cut
 withDepthOfCut :: Double 		-- ^ ndc : The new depth of cut

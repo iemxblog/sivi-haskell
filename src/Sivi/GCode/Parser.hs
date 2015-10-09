@@ -101,6 +101,8 @@ pProgram = pGCode `sepBy` (many endOfLine) <* eof
 
 -- | Parses a GCode program.
 parseGCode :: String				-- ^ The GCode program
-		-> Either ParseError [GCode]	-- ^ The resulting GCode data structure (or parse error)
-parseGCode text = parse pProgram "(gcode)" text
+		-> Either String [GCode]	-- ^ The resulting GCode data structure (or parse error)
+parseGCode text = case parse pProgram "(gcode)" text of
+			Left pe -> Left (show pe)
+			Right gcode -> Right gcode 
 
