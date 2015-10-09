@@ -7,7 +7,7 @@ import Sivi.GCode
 
 spec :: SpecWith ()
 spec = describe "fromGCode" $ do
-	it "transforms a basic program into IR" $ do
+	it "transforms a basic program into GCode data structure" $ do
 		let prg = "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-1\nG38.2 X-10 F10\nY-10\nG92 X0 Y0\nZ-10"
 		case parseGCode prg of
 			Left err -> expectationFailure $ "Parse error : " ++ show err
