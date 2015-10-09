@@ -10,6 +10,15 @@ Portability	: POSIX
 module Sivi.GCode.Base
 (
 	GCode(..)
+	, g00
+	, g01
+	, g02
+	, g03
+	, gcomment
+	, m00
+	, cline
+	, g38d2
+	, g92
 ) where
 
 import Numeric
@@ -54,3 +63,38 @@ instance Show GCode where
 	show (G38d2 mx my mz mf) = "G38.2 " ++ compileParams "XYZF" [mx, my, mz, mf]
 	show (G92 mx my mz) = "G92 " ++ compileParams "XYZ" [mx, my, mz]
 
+-- | Smart constructor for 'G00'
+g00 :: GCode
+g00 = G00 Nothing Nothing Nothing
+
+-- | Smart constructor for 'G01'
+g01 :: GCode
+g01 = G01 Nothing Nothing Nothing Nothing
+
+-- | Smart constructor for 'G02'
+g02 :: GCode
+g02 = G02 Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | Smart constructor for 'G03'
+g03 :: GCode
+g03 = G03 Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | Smart constructor for 'GComment'
+gcomment :: GCode
+gcomment = GComment ""
+
+-- | Smart constructor for M00
+m00 :: GCode
+m00 = M00
+
+-- | Smart constructor for 'CLine'
+cline :: GCode
+cline = CLine Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | Smart constructor for 'G38d2'
+g38d2 :: GCode
+g38d2 = G38d2 Nothing Nothing Nothing Nothing
+
+-- | Smart constructor for 'G92'
+g92 :: GCode
+g92 = G92 Nothing Nothing Nothing

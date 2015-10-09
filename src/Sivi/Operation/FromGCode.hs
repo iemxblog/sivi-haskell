@@ -1,13 +1,13 @@
 {-|
-Module		: Sivi.IR.FromGCode
-Description	: Conversion of GCode to IR
+Module		: Sivi.Operation.FromGCode
+Description	: Conversion of GCode to Operation
 Copyright	: (c) Maxime ANDRE, 2015
 License		: GPL-2
 Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
-module Sivi.IR.FromGCode
+module Sivi.Operation.FromGCode
 (
 	fromGCode
 ) where
