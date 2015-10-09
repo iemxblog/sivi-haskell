@@ -96,8 +96,12 @@ pCLine = do
 pGCode :: Parsec String () GCode
 pGCode = try pG00 <|> try pG01 <|> try pG02 <|> try pG03 <|> try pComment <|> try pM00 <|> try pG38d2 <|> try pG92 <|> pCLine 
 
+-- | Parses a line
+pProgramLine :: Parsec String () GCode
+pProgramLine = pGCode <* (many1 endOfLine)
+
 -- | Parses a GCode program (list of commands)
-pProgram = pGCode `sepBy` (many endOfLine) <* eof
+pProgram = many pProgramLine <* eof
 
 -- | Parses a GCode program.
 parseGCode :: String				-- ^ The GCode program

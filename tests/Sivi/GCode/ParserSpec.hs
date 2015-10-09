@@ -8,7 +8,7 @@ import Sivi.GCode
 spec :: SpecWith ()
 spec = describe "fromGCode" $ do
 	it "transforms a basic program into GCode data structure" $ do
-		let prg = "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-1\nG38.2 X-10 F10\nY-10\nG92 X0 Y0\nZ-10"
+		let prg = "G00 X1 Z2\nG01 Y2 F100\nX3\nY4\nX2 Y2 Z0\nG02 X4 I1 J-1\nG38.2 X-10 F10\nY-10\nG92 X0 Y0\nZ-10\n"
 		case parseGCode prg of
 			Left err -> expectationFailure $ "Parse error : " ++ show err
 			Right gcode -> gcode `shouldBe` 
@@ -24,7 +24,10 @@ spec = describe "fromGCode" $ do
 				, cline {z = Just (-10)}	
 				]
 	it "fails when no parameters are provided for a G00" $ 
-		case parseGCode "G00\nG01 X10" of
+		case parseGCode "G00\nG01 X10\n" of
 			Left pe -> pe `shouldBe` "\"(gcode)\" (line 1, column 4):\nunexpected \"\\n\"\nexpecting GCode word"
 			Right _ -> expectationFailure $ "Parsing should have failed."
 
+	it "doesn't fail when a program terminates with a newline" $
+		parseGCode "G00 X10 Y20\nG01 Z5 F100\n" `shouldBe` 
+			Right [g00 {x = Just 10, y = Just 20}, g01 {z = Just 5, f = Just 100}]
