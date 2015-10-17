@@ -21,7 +21,6 @@ module Sivi.Operation.BasicShape (
 )
 where
 
-import Sivi.IR
 import Sivi.Operation.Base
 import Sivi.Operation.Types
 import Sivi.Operation.Repetition

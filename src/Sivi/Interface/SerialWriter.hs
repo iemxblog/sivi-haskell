@@ -36,7 +36,7 @@ serialWriter :: Chan WriteCommand 	-- ^ wc : The Chan where the incoming command
 		-> Chan (IO ()) 	-- ^ pc : The Chan to send IO commands (putStrLn, ...) to the 'Sivi.Interface.PrinterThread.printerThread'
 		-> SerialPort 		-- ^ serial : The serial port
 		-> IO ()
-serialWriter wc pc serial = forever $ do
+serialWriter wc _ serial = forever $ do
 	writeCommand <- readChan wc
 	let grblCommand = toGRBLCommand writeCommand
 	bytes <- send serial (B.pack grblCommand)

@@ -13,7 +13,6 @@ module Sivi.IR.ToGCode
 ) where
 
 import Linear
-import Numeric
 import Sivi.IR.Base
 import Sivi.IR.PositionTracking
 import Sivi.GCode 
