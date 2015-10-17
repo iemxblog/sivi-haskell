@@ -56,7 +56,7 @@ programThread wc rc pc ptc (GCode (x:xs)) Running = do
 		writeChan pc (mapM_ putStrLn $ showLines 58 22 (map show xs))
 		case x of
 			GComment s -> do
-				when (take 4 s == "MSG,") $ do
+				when (take 4 s == "MSG,") $ 
 					writeChan pc (withColor Green $ putInstruction (drop 5 s))
 				programThread wc rc pc ptc (GCode xs) Running
 			M00 -> programThread wc rc pc ptc (GCode xs) Paused

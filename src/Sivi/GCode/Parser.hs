@@ -13,24 +13,24 @@ module Sivi.GCode.Parser
 ) where
 
 import Text.Parsec
-import Text.Parsec ((<?>))
 import Sivi.GCode.Base
 import Sivi.Misc.SharedParsers
 import Control.Applicative((<*), (*>))
+import Control.Monad
 
 -- | Parses a GCode word.
 word :: Char 					-- ^ Name of the word (X or Y or Z, ...)
 	-> Parsec String () (Maybe Double)	-- ^ Result is Nothing if word is not mentioned, or (Just value)
-word wn = (optionMaybe $ do
+word wn = optionMaybe (do
 		char wn
-		double
-	   ) <?> "GCode word"
+		double)
+	    <?> "GCode word"
 
 
 -- | Parses a list of GCode words. Fails if all words are absent.
 pParams :: [Char]				-- ^ The names of the words
 	-> Parsec String () [Maybe Double]	-- ^ The list of word values
-pParams =  (condition (not . all (==Nothing))) . mapM (lexeme . word)
+pParams =  condition (not . all (==Nothing)) . mapM (lexeme . word)
 
 -- | Parses a G00 (rapid move)
 pG00 :: Parsec String () GCodeInstruction
@@ -98,11 +98,11 @@ pGCode = try pG00 <|> try pG01 <|> try pG02 <|> try pG03 <|> try pComment <|> tr
 
 -- | Parses a line
 pProgramLine :: Parsec String () GCodeInstruction
-pProgramLine = pGCode <* (many1 endOfLine)
+pProgramLine = pGCode <* many1 endOfLine
 
 -- | Parses a GCode program (list of commands)
 pProgram :: Parsec String () GCode
-pProgram = (many pProgramLine <* eof) >>= return . GCode
+pProgram = liftM GCode (many pProgramLine <* eof)
 
 -- | Parses a GCode program.
 parseGCode :: String				-- ^ The GCode program

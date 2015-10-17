@@ -315,7 +315,7 @@ defCurPos p = do
 		move (tr p) bDefCurPos
 
 comment :: Backend a => String -> Operation a
-comment s = bComment s
+comment = bComment
 
 changeTool :: Backend a => Tool -> Operation a
 changeTool t = retract 30
@@ -328,11 +328,11 @@ withTool :: Backend a => Tool 			-- ^ t : The tool to use for the operation
 	-> Operation a				-- ^ The resulting operation.
 withTool t op = getTool >>= (\mt -> changeTool t +++ op +++ changeTool mt)
 
-
+-- | Gives a name to an operation. (Used for displaying only an operation and not the others, etc.)
 name :: Backend a => String
 	-> Operation a
 	-> Operation a
-name s op = bName s op
+name = bName
 
 -- | Displays a message and makes a pause (M00). Compatible with LinuxCNC.
 message :: Backend a => String

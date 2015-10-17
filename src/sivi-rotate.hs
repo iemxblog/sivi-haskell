@@ -1,8 +1,9 @@
 import Sivi
 import System.Environment
 import System.Exit
+import Control.Monad
 
-parse ["-h"] = usage >> exitWith ExitSuccess
+parse ["-h"] = usage >> exitSuccess
 parse [] = usage >> exitWith (ExitFailure 1)
 parse [s] = return (read s :: Double)
 
@@ -15,4 +16,4 @@ rotateProgram angle = do
 main :: IO ()
 main = getArgs >>= parse >>= rotateProgram
 
-usage = getProgName >>= return . ("Usage: "++) . (++" [-h] angle") >>= putStrLn
+usage = liftM (("Usage: "++) . (++" [-h] angle")) getProgName >>= putStrLn

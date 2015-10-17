@@ -72,7 +72,7 @@ serialReader rc pc serial buffer = do
 	msg <- recv serial 100
 	let msgString = B.unpack msg
 	let (newMsg, newBuf) = splitLine (buffer ++ msgString)
-	when (not (null newMsg)) $
+	unless (null newMsg) $
 		case parse pReadCommand "(grbl commands)" newMsg of
 			Left _ -> writeChan pc $ do
 				setCursorPosition 5 60

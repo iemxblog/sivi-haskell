@@ -83,7 +83,7 @@ type IRTree = Tree String IRInstruction
 -- It could be possible to make a more general function which accepts more types, but would probably be overkill ??
 flatten :: IRTree-> IR
 flatten (Leaf i) = IR [i]
-flatten (Node v ts) = opening `mappend` (mconcat . (map flatten)) ts `mappend` closing
+flatten (Node v ts) = opening `mappend` (mconcat . map flatten) ts `mappend` closing
 	where
 		opening = if v == "" then mempty else IR [Comment ("> " ++ v)] 
 		closing = if v == "" then mempty else IR [Comment ("< " ++ v)]

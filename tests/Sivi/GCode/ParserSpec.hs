@@ -26,7 +26,7 @@ spec = describe "fromGCode" $ do
 	it "fails when no parameters are provided for a G00" $ 
 		case parseGCode "G00\nG01 X10\n" of
 			Left pe -> pe `shouldBe` "\"(gcode)\" (line 1, column 4):\nunexpected \"\\n\"\nexpecting GCode word"
-			Right _ -> expectationFailure $ "Parsing should have failed."
+			Right _ -> expectationFailure "Parsing should have failed."
 
 	it "doesn't fail when a program terminates with a newline" $
 		parseGCode "G00 X10 Y20\nG01 Z5 F100\n" `shouldBe` 

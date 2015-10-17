@@ -40,7 +40,7 @@ arcInterpolation' ai (Move dst (Arc dir cen f)) = do
 					0 -> 2*pi
 					_ -> alpha
 		let step = case dir of
-			CW -> (negate ai) * pi / 180
+			CW -> negate ai * pi / 180
 			CCW -> ai * pi / 180
 		let angles = range 0 alpha' step
 		return [Move (o + rotate (axisAngle axis angle) oa) (LinearInterpolation f) | angle <- angles]

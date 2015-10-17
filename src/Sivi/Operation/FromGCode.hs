@@ -54,7 +54,7 @@ getParams :: [Char] -> GCodeTransformer [Double]
 getParams = mapM getParam
 			
 
--- | Transforms a 'GCode' instruction to an 'IR' instruction
+-- | Transforms a 'GCode' instruction into an 'Operation'
 fromGCode' :: Backend a => GCodeInstruction -> GCodeTransformer (Operation a)
 fromGCode' (G00 x y z) = do
 				putParams "XYZ" [x,y,z]
@@ -104,7 +104,7 @@ fromGCode' (CLine x y z i j k f) = do
 						"G38.2" -> fromGCode' (G38d2 x y z f)
 						_ -> error $ "fromGCode' : Unknown memorized command (" ++ c ++ ")"
 
--- | Transforms GCode to Intermediate Representation Tree
+-- | Transforms GCode to an 'Operation'
 fromGCode :: Backend a => GCode -> Operation a
 fromGCode (GCode xs) = opsequence operations
 	where
