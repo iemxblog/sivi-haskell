@@ -12,7 +12,7 @@ spec = describe "fromGCode" $ do
 		case parseGCode prg of
 			Left err -> expectationFailure $ "Parse error : " ++ show err
 			Right gcode -> gcode `shouldBe` 
-				[ g00 {x = Just 1,  z = Just 2}
+				GCode [ g00 {x = Just 1,  z = Just 2}
 				, g01 {y = Just 2, f = Just 100}
 				, cline {x = Just 3}
 				, cline {y = Just 4}
@@ -30,4 +30,4 @@ spec = describe "fromGCode" $ do
 
 	it "doesn't fail when a program terminates with a newline" $
 		parseGCode "G00 X10 Y20\nG01 Z5 F100\n" `shouldBe` 
-			Right [g00 {x = Just 10, y = Just 20}, g01 {z = Just 5, f = Just 100}]
+			Right (GCode [g00 {x = Just 10, y = Just 20}, g01 {z = Just 5, f = Just 100}])

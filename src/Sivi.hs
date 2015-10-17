@@ -16,6 +16,7 @@ module Sivi
 	, module Sivi.Interface
 	, module Sivi.Misc
 	, module Sivi.Plotter
+	, module Sivi.Backend
 ) where
 
 import Sivi.Backlash
@@ -25,3 +26,4 @@ import Sivi.Operation
 import Sivi.Interface
 import Sivi.Misc
 import Sivi.Plotter
+import Sivi.Backend

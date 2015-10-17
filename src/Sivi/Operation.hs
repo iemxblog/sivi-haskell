@@ -8,7 +8,8 @@ Stability	: experimental
 Portability	: POSIX
 -}
 module Sivi.Operation(
-	module Sivi.Operation.Base
+	module Sivi.Operation.Types
+	, module Sivi.Operation.Base
 	, module Sivi.Operation.Repetition
 	, module Sivi.Operation.Pocket
 	, module Sivi.Operation.Misc
@@ -18,6 +19,7 @@ module Sivi.Operation(
 	, module Sivi.Operation.FromGCode
 ) where
 
+import Sivi.Operation.Types
 import Sivi.Operation.Base
 import Sivi.Operation.Repetition
 import Sivi.Operation.Pocket

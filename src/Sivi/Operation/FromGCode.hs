@@ -17,7 +17,8 @@ import qualified Data.Map as Map
 import Linear
 import Sivi.GCode
 import Sivi.Operation.Base
-import Sivi.IR.Base
+import Sivi.Operation.Types
+import Sivi.Backend
 
 -- | Monadic datatype to memorize GCode commands (as String) and parameters (as Data.Map.Map Char Double)
 type GCodeTransformer a = State (String, Map.Map Char Double) a
@@ -54,7 +55,7 @@ getParams = mapM getParam
 			
 
 -- | Transforms a 'GCode' instruction to an 'IR' instruction
-fromGCode' :: GCode -> GCodeTransformer (Operation IRTree)
+fromGCode' :: Backend a => GCodeInstruction -> GCodeTransformer (Operation a)
 fromGCode' (G00 x y z) = do
 				putParams "XYZ" [x,y,z]
 				putCommand "G00"
@@ -104,7 +105,7 @@ fromGCode' (CLine x y z i j k f) = do
 						_ -> error $ "fromGCode' : Unknown memorized command (" ++ c ++ ")"
 
 -- | Transforms GCode to Intermediate Representation Tree
-fromGCode :: [GCode] -> Operation IRTree
-fromGCode xs = opsequence operations
+fromGCode :: Backend a => GCode -> Operation a
+fromGCode (GCode xs) = opsequence operations
 	where
 		operations = evalState (mapM fromGCode' xs) ("", Map.fromList (zip "XYZIJKF" (repeat 0)))

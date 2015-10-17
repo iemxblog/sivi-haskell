@@ -13,6 +13,7 @@ module Sivi.Backlash
 ) where
 
 import Linear
+import Data.Monoid
 import Sivi.IR
 
 -- | Memorization of direction.
@@ -36,11 +37,11 @@ onV3 :: (a -> a -> a) 	-- ^ f : Function to apply
 onV3 f (V3 x y z) (V3 x' y' z') = V3 (f x x') (f y y') (f z z')
 
 backlash' :: IR -> V3 Double -> V3 Double -> V3 Double -> V3 Double -> IR
-backlash' [] _ _ _ _ = []
-backlash' (Move _ (Arc{}) : _) _ _ _ _ = error "Backlash compensation not implemented for arcs. Use arcInterpolation before."
-backlash' (Move pos mp : xs) backlashValues ppos pdir pcomp = 
-	if extraMove == V3 0 0 0 then Move compensatedPos mp : backlash' xs backlashValues pos newdir compensation
-	else Move extraMove mp' : Move compensatedPos mp : backlash' xs backlashValues pos newdir compensation
+backlash' (IR []) _ _ _ _ = IR []
+backlash' (IR (Move _ (Arc{}) : _)) _ _ _ _ = error "Backlash compensation not implemented for arcs. Use arcInterpolation before."
+backlash' (IR (Move pos mp : xs)) backlashValues ppos pdir pcomp = 
+	if extraMove == V3 0 0 0 then IR [Move compensatedPos mp] `mappend` backlash' (IR xs) backlashValues pos newdir compensation
+	else IR [Move extraMove mp',  Move compensatedPos mp] `mappend` backlash' (IR xs) backlashValues pos newdir compensation
 	where 
 		sgn = signum (pos-ppos)
 		newdir = onV3 mem pdir sgn
@@ -53,13 +54,13 @@ backlash' (Move pos mp : xs) backlashValues ppos pdir pcomp =
 			LinearInterpolation f -> LinearInterpolation f
 			Arc d c f -> Arc d c f
 			Probe f -> LinearInterpolation f
-backlash' (DefCurPos pos : xs) backlashValues _ pdir pcomp = DefCurPos (pos + pcomp) : backlash' xs backlashValues pos pdir pcomp
-backlash' (x : xs) backlashValues ppos pdir pcomp = x : backlash' xs backlashValues ppos pdir pcomp
+backlash' (IR (DefCurPos pos : xs)) backlashValues _ pdir pcomp = IR [DefCurPos (pos + pcomp)] `mappend` backlash' (IR xs) backlashValues pos pdir pcomp
+backlash' (IR (x : xs)) backlashValues ppos pdir pcomp = IR [x] `mappend` backlash' (IR xs) backlashValues ppos pdir pcomp
 
 -- | Modifies a program to compensate the backlash of the machine.
 backlash :: V3 Double 	-- ^ Position where to make backlash initialization (to put the machine in a known backlash)
 			-> V3 Double 	-- ^ Backlash measured on the machine
 			-> IR		-- ^ Program to modify
 			-> IR		-- ^ Modified program
-backlash initPos backlashValues p = backlash' (initMoves ++ p) backlashValues initPos (V3 (-1) (-1) (-1)) (V3 0 0 0)
-	where initMoves = [Move (V3 0 0 0 + initPos) Rapid, Move (V3 1 1 1 + initPos) Rapid]
+backlash initPos backlashValues p = backlash' (initMoves `mappend`  p) backlashValues initPos (V3 (-1) (-1) (-1)) (V3 0 0 0)
+	where initMoves = IR [Move (V3 0 0 0 + initPos) Rapid, Move (V3 1 1 1 + initPos) Rapid]

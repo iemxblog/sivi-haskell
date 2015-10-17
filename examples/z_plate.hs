@@ -58,5 +58,5 @@ zPlate = chain 1 [
 	]
 
 main :: IO ()
-main = putStr . (++"M2\n") . toString . flatten . runOperationWithDefaultParams $ zPlate
---main = interface . toGCode . flatten . runOperationWithDefaultParams $ zPlate
+main = putStr . (++"M2\n") . show . getGCodeWithDefaultParams $ zPlate
+--main = interface . getGCodeWithDefaultParams $ zPlate

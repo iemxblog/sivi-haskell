@@ -75,7 +75,7 @@ loop wc rc ptc = do
 		Exit -> return ()
 
 -- | Text mode interface for GRBL.
-interface :: [GCode] -> IO ()
+interface :: GCode -> IO ()
 interface gcode = do
 	let port = "/dev/ttyACM0"
 	serial <- openSerial port defaultSerialSettings { commSpeed = CS115200 }

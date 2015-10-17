@@ -10,7 +10,7 @@ spec :: SpecWith ()
 spec = describe "fromGCode" $ 
 	it "transforms a simple program into an operation" $ do
 		let program = 
-			[ g00 {x = Just 10, y = Just 20}
+			GCode [ g00 {x = Just 10, y = Just 20}
 			, g00 {z = Just 30 }
 			, g01 {x = Just 5, f = Just 100}
 			, g00 {x = Just 2, y = Just 1, z = Just 0}
@@ -25,7 +25,7 @@ spec = describe "fromGCode" $
 			, g00 {x = Just 0, y = Just 0, z = Just 0}
 			]
 		let expectedOutput = 
-			[ Move (V3 10 20 0) Rapid
+			IR [ Move (V3 10 20 0) Rapid
 			, Move (V3 10 20 30) Rapid
 			, Move (V3 5 20 30) (LinearInterpolation 100)
 			, Move (V3 2 1 0) Rapid
@@ -39,4 +39,4 @@ spec = describe "fromGCode" $
 			, Pause
 			, Move (V3 0 0 0) Rapid
 			]
-		(flatten . runOperationWithDefaultParams) (fromGCode program) `shouldBe` expectedOutput
+		runOperationWithDefaultParams (fromGCode program) `shouldBe` expectedOutput

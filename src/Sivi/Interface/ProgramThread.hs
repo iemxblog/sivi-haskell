@@ -32,22 +32,22 @@ clearInstruction :: IO ()
 clearInstruction = setCursorPosition 24 0 >> putStrLn (replicate 80 ' ')
 
 
-programThread :: Chan WriteCommand -> Chan ReadCommand -> Chan (IO ()) -> Chan ProgramThreadCommand -> [GCode] -> ThreadState -> IO ()
-programThread _ _ pc _ [] _ = do
+programThread :: Chan WriteCommand -> Chan ReadCommand -> Chan (IO ()) -> Chan ProgramThreadCommand -> GCode -> ThreadState -> IO ()
+programThread _ _ pc _ (GCode []) _ = do
 	writeChan pc $ do
 		setCursorPosition 0 0
 		withColor Green $ mapM_ putStr (showLines 58 22 ["End."])
 	threadDelay (10^7)
-programThread wc rc pc ptc xs Paused = do
+programThread wc rc pc ptc gc Paused = do
 	ptcommand <- readChan ptc
 	case ptcommand of
-		Start -> programThread wc rc pc ptc xs Running
-		Pause -> programThread wc rc pc ptc xs Paused
+		Start -> programThread wc rc pc ptc gc Running
+		Pause -> programThread wc rc pc ptc gc Paused
 		Stop -> return ()
-programThread wc rc pc ptc (x:xs) Running = do	
+programThread wc rc pc ptc (GCode (x:xs)) Running = do	
 	iec <- isEmptyChan ptc	
 	if not iec then
-		programThread wc rc pc ptc (x:xs) Paused
+		programThread wc rc pc ptc (GCode (x:xs)) Paused
 	else do
 		writeChan pc (setCursorPosition 0 0)
 		writeChan pc (putStr "   -> ")
@@ -58,11 +58,11 @@ programThread wc rc pc ptc (x:xs) Running = do
 			GComment s -> do
 				when (take 4 s == "MSG,") $ do
 					writeChan pc (withColor Green $ putInstruction (drop 5 s))
-				programThread wc rc pc ptc xs Running
-			M00 -> programThread wc rc pc ptc xs Paused
+				programThread wc rc pc ptc (GCode xs) Running
+			M00 -> programThread wc rc pc ptc (GCode xs) Paused
 			_ -> do 
 				sendProgram wc rc (show x)
 				writeChan pc (setCursorPosition 0 0)
 				writeChan pc (putStr "ok")
 				writeChan pc clearInstruction
-				programThread wc rc pc ptc xs Running
+				programThread wc rc pc ptc (GCode xs) Running

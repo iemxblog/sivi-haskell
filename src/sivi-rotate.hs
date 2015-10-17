@@ -10,7 +10,7 @@ rotateProgram angle = do
 	s <- getContents
 	case parseGCode s of
 		Left err -> error err
-		Right gcode -> putStr . toString . flatten . runOperationWithDefaultParams . rotate angle . fromGCode $ gcode
+		Right gcode -> print . getGCodeWithDefaultParams . rotate angle . fromGCode $ gcode
 
 main :: IO ()
 main = getArgs >>= parse >>= rotateProgram

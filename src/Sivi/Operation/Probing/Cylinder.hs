@@ -13,16 +13,17 @@ module Sivi.Operation.Probing.Cylinder (
 ) where
 
 import Linear
-import Sivi.IR.Base
+import Sivi.Operation.Types
 import Sivi.Operation.Base
 import Sivi.Operation.Probing.Base
+import Sivi.Backend
 
 -- | Probes a laying cylinder (placed horizontally in a vise). Probes on the right side for the X axis.
-probeHorizontalCylinderRight :: Double 		-- ^ d : Diameter of the cylinder
-			-> Double 		-- ^ l : Length of the cylinder
-			-> Double 		-- ^ margin : Probing margin
-			-> Tool 		-- ^ probetool : Tool used to probe the part
-			-> Operation IRTree	-- ^ Resulting operation
+probeHorizontalCylinderRight :: Backend a => Double 	-- ^ d : Diameter of the cylinder
+			-> Double 			-- ^ l : Length of the cylinder
+			-> Double 			-- ^ margin : Probing margin
+			-> Tool 			-- ^ probetool : Tool used to probe the part
+			-> Operation a			-- ^ Resulting operation
 probeHorizontalCylinderRight d l margin probetool = 
 	withTool probetool (
 		message "Place the probe 5mm above the right side of the strut, centered on the axis of the cylinder"	
@@ -38,10 +39,10 @@ probeHorizontalCylinderRight d l margin probetool =
 	+++ message "Remove the probe connectors"
 
 -- | Probes a vertical cylinder. Touches the outside surface.
-probeOuterCylinder :: 	Double 			-- ^ d : Diameter of the cylinder
+probeOuterCylinder :: 	Backend a => Double 	-- ^ d : Diameter of the cylinder
 			-> Double 		-- ^ margin : Probing margin
 			-> Tool 		-- ^ probeTool : Tool used to probe the part
-			-> Operation IRTree	-- ^ Resulting operation
+			-> Operation a		-- ^ Resulting operation
 probeOuterCylinder d margin probeTool = 
 	withTool probeTool (
 		message "Place the probe 5mm above the center of the cylinder"

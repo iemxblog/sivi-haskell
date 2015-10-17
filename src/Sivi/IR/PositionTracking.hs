@@ -21,7 +21,7 @@ import Sivi.IR.Base
 type TrackedPosition a = State (V3 Double) a
 
 -- | Calculates the next position of the tool, when the instruction has been run.
-nextPosition :: Instruction -> V3 Double -> V3 Double
+nextPosition :: IRInstruction -> V3 Double -> V3 Double
 nextPosition (Move dst _) _ = dst
 nextPosition (Comment _) cp = cp
 nextPosition Pause cp = cp
@@ -35,8 +35,8 @@ getPosition :: TrackedPosition (V3 Double)
 getPosition = get
 
 -- | Runs a function than needs position tracking, and then updates the position stored in the 'State' monad.
-trackPosition :: (Instruction -> TrackedPosition a) 	-- ^ f : Function to run
-		-> Instruction				-- ^ i : Parameter of the function
+trackPosition :: (IRInstruction -> TrackedPosition a) 	-- ^ f : Function to run
+		-> IRInstruction				-- ^ i : Parameter of the function
 		-> TrackedPosition a
 trackPosition f i = do
 			r <- f i
@@ -48,5 +48,5 @@ trackPosition f i = do
 -- Position tracking is needed because I J K parameters for arcs are relative to the current position of the tool.
 -- When the position is needed in the function, use 'getPosition' to retrieve it.
 -- Used in 'Sivi.IR.ArcInterpolation.arcInterpolation' and 'Sivi.IR.ToGCode.toGCode'.
-mapTrackPosition :: (Instruction -> TrackedPosition a) -> [Instruction] -> [a]
-mapTrackPosition f is = evalState (mapM (trackPosition f) is) (V3 0 0 0)
+mapTrackPosition :: (IRInstruction -> TrackedPosition a) -> IR -> [a]
+mapTrackPosition f (IR is) = evalState (mapM (trackPosition f) is) (V3 0 0 0)

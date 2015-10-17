@@ -16,11 +16,12 @@ import Linear
 import Sivi.IR.Base
 import Sivi.IR.PositionTracking
 import Sivi.Misc.Range
+import Sivi.Operation.Types
 
 -- | Function that interpolates an arc. Circles are possible only in the XY plane (quick fix), because it is not possible to know in which plane they are (the 3 points used to define them are colinear). Arcs are possible in 3D if the starting, ending and center are not colinear.
 arcInterpolation' :: 	Double 			-- ^ ai : Angle increment (in degrees)
-			-> Instruction 		-- ^ Instruction to interpolate
-			-> TrackedPosition [Instruction]
+			-> IRInstruction 		-- ^ Instruction to interpolate
+			-> TrackedPosition [IRInstruction]
 arcInterpolation' ai (Move dst (Arc dir cen f)) = do
 		cp <- getPosition
 		let a = cp
@@ -47,6 +48,6 @@ arcInterpolation' _ i = return [i]
 
 -- | Interpolates arcs (transforms them into a list of linear interpolations)
 arcInterpolation :: Double		-- ^ ai : Angle increment (in degrees)
-		-> [Instruction]	-- ^ List of instructions
-		-> [Instruction]
-arcInterpolation ai = concat . mapTrackPosition (arcInterpolation' ai)
+		-> IR			-- ^ Intermediate Representation
+		-> IR
+arcInterpolation ai = IR . concat . mapTrackPosition (arcInterpolation' ai)

@@ -4,6 +4,7 @@ module Sivi.BacklashSpec (
 
 import Test.Hspec
 import Linear
+import Data.Monoid
 import Sivi.Backlash
 import Sivi.IR
 
@@ -64,7 +65,7 @@ backlashValues :: V3 Double
 backlashValues = V3 0.2 0.3 0.4
 
 withProbe :: IR
-withProbe = [
+withProbe = IR [
 	Move (V3 5 4 0) Rapid
 	, Move (V3 5 3 0) Rapid
 	, Move (V3 6 6 0) Rapid
@@ -77,7 +78,7 @@ withProbe = [
 	]
 
 expectedWithProbe :: IR
-expectedWithProbe = [
+expectedWithProbe = IR [
 	Move (V3 0 0 0) Rapid
 	, Move (V3 0.2 0.3 0.4) Rapid
 	, Move (V3 1.2 1.3 1.4) Rapid
@@ -100,13 +101,13 @@ expectedWithProbe = [
 	
 spec :: SpecWith ()
 spec = describe "backlashCompensation" $ do
-		let fRapid = map (\x -> Move x Rapid)
-		let fLinearInterpolation = map (\x -> Move x (LinearInterpolation 100))
+		let fRapid = IR . map (\x -> Move x Rapid)
+		let fLinearInterpolation = IR . map (\x -> Move x (LinearInterpolation 100))
 		it "compensates backlash for rapid moves" $ 
 			backlash initPos backlashValues (fRapid pos)  `shouldBe` fRapid (expectedPos1 ++ expectedPos2)
 
 		it "compensates backlash for linear interpolations" $ 
-			backlash initPos backlashValues (fLinearInterpolation pos)  `shouldBe` fRapid expectedPos1 ++ fLinearInterpolation expectedPos2
+			backlash initPos backlashValues (fLinearInterpolation pos)  `shouldBe` fRapid expectedPos1 `mappend` fLinearInterpolation expectedPos2
 
 		it "compensates backlash for probing motions (G38.2) and offsets (G92)" $
 			backlash initPos backlashValues withProbe `shouldBe` expectedWithProbe

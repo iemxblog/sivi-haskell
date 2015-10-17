@@ -9,32 +9,24 @@ Portability	: POSIX
 -}
 module Sivi.IR.Base
 (
-	Tool(..)
-	, ArcDirection(..)
-	, MoveParams(..)
-	, Instruction(..)
-	, IR
+	MoveParams(..)
+	, IRInstruction(..)
+	, IR(..)
+	, getIR
+	, getIRWithDefaultParams
 	, Tree(..)
 	, IRTree
 	, flatten
 ) where
 
 import Linear
-
--- | Tool data type.
--- Used for tool changes, radius compensation.
-data Tool = 
-	EndMill { diameter :: Double, len :: Double }
-	| BallEndMill { diameter :: Double, shankDiameter :: Double, len :: Double } 
-	| ProbeTool { diameter :: Double, len :: Double }
-	deriving (Eq, Show)
+import Data.Monoid
+import Sivi.Operation.Types
+import Sivi.Operation.Base
+import Sivi.Backend
 
 type Coordinate = Double
 type FeedRate = Double
-
-data ArcDirection = 	CW 	-- ^ Clockwise
-			| CCW 	-- ^ Counterclockwise
-			deriving (Eq, Show)
 
 -- | Parameters for the 'Move' data constructor.
 -- A move is either a Rapid move, or a linear interpolation with a feed rate, or an arc. So there is only one data constructor for moves.
@@ -45,27 +37,53 @@ data MoveParams = Rapid
 		deriving (Eq, Show)
 
 -- | Intermediate Representation
-data Instruction = 
+data IRInstruction = 
 	Move (V3 Coordinate) MoveParams		-- ^ Rapid, Linear interpolation, Arc, ... (all actions that make the tool move)
 	| Comment String			-- ^ Comments
 	| Pause					-- ^ Pause (waits for user interaction, translated to a M00 GCode). In GRBL, program will stop until Cycle Start is pressed.
 	| DefCurPos (V3 Coordinate)		-- ^ Define current position
 	deriving (Eq, Show)
 
-type IR = [Instruction]
+newtype IR = IR [IRInstruction] deriving (Eq, Show)
+
+instance Monoid IR where
+	mempty = IR []
+	IR xs `mappend` IR ys = IR $ xs ++ ys
+
+instance Backend IR where
+	bRapid dst = return $ IR [Move dst Rapid]
+	bFeed fr dst = return $ IR [Move dst (LinearInterpolation fr)]	
+	bArc fr dir center dst = return $ IR [Move dst (Arc dir center fr)]
+	bPause = return $ IR [Pause]
+	bProbe pbr dst = return $ IR [Move dst (Probe pbr)]
+	bDefCurPos dst = return $ IR [DefCurPos dst]
+	bComment s = return $ IR [Comment s]
+	bName s op = op	-- name is ignored
+
+-- | Returns IR code generated from an operation. This is an IR specific version of 'runOperation'.
+getIR :: (Double, Double, Double, Double)	-- ^ (fr, pr, pbr, dc) : Feed rate, plunge rate, depth of cut (depth of cut must be a negative number)
+		-> V3 Double			-- ^ spos : Starting position of the tool
+		-> Tool				-- ^ tool : Default tool
+		-> Operation IR			-- ^ op : Operation to tun
+		-> IR				-- ^ Resulting GCode program
+getIR = runOperation
+
+-- | Returns the IR code generated from an operation. This is an IR specific version of 'runOperationWithDefaultParams'.
+getIRWithDefaultParams :: Operation IR -> IR
+getIRWithDefaultParams = runOperationWithDefaultParams
 
 data Tree v a = 
 	Leaf a
 	| Node v [Tree v a]
 
 -- | Tree of instructions
-type IRTree = Tree String Instruction
+type IRTree = Tree String IRInstruction
 
 -- | Transforms a tree of intructions to a list of instructions. Annotations are transformed into comments.
 -- It could be possible to make a more general function which accepts more types, but would probably be overkill ??
-flatten :: IRTree-> [Instruction]
-flatten (Leaf i) = [i]
-flatten (Node v ts) = opening ++ concatMap flatten ts ++ closing
+flatten :: IRTree-> IR
+flatten (Leaf i) = IR [i]
+flatten (Node v ts) = opening `mappend` (mconcat . (map flatten)) ts `mappend` closing
 	where
-		opening = if v == "" then [] else [Comment ("> " ++ v)] 
-		closing = if v == "" then [] else [Comment ("< " ++ v)]
+		opening = if v == "" then mempty else IR [Comment ("> " ++ v)] 
+		closing = if v == "" then mempty else IR [Comment ("< " ++ v)]
