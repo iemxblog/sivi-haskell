@@ -16,7 +16,13 @@ import Graphics.UI.Gtk
 import Graphics.Rendering.Cairo
 import Graphics.Rendering.Cairo.Matrix hiding (scale)
 
-initCanvas :: Double -> Double -> Double -> Double -> Render ()
+
+-- | Initializes a canvas, and sets the scale to maximize to have the biggest possible picture.
+initCanvas :: 	Double		-- ^ w : Width of the canvas 
+		-> Double	-- ^ h : Height of the canvas
+		-> Double	-- ^ lx : Width of the drawing
+		-> Double	-- ^ ly : Height of the drawing
+		-> Render ()
 initCanvas w h lx ly = do
 	setSourceRGB 1 1 1
 	paint
