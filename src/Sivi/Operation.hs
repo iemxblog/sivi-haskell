@@ -17,6 +17,7 @@ module Sivi.Operation(
         , module Sivi.Operation.Contour
         , module Sivi.Operation.Probing
         , module Sivi.Operation.FromGCode
+	, module Sivi.Operation.BoundingBox
 ) where
 
 import Sivi.Operation.Types
@@ -28,3 +29,4 @@ import Sivi.Operation.BasicShape
 import Sivi.Operation.Contour
 import Sivi.Operation.Probing
 import Sivi.Operation.FromGCode
+import Sivi.Operation.BoundingBox

@@ -54,6 +54,7 @@ Library
         Sivi.Operation,
         Sivi.Operation.Base,
         Sivi.Operation.BasicShape,
+        Sivi.Operation.BoundingBox,
         Sivi.Operation.Contour,
         Sivi.Operation.FromGCode,
         Sivi.Operation.Misc,
