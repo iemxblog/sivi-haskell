@@ -12,10 +12,8 @@ module Sivi.IR
 	module Sivi.IR.Base
 	, module Sivi.IR.ToGCode
 	, module Sivi.IR.PositionTracking
-	, module Sivi.IR.ArcInterpolation
 ) where
 
 import Sivi.IR.Base
 import Sivi.IR.ToGCode
 import Sivi.IR.PositionTracking
-import Sivi.IR.ArcInterpolation

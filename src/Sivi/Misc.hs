@@ -11,7 +11,9 @@ module Sivi.Misc
 (
 	module Sivi.Misc.SharedParsers
 	, module Sivi.Misc.Range
+	, module Sivi.Misc.ArcInterpolation
 ) where
 
 import Sivi.Misc.SharedParsers
 import Sivi.Misc.Range
+import Sivi.Misc.ArcInterpolation
