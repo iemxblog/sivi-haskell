@@ -4,6 +4,7 @@ module Main (
 
 import Sivi
 import Linear
+import Graphics.Rendering.Cairo hiding (translate)
 
 bigPocket :: Backend a => Operation a
 bigPocket = circularPocket 50 10 0.5
@@ -19,7 +20,19 @@ complexOp = translate (V3 0 0 (-10)) . circularRepetition 20 6 0 1 $ rectanglePl
  
 op :: Backend a => Operation a	
 op = complexOp	
-		
+
+
+draw1 :: Canvas
+draw1 w h = do
+	initCanvas w h 70 70
+	drawOperation op (\(V3 x y z) -> V2 x y)	
+
+draw2 :: Canvas
+draw2 w h = do
+	initCanvas w h 70 70
+	drawOperation op (\(V3 x y z) -> V2 x z)	
+
 main :: IO ()
-main = putStr . (++"M2\n") . show . getGCodeWithDefaultParams $ op
+--main = putStr . (++"M2\n") . show . getGCodeWithDefaultParams $ op
 --main = interface . getGCodeWithDefaultParams $ op
+main = plot draw1 draw2
