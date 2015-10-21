@@ -85,7 +85,7 @@ instance Backend Drawing where
 	
 	bComment _ = return $ Drawing (\proj -> return ())
 
-	bName _ _ = return $ Drawing (\proj -> return ())
+	bName _ op = op
 
 getDrawingWithDefaultParameters :: Operation Drawing -> Drawing
 getDrawingWithDefaultParameters = runOperationWithDefaultParams
