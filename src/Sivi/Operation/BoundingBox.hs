@@ -67,6 +67,7 @@ instance Backend BoundingBox where
 -- | Place an operation next to another, on the X axis. Tool retraction at z=1.
 -- It could be possible to calculate automatically the necessary altitude of tool rtraction with the BoundingBox,
 -- in a future version.
+-- Bug because the context of the monad is modified when calculating the BoundingBox !!!
 (|>|) :: Backend a => (forall a . Backend a => Operation a)	-- ^ op1 : Operation 1
 	-> (forall a . Backend a => Operation a)		-- ^ op2 : Operation 2
 	-> Operation a						-- ^ Operation 1, retract at z=1, Operation 2 next to Operation 1 (on its right)
@@ -79,6 +80,7 @@ op1 |>| op2 = do
 		(Boundary (_, xp1), Boundary (xm2, _)) -> op1 +^+ translate (V3 (xp1-xm2) 0 0) op2
 
 -- | Stacks two operations (the second under the other)
+-- Bug because the context of the monad is modified when calculating the BoundingBox !!!
 (|.|) :: Backend a => (forall a . Backend a => Operation a)	-- ^ op1 : Operation 1
 	-> (forall a . Backend a => Operation a)		-- ^ op2 : Operation 2
 	-> Operation a						-- ^ Operation 1, then Operation 2 under it
