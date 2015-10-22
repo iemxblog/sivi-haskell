@@ -7,10 +7,12 @@ Maintainer	: iemxblog@gmail.com
 Stability	: experimental
 Portability	: POSIX
 -}
+{-# LANGUAGE RankNTypes #-}
 module Sivi.Operation.BoundingBox(
 	Boundary(..)
 	, BoundingBox(..)	
 	, (|>|)
+	, (|.|)
 ) where
 
 import Data.Monoid
@@ -62,15 +64,27 @@ instance Backend BoundingBox where
 	bName _ op = op
 
 
---(|>|) :: Backend a => Operation a -> Operation a -> Operation a
+-- | Place an operation next to another, on the X axis. Tool retraction at z=1.
+-- It could be possible to calculate automatically the necessary altitude of tool rtraction with the BoundingBox,
+-- in a future version.
+(|>|) :: Backend a => (forall a . Backend a => Operation a)	-- ^ op1 : Operation 1
+	-> (forall a . Backend a => Operation a)		-- ^ op2 : Operation 2
+	-> Operation a						-- ^ Operation 1, retract at z=1, Operation 2 next to Operation 1 (on its right)
 op1 |>| op2 = do
 	BoundingBox [bx1, _, _] <- op1
 	BoundingBox [bx2, _, _] <- op2
 	case (bx1, bx2) of
-		(EmptyBoundary, _) -> op1 +++ op2
-		(Boundary (_, xp1), EmptyBoundary) -> op1 +++ translate (V3 xp1 0 0) op2
-		(Boundary (_, xp1), Boundary (xm2, _)) -> op1 +++ translate (V3 (xp1-xm2) 0 0) op2
+		(EmptyBoundary, _) -> op1 +^+ op2
+		(Boundary (_, xp1), EmptyBoundary) -> op1 +^+ translate (V3 xp1 0 0) op2
+		(Boundary (_, xp1), Boundary (xm2, _)) -> op1 +^+ translate (V3 (xp1-xm2) 0 0) op2
 
---boundingBox :: Backend a => Operation a -> Operation BoundingBox
---boundingBox op = 
--- correct bName in plotter.hs !!!!!!
+-- | Stacks two operations (the second under the other)
+(|.|) :: Backend a => (forall a . Backend a => Operation a)	-- ^ op1 : Operation 1
+	-> (forall a . Backend a => Operation a)		-- ^ op2 : Operation 2
+	-> Operation a						-- ^ Operation 1, then Operation 2 under it
+op1 |.| op2 = do
+	BoundingBox [_, _, bz1] <- op1
+	case bz1 of
+		EmptyBoundary -> op1 +++ op2
+		Boundary (zm1, _) -> op1 +++ translate (V3 0 0 zm1) op2
+

@@ -39,6 +39,7 @@ module Sivi.Operation.Base (
         , rotate
         , symmetryX
         , symmetryY
+        , (+^+)
         , chain
         , runOperation
         , getReturnValue
@@ -284,6 +285,12 @@ symmetryY ::    Monoid w =>
                 Operation m w a 
                 -> Operation m w a 
 symmetryY = withTransformation (\(V3 x y z) -> V3 (-x) y z)
+
+-- | Chain two operations, with tool retraction at z=1 between the operations.
+(+^+) :: Backend a => Operation a	-- ^ o1 : Operation 1
+	-> Operation a			-- ^ o2 : Operation 2
+	-> Operation a			-- ^ Operation 1, retract at z=1, operation 2
+o1 +^+ o2 = o1 >> retract 1 >> o2
 
 -- | Chains a list of operations, and intersperses tool retractions between them.
 chain :: Backend w => Double            -- ^ zSafe : The altitude of tool retractions
