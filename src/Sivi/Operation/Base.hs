@@ -39,7 +39,6 @@ module Sivi.Operation.Base (
 	, rotate
 	, symmetryX
 	, symmetryY
-	, cylCoords
 	, (+++)
 	, opsequence
 	, chain
@@ -278,11 +277,6 @@ symmetryX = withTransformation (\(V3 x y z) -> V3 x (-y) z)
 symmetryY :: 	Operation a
 		-> Operation a
 symmetryY = withTransformation (\(V3 x y z) -> V3 (-x) y z)
-
--- | Cylindrical coordinates, with Z as the longitudinal axis. Do not use rotations or symmetries inside the called operation. Angles are in degrees.
-cylCoords :: Operation a ->
-	Operation a
-cylCoords = withTransformation (\(V3 r theta z) -> (V3 (r*cos(theta*pi/180)) (r*sin(theta*pi/180)) z))
 
 -- | Chain two operations (without tool retraction between operations)
 (+++) :: Monoid m => Operation m	-- ^ o1 : Operation 1
