@@ -78,7 +78,7 @@ executable cap
 
 executable z_plate
   main-is:             z_plate.hs
-  -- other-modules:       
+  other-modules:       ScrewHoles
   -- other-extensions: 
   build-depends:       base >=4.7 && <4.8, linear >=1.18 && <1.19, containers >=0.5 && <0.6, mtl >=2.2 && <2.3, bytestring >=0.10.4 && < 0.10.5, ansi-terminal >=0.6.2.1 && <0.6.2.2, serialport >=0.4.7 && <0.4.8, parsec >= 3.1.9 && < 3.2, gtk >= 0.13.9 && < 0.14, cairo >= 0.13.1.0 && <0.13.1.1, sivi
   ghc-options:         -threaded
