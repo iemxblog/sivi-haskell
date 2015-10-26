@@ -25,7 +25,13 @@ import Sivi.Misc.ArcInterpolation
 
 data Boundary = Boundary (Double, Double) 
 		| EmptyBoundary
-		deriving (Eq, Show)
+		deriving (Show)
+
+instance Eq Boundary where  -- useful for tests
+	EmptyBoundary == EmptyBoundary = True
+	EmptyBoundary == Boundary _ = False
+	Boundary _ == EmptyBoundary = False
+	Boundary (a, b) == Boundary (c, d) = all (<0.001) [abs (c-a), abs (d-b)]
 
 
 newtype BoundingBox = BoundingBox [Boundary] deriving (Eq, Show)
@@ -41,12 +47,11 @@ instance Monoid BoundingBox where
 	BoundingBox xs1 `mappend` BoundingBox xs2 = BoundingBox $ zipWith mappend xs1 xs2
 
 instance Backend BoundingBox where
-	bRapid (V3 x y z) = do
-		td <- getToolDiameter	
-		return $ BoundingBox [Boundary (x-td/2, x+td/2), Boundary (y-td/2, y+td/2), Boundary (z, z)]
+	bRapid (V3 x y z) = return mempty
 	bFeed _ (V3 x y z) = do
 		td <- getToolDiameter	
-		return $ BoundingBox [Boundary (x-td/2, x+td/2), Boundary (y-td/2, y+td/2), Boundary (z, z)]
+		dc <- getDepthOfCut
+		return $ BoundingBox [Boundary (x-td/2, x+td/2), Boundary (y-td/2, y+td/2), Boundary (z, z + abs dc)]
 	bArc f dir center dst = do
 		cp <- getCurrentPosition
 		let points = arcInterpolation cp dst center dir 1
