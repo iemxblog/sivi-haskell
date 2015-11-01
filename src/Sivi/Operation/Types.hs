@@ -44,7 +44,7 @@ type Operation a = ReaderT (Transformation, Double, Double, Double, Double) (Sta
 -- Used for tool changes, radius compensation.
 data Tool = 
 	EndMill { diameter :: Double, len :: Double }
-	| BallEndMill { diameter :: Double, shankDiameter :: Double, len :: Double } 
+	| BallEndMill { diameter :: Double, shankDiameter :: Double, len :: Double } -- ^ The coordinates of the tool are the center of the ball (and not the bottom of the tool)
 	| ProbeTool { diameter :: Double, len :: Double }
 	deriving (Eq, Show)
 
