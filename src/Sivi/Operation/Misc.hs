@@ -11,6 +11,8 @@ Portability	: POSIX
 module Sivi.Operation.Misc (
 	saw_left
 	, drill
+	, ArcCompensation(..)
+	, compensatedArc
 )
 where
 import Linear
@@ -19,6 +21,7 @@ import Sivi.Operation.Base
 import Sivi.Operation.Types
 import Sivi.Operation.Repetition
 import Sivi.Backend
+import Sivi.Misc.ArcInterpolation
 
 -- | Generates a single pass of a sawing operation. Cuts in the Y direction. Tool radius compensation is done on the left. P means "Pass".
 saw_leftP :: Backend a => Double	-- ^ w : Width of the cut (tool radius compensation is automatic)
@@ -45,3 +48,25 @@ drill :: Backend a => Double 	-- ^ depth : Depth of the hole
 	-> Double 		-- ^ retraction : Altitude to go to in order to evacuate the chips
 	-> Operation a		-- ^ Resulting operation
 drill depth retraction = zRepetition depth (Just retraction) drillP
+
+data ArcCompensation = InnerCompensation | OuterCompensation deriving (Eq, Show)
+
+-- | Interpolated arc with tool radius compensation. Approach move is included in it.
+compensatedArc :: Backend a =>
+		ArcCompensation		-- ^ comp : Inner or outer compensation of the arc
+		-> V3 Double		-- ^ from : Starting point
+		-> V3 Double		-- ^ to : End point
+		-> V3 Double		-- ^ cen : Center of the arc
+		-> ArcDirection		-- ^ dir : Direction ('CW' : clockwise, or 'CCW' : counterclockwise)
+		-> Double		-- ^ ai : Angle increment (in degrees)
+		-> Operation a
+compensatedArc comp from to cen dir ai = do
+	td <- getToolDiameter
+	let from' = case comp of
+		InnerCompensation -> compensate cen from (-td/2)
+		OuterCompensation -> compensate cen from (td/2)
+	let to' = case comp of
+		InnerCompensation -> compensate cen to (-td/2)
+		OuterCompensation -> compensate cen to (td/2)
+	approach from' +++ (opsequence . map feed) (arcInterpolation from' to' cen dir ai)
+	where compensate o p c = o +  ((norm (p-o)) + c) *^ (signorm (p-o))
