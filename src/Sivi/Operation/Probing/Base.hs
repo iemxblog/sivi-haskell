@@ -69,5 +69,9 @@ probeYPlus = probeHelper (V3 0 1 0) True
 probeZMinus :: 	Backend a => V3 Double		-- ^ Point to probe
 		-> Double			-- ^ Margin (distance between point to probe and initial tool position) 
 		-> Operation a
-probeZMinus = probeHelper (V3 0 0 (-1)) False
+probeZMinus dst margin = do
+	t <- getTool
+	case t of
+		EndMill {} -> probeHelper (V3 0 0 (-1)) False dst margin
+		BallEndMill {} -> probeHelper (V3 0 0 (-1)) True dst margin
 
