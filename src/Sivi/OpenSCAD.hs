@@ -10,6 +10,7 @@ Portability	: POSIX
 module Sivi.OpenSCAD
 (
 	OSObject(..)
+	, simulation
 ) where
 
 import Linear
@@ -30,6 +31,7 @@ data OSObject =
 	| Cylinder Double Double Double Bool -- ^ h r1 r2 center
 	| Hull [OSObject]
 	| Union [OSObject]
+	| Difference [OSObject]
 	| Translate (V3 Double) OSObject	
 	deriving Eq	
 
@@ -39,6 +41,7 @@ instance Show OSObject where
 	show (Cylinder h r1 r2 center) = "cylinder(h=" ++ show h ++", r1=" ++ show r1 ++ ", r2=" ++ show r2 ++ ", center=" ++ map toLower (show center) ++ ");\n"
 	show (Hull o) = "hull() {\n" ++ concatMap show o ++ "}\n"
 	show (Union o) = "union() {\n" ++ concatMap show o ++ "}\n"
+	show (Difference o) = "difference() {\n" ++ concatMap show o ++ "}\n"
 	show (Translate v o) = "translate(" ++ oV3 v ++ ") {\n" ++ show o ++ "}\n"
 
 toolShape :: Tool -> OSObject
@@ -78,3 +81,6 @@ instance Backend OSObject where
 	bComment _ = return mempty
 
 	bName _ op = op
+
+simulation :: OSObject -> Operation OSObject -> String
+simulation raw op = show $ Difference [raw, runOperationWithDefaultParams op]

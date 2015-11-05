@@ -22,17 +22,9 @@ op :: Backend a => Operation a
 op = complexOp	
 
 
-draw1 :: Canvas
-draw1 w h = do
-	initCanvas w h 70 70
-	drawOperation op (\(V3 x y z) -> V2 x y)	
-
-draw2 :: Canvas
-draw2 w h = do
-	initCanvas w h 70 70
-	drawOperation op (\(V3 x y z) -> V2 x z)	
+raw = Translate (V3 0 0 (-20)) $ Cylinder 20 50 50 False
 
 main :: IO ()
 --main = putStr . (++"M2\n") . show . getGCodeWithDefaultParams $ op
 --main = interface . getGCodeWithDefaultParams $ op
-main = plot draw1 draw2
+main = putStr $ simulation raw op
