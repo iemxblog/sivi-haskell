@@ -17,6 +17,7 @@ module Sivi
 	, module Sivi.Misc
 	, module Sivi.Plotter
 	, module Sivi.Backend
+	, module Sivi.OpenSCAD
 ) where
 
 import Sivi.Backlash
@@ -27,3 +28,4 @@ import Sivi.Interface
 import Sivi.Misc
 import Sivi.Plotter
 import Sivi.Backend
+import Sivi.OpenSCAD
