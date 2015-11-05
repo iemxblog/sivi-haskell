@@ -15,7 +15,6 @@ module Sivi
 	, module Sivi.Operation
 	, module Sivi.Interface
 	, module Sivi.Misc
-	, module Sivi.Plotter
 	, module Sivi.Backend
 	, module Sivi.OpenSCAD
 ) where
@@ -26,6 +25,5 @@ import Sivi.IR
 import Sivi.Operation
 import Sivi.Interface
 import Sivi.Misc
-import Sivi.Plotter
 import Sivi.Backend
 import Sivi.OpenSCAD

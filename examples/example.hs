@@ -4,7 +4,6 @@ module Main (
 
 import Sivi
 import Linear
-import Graphics.Rendering.Cairo hiding (translate)
 
 bigPocket :: Backend a => Operation a
 bigPocket = circularPocket 50 10 0.5
