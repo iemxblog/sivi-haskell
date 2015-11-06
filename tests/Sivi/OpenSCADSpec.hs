@@ -24,6 +24,5 @@ spec = describe "OpenSCAD backend" $ do
 			map (`mappend` mempty) objects `shouldBe` objects
 
 		it "should verify the third monoid law" $ do
-			print [(x `mappend` y) `mappend` z == x `mappend` (y `mappend` z) | x <- objects, y <- objects, z <- objects]
 			all (==True) [(x `mappend` y) `mappend` z == x `mappend` (y `mappend` z) | x <- objects, y <- objects, z <- objects] `shouldBe` True
 

@@ -47,5 +47,5 @@ handle =
 		d2 = 3
 
 main :: IO ()
---main = putStr . (++"M2\n") . show . getGCodeWithDefaultParams $ handle
-main = interface . getGCodeWithDefaultParams $ handle
+--main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters $ handle
+main = interface . getGCode defaultCuttingParameters $ handle

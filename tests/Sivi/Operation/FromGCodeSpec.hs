@@ -5,6 +5,7 @@ module Sivi.Operation.FromGCodeSpec (
 import Test.Hspec
 import Linear
 import Sivi
+import Sivi.IR
 
 spec :: SpecWith ()
 spec = describe "fromGCode" $ 
@@ -39,4 +40,4 @@ spec = describe "fromGCode" $
 			, Pause
 			, Move (V3 0 0 0) Rapid
 			]
-		runOperationWithDefaultParams (fromGCode program) `shouldBe` expectedOutput
+		runOperation defaultCuttingParameters (fromGCode program) `shouldBe` expectedOutput

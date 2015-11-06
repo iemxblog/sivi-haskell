@@ -13,6 +13,7 @@ module Sivi.Operation.Types
 	, Operation
 	, Tool(..)
 	, ArcDirection(..)
+	, CuttingParameters(..)
 ) where
 
 import Linear
@@ -52,3 +53,13 @@ data ArcDirection = 	CW 	-- ^ Clockwise
 			| CCW 	-- ^ Counterclockwise
 			deriving (Eq, Show)
 
+
+data CuttingParameters = CuttingParameters {
+	transformation :: Transformation
+	, feedRate :: Double
+	, plungeRate :: Double
+	, probeRate :: Double
+	, depthOfCut :: Double	-- ^ Must be a negative number
+	, initialPosition :: V3 Double
+	, initialTool :: Tool
+	}

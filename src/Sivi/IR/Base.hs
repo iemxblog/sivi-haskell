@@ -13,7 +13,6 @@ module Sivi.IR.Base
 	, IRInstruction(..)
 	, IR(..)
 	, getIR
-	, getIRWithDefaultParams
 	, Tree(..)
 	, IRTree
 	, flatten
@@ -25,23 +24,20 @@ import Sivi.Operation.Types
 import Sivi.Operation.Base
 import Sivi.Backend
 
-type Coordinate = Double
-type FeedRate = Double
-
 -- | Parameters for the 'Move' data constructor.
 -- A move is either a Rapid move, or a linear interpolation with a feed rate, or an arc. So there is only one data constructor for moves.
 data MoveParams = Rapid 
-		| LinearInterpolation { feedRate :: FeedRate } 
-		| Arc { direction :: ArcDirection, center :: V3 Double, feedRate :: FeedRate }
-		| Probe {feedRate :: FeedRate }
+		| LinearInterpolation { feedRate :: Double } 
+		| Arc { direction :: ArcDirection, center :: V3 Double, feedRate :: Double }
+		| Probe {feedRate :: Double }
 		deriving (Eq, Show)
 
 -- | Intermediate Representation
 data IRInstruction = 
-	Move (V3 Coordinate) MoveParams		-- ^ Rapid, Linear interpolation, Arc, ... (all actions that make the tool move)
+	Move (V3 Double) MoveParams		-- ^ Rapid, Linear interpolation, Arc, ... (all actions that make the tool move)
 	| Comment String			-- ^ Comments
 	| Pause					-- ^ Pause (waits for user interaction, translated to a M00 GCode). In GRBL, program will stop until Cycle Start is pressed.
-	| DefCurPos (V3 Coordinate)		-- ^ Define current position
+	| DefCurPos (V3 Double)		-- ^ Define current position
 	deriving (Eq, Show)
 
 newtype IR = IR [IRInstruction] deriving (Eq, Show)
@@ -61,16 +57,10 @@ instance Backend IR where
 	bName _ op = op	-- name is ignored
 
 -- | Returns IR code generated from an operation. This is an IR specific version of 'runOperation'.
-getIR :: (Double, Double, Double, Double)	-- ^ (fr, pr, pbr, dc) : Feed rate, plunge rate, depth of cut (depth of cut must be a negative number)
-		-> V3 Double			-- ^ spos : Starting position of the tool
-		-> Tool				-- ^ tool : Default tool
+getIR :: 	CuttingParameters
 		-> Operation IR			-- ^ op : Operation to tun
 		-> IR				-- ^ Resulting GCode program
 getIR = runOperation
-
--- | Returns the IR code generated from an operation. This is an IR specific version of 'runOperationWithDefaultParams'.
-getIRWithDefaultParams :: Operation IR -> IR
-getIRWithDefaultParams = runOperationWithDefaultParams
 
 data Tree v a = 
 	Leaf a

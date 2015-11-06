@@ -24,6 +24,6 @@ op = complexOp
 raw = Translate (V3 0 0 (-20)) $ Cylinder 20 50 50 False
 
 main :: IO ()
---main = putStr . (++"M2\n") . show . getGCodeWithDefaultParams $ op
---main = interface . getGCodeWithDefaultParams $ op
-main = putStr $ simulation raw op
+--main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters $ op
+--main = interface . getGCode defaultCuttingParameters $ op
+main = putStr $ simulation raw defaultCuttingParameters op

@@ -12,5 +12,5 @@ coupling = 	chain 5 [
 		]
 
 main :: IO ()
---main = putStr . (++"M2\n") . show . getGCodeWithDefaultParams $ coupling
-main = interface . getGCodeWithDefaultParams $ coupling
+--main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters $ coupling
+main = interface . getGCode defaultCuttingParameters $ coupling

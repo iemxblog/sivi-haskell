@@ -12,7 +12,6 @@ module Sivi.GCode.Base
 	GCode(..)
 	, GCodeInstruction(..)
 	, getGCode
-	, getGCodeWithDefaultParams
 	, g00
 	, g01
 	, g02
@@ -132,16 +131,10 @@ instance Backend GCode where
 	bName _ op = op -- name is ignored in this instance
 
 -- | Returns the GCode generated from an operation. This is a GCode specific version of 'runOperation'.
-getGCode :: (Double, Double, Double, Double)	-- ^ (fr, pr, pbr, dc) : Feed rate, plunge rate, depth of cut (depth of cut must be a negative number)
-		-> V3 Double			-- ^ spos : Starting position of the tool
-		-> Tool				-- ^ tool : Default tool
+getGCode :: 	CuttingParameters
 		-> Operation GCode		-- ^ op : Operation to tun
 		-> GCode			-- ^ Resulting GCode program
 getGCode = runOperation
-
--- | Returns the GCode generated from an operation. This is a GCode specific version of 'runOperationWithDefaultParams'.
-getGCodeWithDefaultParams :: Operation GCode -> GCode
-getGCodeWithDefaultParams = runOperationWithDefaultParams
 
 -- | Smart constructor for 'G00'
 g00 :: GCodeInstruction

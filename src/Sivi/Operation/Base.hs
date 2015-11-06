@@ -43,7 +43,7 @@ module Sivi.Operation.Base (
 	, opsequence
 	, chain
 	, runOperation
-	, runOperationWithDefaultParams
+	, defaultCuttingParameters
 	, pause
 	, probe
 	, defCurPos
@@ -340,27 +340,12 @@ message :: Backend a => String
 message s = comment ("MSG, " ++ s) +++ pause
 
 -- | Runs an operation with the specified parameters.
-runOperation ::	Backend a => (Double, Double, Double, Double) 	-- ^ (fr, pr, pbr, dc) : Feed rate, plunge rate, probe rate, depth of cut (depth of cut must be a negative number)
-		-> V3 Double					-- ^ spos : Starting position of the tool	
-		-> Tool						-- ^ tool : Default tool 
+runOperation ::	Backend a => 
+		CuttingParameters
 		-> Operation a					-- ^ op : Operation to run
 		-> a
-runOperation (fr, pr, pbr, dc) spos tool op = evalState (runReaderT op (id, fr, pr, pbr, dc))  (spos, tool)
+runOperation (CuttingParameters tr fr pr pbr dc ipos itool) op = evalState (runReaderT op (tr, fr, pr, pbr, dc))  (ipos, itool)
 	
--- | Runs an operation with default starting transformation, feed rate, plunge rate, probe rate, depth of cut, position and tool.
---
--- 	* Starting transformation : id
---
--- 	* Feed rate : 100mm/min
---
--- 	* Plunge rate : 30 mm/min
---
--- 	* Probe rate : 10 mm/min
---
--- 	* Depth of cut : -0.5 mm
---
---	* Tool : EndMill : diameter=3 length=42
-runOperationWithDefaultParams :: Backend a => Operation a 	-- ^ The operation to run
-				-> a
-runOperationWithDefaultParams = runOperation (100, 30, 10, -0.5) (V3 0 0 0) EndMill{diameter=3, len=42}
-
+-- | Default cutting parameters.
+defaultCuttingParameters :: CuttingParameters
+defaultCuttingParameters = CuttingParameters {transformation = id, feedRate = 100, plungeRate = 30, probeRate = 10, depthOfCut = -0.5, initialPosition = (V3 0 0 0), initialTool = EndMill{diameter = 3, len=42}}

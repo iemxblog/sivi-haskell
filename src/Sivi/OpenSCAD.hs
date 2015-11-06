@@ -84,5 +84,5 @@ instance Backend OSObject where
 
 	bName _ op = op
 
-simulation :: OSObject -> Operation OSObject -> String
-simulation raw op = show $ Difference [raw, runOperationWithDefaultParams op]
+simulation :: OSObject -> CuttingParameters -> Operation OSObject -> String
+simulation raw params op = show $ Difference [raw, runOperation params op]
