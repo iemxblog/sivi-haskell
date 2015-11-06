@@ -48,7 +48,7 @@ instance Show OSObject where
 
 toolShape :: Tool -> OSObject
 toolShape (EndMill d l) = Cylinder l (d/2) (d/2) False
-toolShape (BallEndMill d _ _) = Sphere (d/2)
+toolShape (BallEndMill d sd l) = Union [Cylinder l (sd/2) (sd/2) False, Sphere (d/2)]
 toolShape (ProbeTool _ _) = EmptyObject
 
 instance Monoid OSObject where
