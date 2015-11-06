@@ -11,7 +11,6 @@ module Sivi
 (
 	module Sivi.Backlash
 	, module Sivi.GCode
-	, module Sivi.IR
 	, module Sivi.Operation
 	, module Sivi.Interface
 	, module Sivi.Misc
@@ -21,7 +20,6 @@ module Sivi
 
 import Sivi.Backlash
 import Sivi.GCode
-import Sivi.IR
 import Sivi.Operation
 import Sivi.Interface
 import Sivi.Misc
