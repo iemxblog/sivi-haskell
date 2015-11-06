@@ -33,6 +33,7 @@ data OSObject =
 	| Union [OSObject]
 	| Difference [OSObject]
 	| Translate (V3 Double) OSObject	
+	| Rotate (V3 Double) OSObject
 	deriving Eq	
 
 instance Show OSObject where
@@ -43,6 +44,7 @@ instance Show OSObject where
 	show (Union o) = "union() {\n" ++ concatMap show o ++ "}\n"
 	show (Difference o) = "difference() {\n" ++ concatMap show o ++ "}\n"
 	show (Translate v o) = "translate(" ++ oV3 v ++ ") {\n" ++ show o ++ "}\n"
+	show (Rotate v o) = "rotate(" ++ oV3 v ++ ") {\n" ++ show o ++ "}\n"
 
 toolShape :: Tool -> OSObject
 toolShape (EndMill d l) = Cylinder l (d/2) (d/2) False
