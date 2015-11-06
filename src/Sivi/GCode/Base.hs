@@ -23,12 +23,12 @@ module Sivi.GCode.Base
 	, g92
 ) where
 
-import Numeric
 import Data.Monoid
 import Linear
 import Sivi.Backend
 import Sivi.Operation.Base
 import Sivi.Operation.Types
+import Sivi.Misc
 
 data GCodeInstruction  =
  	G00 { x :: Maybe Double, y :: Maybe Double, z :: Maybe Double }
@@ -46,10 +46,6 @@ data GCodeInstruction  =
 	deriving Eq
 
 newtype GCode = GCode { getgCodeInstructions :: [GCodeInstruction] } deriving Eq
-
--- | Helper function used to show a Double with 3 decimals
-showDouble :: Double -> String
-showDouble d = showFFloat (Just 3) d ""
 
 -- | Shows a GCode word (with Maybe value)
 gword :: Char -> Maybe Double -> String

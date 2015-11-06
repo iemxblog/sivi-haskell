@@ -20,10 +20,10 @@ import Sivi.Operation.Base
 import Data.Char
 import Control.Monad
 import Data.Monoid
-import Sivi.Misc.ArcInterpolation
+import Sivi.Misc
 
-oV3 :: Show a => V3 a -> String
-oV3 (V3 x y z) = "[" ++ show x ++ ", " ++ show y ++ ", " ++ show z ++ "]"
+oV3 :: V3 Double -> String
+oV3 (V3 x y z) = "[" ++ showDouble x ++ ", " ++ showDouble y ++ ", " ++ showDouble z ++ "]"
 
 data OSObject = 
 	EmptyObject
@@ -38,8 +38,8 @@ data OSObject =
 
 instance Show OSObject where
 	show EmptyObject = ""
-	show (Sphere r) = "sphere(r=" ++ show r ++ ");\n"
-	show (Cylinder h r1 r2 center) = "cylinder(h=" ++ show h ++", r1=" ++ show r1 ++ ", r2=" ++ show r2 ++ ", center=" ++ map toLower (show center) ++ ");\n"
+	show (Sphere r) = "sphere(r=" ++ showDouble r ++ ");\n"
+	show (Cylinder h r1 r2 center) = "cylinder(h=" ++ showDouble h ++", r1=" ++ showDouble r1 ++ ", r2=" ++ showDouble r2 ++ ", center=" ++ map toLower (show center) ++ ");\n"
 	show (Hull o) = "hull() {\n" ++ concatMap show o ++ "}\n"
 	show (Union o) = "union() {\n" ++ concatMap show o ++ "}\n"
 	show (Difference o) = "difference() {\n" ++ concatMap show o ++ "}\n"
