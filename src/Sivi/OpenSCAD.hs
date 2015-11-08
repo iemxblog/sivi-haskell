@@ -29,6 +29,7 @@ data OSObject =
 	EmptyObject
 	| Sphere Double -- ^ r
 	| Cylinder Double Double Double Bool -- ^ h r1 r2 center
+	| Cube (V3 Double) Bool -- ^ size center
 	| Hull [OSObject]
 	| Union [OSObject]
 	| Difference [OSObject]
@@ -40,6 +41,7 @@ instance Show OSObject where
 	show EmptyObject = ""
 	show (Sphere r) = "sphere(r=" ++ showDouble r ++ ");\n"
 	show (Cylinder h r1 r2 center) = "cylinder(h=" ++ showDouble h ++", r1=" ++ showDouble r1 ++ ", r2=" ++ showDouble r2 ++ ", center=" ++ map toLower (show center) ++ ");\n"
+	show (Cube s center) = "cube(" ++ oV3 s ++ ", center=" ++ map toLower (show center) ++ ");\n"
 	show (Hull o) = "hull() {\n" ++ concatMap show o ++ "}\n"
 	show (Union o) = "union() {\n" ++ concatMap show o ++ "}\n"
 	show (Difference o) = "difference() {\n" ++ concatMap show o ++ "}\n"
