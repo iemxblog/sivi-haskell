@@ -8,7 +8,8 @@ Stability	: experimental
 Portability	: POSIX
 -}
 module Sivi.Operation.Repetition (
-	circularRepetition
+	repetition
+	, circularRepetition
 	, gridRepetition
 	, zRepetition
 ) where
