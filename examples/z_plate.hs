@@ -37,14 +37,14 @@ front1 = chain 1 [
 		, screwHoles
 		, translate (V3 28.6 9 0) $ drill (10+0.5) 1
 		, translate (V3 (-28.6) 9 0) $ drill (10+0.5) 1
-		, zRepetition 10.5 (Just 1) $ contour [V2 (-35) 22.75, V2 (-35) (-14.5), V2 35 (-14.5), V2 35 22.75] RightSide False
+		, zRepetition 10.5 (Just 1) (const $ contour [V2 (-35) 22.75, V2 (-35) (-14.5), V2 35 (-14.5), V2 35 22.75] RightSide False)
 	]
 
 front2 = chain 1 [
 		probeCorner
 		, translate (V3 19.8 54.2 0) $ drill (10+0.5) 1
 		, translate (V3 (-19.8) 54.2 0) $ drill (10+0.5) 1
-		, zRepetition 10.5 (Just 1) $ contour [V2 35 22.75, V2 24.38 62.9, V2 (-24.38) 62.9, V2 (-35) 22.75] RightSide False
+		, zRepetition 10.5 (Just 1) (const $ contour [V2 35 22.75, V2 24.38 62.9, V2 (-24.38) 62.9, V2 (-35) 22.75] RightSide False)
 	]
 
 zPlate = chain 1 [

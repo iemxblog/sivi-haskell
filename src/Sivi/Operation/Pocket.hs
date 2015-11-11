@@ -51,7 +51,7 @@ circularPocket :: Backend a => Double		-- ^ d : Diameter of the pocket
 		-> Double			-- ^ depth : Depth of the pocket
 		-> Double			-- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
 		-> Operation a			-- ^ Resulting operation
-circularPocket d depth step_over = zRepetition depth Nothing (circularPocketP d step_over)
+circularPocket d depth step_over = zRepetition depth Nothing (const $ circularPocketP d step_over)
 				
 
 -- | Generates the coordinates of a rectangular spiral (in 2D).
@@ -98,4 +98,4 @@ rectangularPocket :: 	Backend a => Double		-- ^ lx : Size of the pocket on the x
 			-> Double			-- ^ depth : Depth of the pocket
 			-> Double			-- ^ step_over : Then end mill covers step_over mm of the precedent turn
 			-> Operation a			-- ^ Resulting operation
-rectangularPocket lx ly depth step_over = zRepetition depth Nothing (rectangularPocketP lx ly step_over)
+rectangularPocket lx ly depth step_over = zRepetition depth Nothing (const $ rectangularPocketP lx ly step_over)

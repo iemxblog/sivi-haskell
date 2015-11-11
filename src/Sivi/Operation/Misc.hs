@@ -37,7 +37,7 @@ saw_left :: Backend a => Double		-- ^ w : Width of the cut (tool radius compensa
 	-> Double			-- ^ depth : Depth of the cut
 	-> Double			-- ^ retraction : Altitude to go to between each pass
 	-> Operation a			-- ^ Resulting operation
-saw_left w depth retraction = zRepetition depth (Just retraction) (saw_leftP w)
+saw_left w depth retraction = zRepetition depth (Just retraction) (const $ saw_leftP w)
 
 -- | Generates a single pass of a drilling operation. P means "pass".
 drillP :: Backend a => Operation a
@@ -47,7 +47,7 @@ drillP = approach (V3 0 0 0)
 drill :: Backend a => Double 	-- ^ depth : Depth of the hole
 	-> Double 		-- ^ retraction : Altitude to go to in order to evacuate the chips
 	-> Operation a		-- ^ Resulting operation
-drill depth retraction = zRepetition depth (Just retraction) drillP
+drill depth retraction = zRepetition depth (Just retraction) (const drillP)
 
 data ArcCompensation = InnerCompensation | OuterCompensation deriving (Eq, Show)
 

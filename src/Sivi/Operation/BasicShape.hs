@@ -55,13 +55,13 @@ circleFromHere = do
 cylinderInner :: Backend a => Double	-- ^ d : Diameter of the cylinder
 		-> Double		-- ^ depth : Depth of the cylinder
 		-> Operation a		-- ^ Resulting operation
-cylinderInner d depth = zRepetition depth Nothing (circleInner d)
+cylinderInner d depth = zRepetition depth Nothing (const $ circleInner d)
 
 -- | Cylinder with tool radius compensation on the outer side. Does not cut the inside of the cylinder, but just the contour.
 cylinderOuter :: Backend a => Double	-- ^ d : Diameter of the cylinder
 		-> Double		-- ^ depth : Depth of the cylinder
 		-> Operation a		-- ^ Resulting operation
-cylinderOuter d depth = zRepetition depth Nothing (circleOuter d)
+cylinderOuter d depth = zRepetition depth Nothing (const $ circleOuter d)
 
 
 -- | Rectangle (does not cut the inside of the rectangle, but just the contour).
