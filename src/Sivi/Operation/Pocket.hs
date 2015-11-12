@@ -9,7 +9,10 @@ Portability	: POSIX
 -}
 module Sivi.Operation.Pocket (
 	circularPocket
+	, circularPocketP
 	, rectangularPocket
+	, rectangularPocketP
+	
 )
 where
 
