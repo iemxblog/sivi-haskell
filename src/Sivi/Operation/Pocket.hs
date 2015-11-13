@@ -82,17 +82,17 @@ rectangularPocketP :: 	Backend a => Double 				-- ^ lx : Size of the pocket on t
 			-> Double 			-- ^ step_over : The end mill covers step_over mm of the precedent turn
 			-> Operation a			-- Resulting operation
 rectangularPocketP lx ly step_over = do
+			td <- getToolDiameter		
 			a <- approach (V3 0 0 0)
-			df <- getToolDiameter		
-			let initial_spacing = df - step_over
-			let cycles_x = floor $ (lx - df)/(2 * initial_spacing)
-			let cycles_y = floor $ (ly - df)/(2 * initial_spacing)
+			let initial_spacing = td - step_over
+			let cycles_x = floor $ (lx - td)/(2 * initial_spacing)
+			let cycles_y = floor $ (ly - td)/(2 * initial_spacing)
 			let cycles = fromIntegral $ max cycles_x cycles_y
-			let spacing_x = (lx - df)/(2 * cycles)
-			let spacing_y = (ly - df)/(2 * cycles)
+			let spacing_x = (lx - td)/(2 * cycles)
+			let spacing_y = (ly - td)/(2 * cycles)
 			let sp' = takeWhile (\(x,y) -> abs x <= lx/2 && abs y <= ly/2) $ rectangularSpiral spacing_x spacing_y
 			sp <- opsequence [feed (V3 x y 0) | (x, y) <- sp']
-			r <- centeredRectangle (lx-df) (ly-df)
+			r <- centeredRectangle (lx-td) (ly-td)
 			return $ mconcat [a, sp, r]
 
 -- | Generates a rectangular pocket.
