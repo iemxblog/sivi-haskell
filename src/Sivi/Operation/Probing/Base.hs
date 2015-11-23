@@ -74,4 +74,5 @@ probeZMinus dst margin = do
 	case t of
 		EndMill {} -> probeHelper (V3 0 0 (-1)) False dst margin
 		BallEndMill {} -> probeHelper (V3 0 0 (-1)) True dst margin
+		ProbeTool {} -> probeHelper (V3 0 0 (-1)) False dst margin
 
