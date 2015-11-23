@@ -12,6 +12,7 @@ module Sivi.Operation.Probing.Corner (
 	, probeInnerCornerNW
 	, probeInnerCornerSW
 	, probeInnerCornerSE
+	, probeOuterCornerNE
 ) where
 
 import Linear hiding (rotate)
@@ -56,3 +57,22 @@ probeInnerCornerSE :: 	Backend a => Double	-- ^ margin : Probing margin
 			-> Tool 		-- ^ probeTool : Tool used to probe the part
 			-> Operation a
 probeInnerCornerSE margin probeTool = rotate 270 $ probeInnerCornerNE margin probeTool
+
+-- | Probes a corner, in the North-East direction.
+probeOuterCornerNE :: 	Backend a => Double	-- ^ margin : Probing margin
+			-> Tool 		-- ^ probeTool : Tool used to probe the part
+			-> Operation a
+probeOuterCornerNE margin probeTool = 
+	withTool probeTool (
+		message "Place the probe 5mm above the corner"
+		+++ defCurPos (V3 0 0 5)
+		+++ chain 5 [
+			probeZMinus (V3 margin margin 0) margin
+			, probeXPlus (V3 0 margin (-margin)) margin
+			, probeYPlus (V3 margin 0 (-margin)) margin
+		]
+	)
+	+++ message "Tool length measurement"
+	+++ probeZMinus (V3 margin margin 0) margin
+	+++ message "Finished probing"
+
