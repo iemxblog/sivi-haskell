@@ -83,17 +83,20 @@ rectangularPocketP :: 	Backend a => Double 				-- ^ lx : Size of the pocket on t
 			-> Operation a			-- Resulting operation
 rectangularPocketP lx ly step_over = do
 			td <- getToolDiameter		
-			a <- approach (V3 0 0 0)
-			let initial_spacing = td - step_over
-			let cycles_x = floor $ (lx - td)/(2 * initial_spacing)
-			let cycles_y = floor $ (ly - td)/(2 * initial_spacing)
-			let cycles = fromIntegral $ max cycles_x cycles_y
-			let spacing_x = (lx - td)/(2 * cycles)
-			let spacing_y = (ly - td)/(2 * cycles)
-			let sp' = takeWhile (\(x,y) -> abs x <= lx/2 && abs y <= ly/2) $ rectangularSpiral spacing_x spacing_y
-			sp <- opsequence [feed (V3 x y 0) | (x, y) <- sp']
-			r <- centeredRectangle (lx-td) (ly-td)
-			return $ mconcat [a, sp, r]
+			if td > lx || td > ly 
+				then noOp
+				else do
+					a <- approach (V3 0 0 0)
+					let initial_spacing = td - step_over
+					let cycles_x = floor $ (lx - td)/(2 * initial_spacing)
+					let cycles_y = floor $ (ly - td)/(2 * initial_spacing)
+					let cycles = fromIntegral $ max cycles_x cycles_y
+					let spacing_x = (lx - td)/(2 * cycles)
+					let spacing_y = (ly - td)/(2 * cycles)
+					let sp' = takeWhile (\(x,y) -> abs x <= lx/2 && abs y <= ly/2) $ rectangularSpiral spacing_x spacing_y
+					sp <- opsequence [feed (V3 x y 0) | (x, y) <- sp']
+					r <- centeredRectangle (lx-td) (ly-td)
+					return $ mconcat [a, sp, r]
 
 -- | Generates a rectangular pocket.
 rectangularPocket :: 	Backend a => Double		-- ^ lx : Size of the pocket on the x axis
