@@ -52,6 +52,7 @@ module Sivi.Operation.Base (
 	, withTool
 	, name
 	, message
+	, zigzag
 )
 where
 
@@ -318,7 +319,7 @@ comment :: Backend a => String -> Operation a
 comment = bComment
 
 changeTool :: Backend a => Tool -> Operation a
-changeTool t = retract 30
+changeTool t = retract 20
 		+++ message ("Please place the tool " ++ show t ++ " in the spindle.")
 		<* putTool t
 
@@ -349,3 +350,23 @@ runOperation (CuttingParameters tr fr pr pbr dc ipos itool) op = evalState (runR
 -- | Default cutting parameters.
 defaultCuttingParameters :: CuttingParameters
 defaultCuttingParameters = CuttingParameters {transformation = id, feedRate = 100, plungeRate = 30, probeRate = 10, depthOfCut = -0.5, initialPosition = (V3 0 0 0), initialTool = EndMill{diameter = 3, len=42}}
+
+
+-- | See 'zigzag'
+zigzag' :: Backend a => Bool -> [[V3 Double]] -> Operation a
+zigzag' _ [] = noOp
+zigzag' b (x:xs) = opsequence [feed p | p <- ps] +++ zigzag' (not b) xs
+	where
+		ps = case b of
+			True -> reverse x
+			False -> x
+
+-- | Function used to build zigzag operations. 
+zigzag :: Backend a => 
+	[[V3 Double]]	-- ^ List of paths, every other path is reversed to make zig-zags.
+	-> Operation a
+zigzag xs 
+	| null (concat xs) = noOp
+	| otherwise = approach firstPoint +++ zigzag' False xs
+		where firstPoint = head . concat $ xs
+	
