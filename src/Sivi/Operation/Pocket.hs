@@ -116,17 +116,20 @@ rectangularPocketZigzagP :: Backend a =>
 			-> Bool			-- ^ center : True -> centered, False -> not centered
 			-> Operation a
 rectangularPocketZigzagP lx ly stepOver center = do
-		-- d1 is the longest side, d2 the shortest
-		-- d1v is the direction of the longest side (x or y axis), d2v is the direction of the shortest
-		let (d1, d2, d1v, d2v) = case compare lx ly of
-			LT -> (ly, lx, (V3 0 1 0), (V3 1 0 0))
-			EQ -> (lx, ly, (V3 1 0 0), (V3 0 1 0))
-			GT -> (lx, ly, (V3 1 0 0), (V3 0 1 0))
 		td <- getToolDiameter
-		let translation = case center of
-			True -> V3 (-lx/2) (-ly/2) 0
-			False -> V3 0 0 0
-		translate translation $ zigzag [[d1v ^* (td/2) + d2v^*a, d1v ^* (d1-td/2) + d2v^*a] | a <- range (td/2) (d2-td/2) (td-stepOver)] 
+		if td > lx || td > ly
+			then noOp
+			else do
+				-- d1 is the longest side, d2 the shortest
+				-- d1v is the direction of the longest side (x or y axis), d2v is the direction of the shortest
+				let (d1, d2, d1v, d2v) = case compare lx ly of
+					LT -> (ly, lx, (V3 0 1 0), (V3 1 0 0))
+					EQ -> (lx, ly, (V3 1 0 0), (V3 0 1 0))
+					GT -> (lx, ly, (V3 1 0 0), (V3 0 1 0))
+				let translation = case center of
+					True -> V3 (-lx/2) (-ly/2) 0
+					False -> V3 0 0 0
+				translate translation $ zigzag [[d1v ^* (td/2) + d2v^*a, d1v ^* (d1-td/2) + d2v^*a] | a <- range (td/2) (d2-td/2) (td-stepOver)] 
 
 -- | Generates a rectangular pocket. (zigzag version)
 rectangularPocketZigzag :: 	Backend a => Double		-- ^ lx : Size of the pocket on the x axis
