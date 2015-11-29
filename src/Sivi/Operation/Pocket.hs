@@ -12,7 +12,8 @@ module Sivi.Operation.Pocket (
 	, circularPocketP
 	, rectangularPocket
 	, rectangularPocketP
-	
+	, rectangularPocketZigzagP	
+	, rectangularPocketZigzag
 )
 where
 
@@ -21,6 +22,7 @@ import Sivi.Operation.Types
 import Sivi.Operation.BasicShape
 import Sivi.Operation.Repetition
 import Sivi.Backend
+import Sivi.Misc.Range
 import Linear
 import Data.Monoid
 
@@ -98,10 +100,40 @@ rectangularPocketP lx ly step_over = do
 					r <- centeredRectangle (lx-td) (ly-td)
 					return $ mconcat [a, sp, r]
 
--- | Generates a rectangular pocket.
+-- | Generates a rectangular pocket. (spiral version)
 rectangularPocket :: 	Backend a => Double		-- ^ lx : Size of the pocket on the x axis
 			-> Double			-- ^ ly : Size of the pocket on the y axis
 			-> Double			-- ^ depth : Depth of the pocket
 			-> Double			-- ^ step_over : Then end mill covers step_over mm of the precedent turn
 			-> Operation a			-- ^ Resulting operation
 rectangularPocket lx ly depth step_over = zRepetition depth Nothing (const $ rectangularPocketP lx ly step_over)
+
+-- | Generates a single pass of a rectangular pocket (zigzag version).
+rectangularPocketZigzagP :: Backend a =>
+			Double		-- ^ lx : Size of the pocket on the x axis
+			-> Double		-- ^ ly : Size of the pocket on the y axis
+			-> Double		-- ^ stepOver : The end mill covers stepOver mm of the precedent turn
+			-> Bool			-- ^ center : True -> centered, False -> not centered
+			-> Operation a
+rectangularPocketZigzagP lx ly stepOver center = do
+		-- d1 is the longest side, d2 the shortest
+		-- d1v is the direction of the longest side (x or y axis), d2v is the direction of the shortest
+		let (d1, d2, d1v, d2v) = case compare lx ly of
+			LT -> (ly, lx, (V3 0 1 0), (V3 1 0 0))
+			EQ -> (lx, ly, (V3 1 0 0), (V3 0 1 0))
+			GT -> (lx, ly, (V3 1 0 0), (V3 0 1 0))
+		td <- getToolDiameter
+		let translation = case center of
+			True -> V3 (-lx/2) (-ly/2) 0
+			False -> V3 0 0 0
+		translate translation $ zigzag [[d1v ^* (td/2) + d2v^*a, d1v ^* (d1-td/2) + d2v^*a] | a <- range (td/2) (d2-td/2) (td-stepOver)] 
+
+-- | Generates a rectangular pocket. (zigzag version)
+rectangularPocketZigzag :: 	Backend a => Double		-- ^ lx : Size of the pocket on the x axis
+				-> Double			-- ^ ly : Size of the pocket on the y axis
+				-> Double			-- ^ depth : Depth of the pocket
+				-> Double			-- ^ step_over : Then end mill covers step_over mm of the precedent turn
+				-> Bool				-- ^ center : True -> centered, False -> not centered
+				-> Operation a			-- ^ Resulting operation
+rectangularPocketZigzag lx ly depth step_over center = zRepetition depth Nothing (const $ rectangularPocketZigzagP lx ly step_over center)
+
