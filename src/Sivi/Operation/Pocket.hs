@@ -129,7 +129,7 @@ rectangularPocketZigzagP lx ly stepOver center = do
 				let translation = case center of
 					True -> V3 (-lx/2) (-ly/2) 0
 					False -> V3 0 0 0
-				translate translation $ zigzag [[d1v ^* (td/2) + d2v^*a, d1v ^* (d1-td/2) + d2v^*a] | a <- range (td/2) (d2-td/2) (td-stepOver)] 
+				translate translation $ zigzag [[d1v ^* (td/2) + d2v^*a, d1v ^* (d1-td/2) + d2v^*a] | a <- range (td/2) (d2-td/2) (td-stepOver)] +++ translate (V3 (td/2) (td/2) 0 ) (rectangle (lx-td) (ly-td))
 
 -- | Generates a rectangular pocket. (zigzag version)
 rectangularPocketZigzag :: 	Backend a => Double		-- ^ lx : Size of the pocket on the x axis
