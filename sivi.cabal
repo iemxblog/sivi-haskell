@@ -90,12 +90,6 @@ executable strut
     build-depends:
         base >=4.7 && <4.9,
         linear >=1.18 && <1.19,
-        containers >=0.5 && <0.6,
-        mtl >=2.2 && <2.3,
-        bytestring >=0.10.4 && < 0.10.7,
-        ansi-terminal >=0.6.2.1 && <0.6.2.2,
-        serialport >=0.4.7 && <0.4.8,
-        parsec >= 3.1.9 && < 3.2,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -103,17 +97,12 @@ executable strut
 
 executable example
     main-is:             example.hs
-    -- other-modules:       
-    -- other-extensions: 
+    -- other-modules:
+    -- other-extensions:
     build-depends:
         base >=4.7 && <4.9,
         linear >=1.18 && <1.19,
-        containers >=0.5 && <0.6,
-        mtl >=2.2 && <2.3,
-        bytestring >=0.10.4 && < 0.10.7,
-        ansi-terminal >=0.6.2.1 && <0.6.2.2,
-        serialport >=0.4.7 && <0.4.8,
-        parsec >= 3.1.9 && < 3.2, sivi
+        sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
     default-language:    Haskell2010
@@ -125,12 +114,6 @@ executable handle
     build-depends:
         base >=4.7 && <4.9,
         linear >=1.18 && <1.19,
-        containers >=0.5 && <0.6,
-        mtl >=2.2 && <2.3,
-        bytestring >=0.10.4 && < 0.10.7,
-        ansi-terminal >=0.6.2.1 && <0.6.2.2,
-        serialport >=0.4.7 && <0.4.8,
-        parsec >= 3.1.9 && < 3.2,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -143,12 +126,6 @@ executable coupling
     build-depends:
         base >=4.7 && <4.9,
         linear >=1.18 && <1.19,
-        containers >=0.5 && <0.6,
-        mtl >=2.2 && <2.3,
-        bytestring >=0.10.4 && < 0.10.7,
-        ansi-terminal >=0.6.2.1 && <0.6.2.2,
-        serialport >=0.4.7 && <0.4.8,
-        parsec >= 3.1.9 && < 3.2,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -161,12 +138,6 @@ executable cap
     build-depends:
         base >=4.7 && <4.9,
         linear >=1.18 && <1.19,
-        containers >=0.5 && <0.6,
-        mtl >=2.2 && <2.3,
-        bytestring >=0.10.4 && < 0.10.7,
-        ansi-terminal >=0.6.2.1 && <0.6.2.2,
-        serialport >=0.4.7 && <0.4.8,
-        parsec >= 3.1.9 && < 3.2,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -179,12 +150,6 @@ executable z_plate
     build-depends:
         base >=4.7 && <4.9,
         linear >=1.18 && <1.19,
-        containers >=0.5 && <0.6,
-        mtl >=2.2 && <2.3,
-        bytestring >=0.10.4 && < 0.10.7,
-        ansi-terminal >=0.6.2.1 && <0.6.2.2,
-        serialport >=0.4.7 && <0.4.8,
-        parsec >= 3.1.9 && < 3.2,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -205,5 +170,5 @@ test-suite tests
         parsec >= 3.1.9 && < 3.2, 
         hspec >=2.1.8 && <2.3, 
         sivi
-    hs-source-dirs:      tests src
+    hs-source-dirs:      tests 
     default-language:    Haskell2010
