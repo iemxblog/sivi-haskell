@@ -23,7 +23,7 @@ module Sivi.GCode.Base
         , g92
 ) where
 
-import Data.Monoid
+import Data.Monoid()
 import Linear
 import Sivi.Backend
 import Sivi.Operation.Base

@@ -13,7 +13,6 @@ module Sivi.Backlash
 ) where
 
 import Linear
-import Data.Monoid
 import Sivi.IR
 
 -- | Memorization of direction.

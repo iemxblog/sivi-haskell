@@ -16,7 +16,7 @@ module Sivi.Operation.Probing.Base (
 ) where
 
 import Linear
-import Data.Monoid
+import Data.Monoid()
 import Sivi.Operation.Base
 import Sivi.Operation.Types
 import Sivi.Backend

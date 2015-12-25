@@ -19,7 +19,7 @@ import Sivi.Operation.Types
 import Sivi.Operation.Base
 import Data.Char
 import Control.Monad
-import Data.Monoid
+import Data.Monoid()
 import Sivi.Misc
 
 oV3 :: V3 Double -> String

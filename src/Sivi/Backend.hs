@@ -13,7 +13,7 @@ module Sivi.Backend
 ) where
 
 import Sivi.Operation.Types
-import Data.Monoid
+import Data.Monoid()
 import Linear
 
 class Monoid m => Backend m where

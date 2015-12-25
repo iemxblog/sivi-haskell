@@ -19,7 +19,7 @@ module Sivi.IR.Base
 ) where
 
 import Linear
-import Data.Monoid
+import Data.Monoid()
 import Sivi.Operation.Types
 import Sivi.Operation.Base
 import Sivi.Backend

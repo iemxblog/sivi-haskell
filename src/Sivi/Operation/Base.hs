@@ -62,9 +62,9 @@ import Linear hiding (rotate)
 import qualified Linear (rotate)
 import Control.Monad.State
 import Control.Monad.Reader
-import Control.Applicative
+import Control.Applicative()
 import Data.List
-import Data.Monoid
+import Data.Monoid()
 
 -- | Returns the current transformation
 getTransformation :: Operation Transformation
