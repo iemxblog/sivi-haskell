@@ -5,12 +5,13 @@ module Sivi.Operation.BoundingBoxSpec (
 import Test.Hspec
 import Linear
 import Sivi
+import Sivi.IR
 
 
 spec :: SpecWith ()
 spec = describe "BoundingBox module" $ do
 	describe "boundingBox" $ do
-		let boundingBox = runOperationWithDefaultParams 
+		let boundingBox = runOperation defaultCuttingParameters
 		it "calculates the bounding box of a circular pocket" $ 
 			boundingBox (circularPocket 20 5 0.5) `shouldBe` BoundingBox [Boundary (-10, 10), Boundary (-10, 10), Boundary (-5, 0)]
 		it "calculates the bounding box of a translated circular pocket" $ 
@@ -24,41 +25,41 @@ spec = describe "BoundingBox module" $ do
 
 	describe "|>|" $ do
 		it "places a square next to another square" $
-			(runOperationWithDefaultParams $ square 10 |>| square 15 :: IR) `shouldBe`
-				IR [ Move (V3 10.0 0.0 0.0) (LinearInterpolation {feedRate = 100.0})
-				, Move (V3 10.0 10.0 0.0) (LinearInterpolation {feedRate = 100.0})
-				, Move (V3 0.0 10.0 0.0) (LinearInterpolation {feedRate = 100.0})
-				, Move (V3 0.0 0.0 0.0) (LinearInterpolation {feedRate = 100.0})
+			(runOperation defaultCuttingParameters $ square 10 |>| square 15 :: IR) `shouldBe`
+				IR [ Move (V3 10.0 0.0 0.0) (LinearInterpolation 100.0)
+				, Move (V3 10.0 10.0 0.0) (LinearInterpolation 100.0)
+				, Move (V3 0.0 10.0 0.0) (LinearInterpolation 100.0)
+				, Move (V3 0.0 0.0 0.0) (LinearInterpolation 100.0)
 				, Move (V3 0.0 0.0 1.0) Rapid
 				, Move (V3 13.0 0.0 1.0) Rapid
-				, Move (V3 13.0 0.0 0.0) (LinearInterpolation {feedRate = 30.0})
-				, Move (V3 28.0 0.0 0.0) (LinearInterpolation {feedRate = 100.0})
-				, Move (V3 28.0 15.0 0.0) (LinearInterpolation {feedRate = 100.0})
-				, Move (V3 13.0 15.0 0.0) (LinearInterpolation {feedRate = 100.0})
-				, Move (V3 13.0 0.0 0.0) (LinearInterpolation {feedRate = 100.0})
+				, Move (V3 13.0 0.0 0.0) (LinearInterpolation 30.0)
+				, Move (V3 28.0 0.0 0.0) (LinearInterpolation 100.0)
+				, Move (V3 28.0 15.0 0.0) (LinearInterpolation 100.0)
+				, Move (V3 13.0 15.0 0.0) (LinearInterpolation 100.0)
+				, Move (V3 13.0 0.0 0.0) (LinearInterpolation 100.0)
 				]
 		it "translation of 2 squares placed next to each other" $
-			((runOperationWithDefaultParams (translate (V3 10 0 (-10) ) (square 10 |>| square 15))) :: IR) `shouldBe`
+			((runOperation defaultCuttingParameters (translate (V3 10 0 (-10) ) (square 10 |>| square 15))) :: IR) `shouldBe`
 				IR [ Move (V3 10.0 0.0 (-10.0)) Rapid
-				,Move (V3 10.0 0.0 (-10.0)) (LinearInterpolation {feedRate = 30.0})
-				,Move (V3 20.0 0.0 (-10.0)) (LinearInterpolation {feedRate = 100.0})
-				,Move (V3 20.0 10.0 (-10.0)) (LinearInterpolation {feedRate = 100.0})
-				,Move (V3 10.0 10.0 (-10.0)) (LinearInterpolation {feedRate = 100.0})
-				,Move (V3 10.0 0.0 (-10.0)) (LinearInterpolation {feedRate = 100.0})
+				,Move (V3 10.0 0.0 (-10.0)) (LinearInterpolation 30.0)
+				,Move (V3 20.0 0.0 (-10.0)) (LinearInterpolation 100.0)
+				,Move (V3 20.0 10.0 (-10.0)) (LinearInterpolation 100.0)
+				,Move (V3 10.0 10.0 (-10.0)) (LinearInterpolation 100.0)
+				,Move (V3 10.0 0.0 (-10.0)) (LinearInterpolation 100.0)
 				,Move (V3 10.0 0.0 (-9.0)) Rapid
 				,Move (V3 23.0 0.0 (-9.0)) Rapid
-				,Move (V3 23.0 0.0 (-10.0)) (LinearInterpolation {feedRate = 30.0})
-				,Move (V3 38.0 0.0 (-10.0)) (LinearInterpolation {feedRate = 100.0})
-				,Move (V3 38.0 15.0 (-10.0)) (LinearInterpolation {feedRate = 100.0})
-				,Move (V3 23.0 15.0 (-10.0)) (LinearInterpolation {feedRate = 100.0})
-				,Move (V3 23.0 0.0 (-10.0)) (LinearInterpolation {feedRate = 100.0})
+				,Move (V3 23.0 0.0 (-10.0)) (LinearInterpolation 30.0)
+				,Move (V3 38.0 0.0 (-10.0)) (LinearInterpolation 100.0)
+				,Move (V3 38.0 15.0 (-10.0)) (LinearInterpolation 100.0)
+				,Move (V3 23.0 15.0 (-10.0)) (LinearInterpolation 100.0)
+				,Move (V3 23.0 0.0 (-10.0)) (LinearInterpolation 100.0)
 				]
 			
 		it "arc placed next to a diagonal line" $ 
-			(runOperationWithDefaultParams (feed (V3 10 10 0) |>| (approach (V3 0 0 0) +++ arc CCW (V3 0 5 0) (V3 0 10 0))) :: IR) `shouldBe`
-				IR [Move (V3 10.0 10.0 0.0) (LinearInterpolation {feedRate = 100.0})
+			(runOperation defaultCuttingParameters (feed (V3 10 10 0) |>| (approach (V3 0 0 0) +++ arc CCW (V3 0 5 0) (V3 0 10 0))) :: IR) `shouldBe`
+				IR [Move (V3 10.0 10.0 0.0) (LinearInterpolation 100.0)
 				, Move (V3 10.0 10.0 1.0) Rapid
 				, Move (V3 13.0 0.0 1.0) Rapid
-				, Move (V3 13.0 0.0 0.0) (LinearInterpolation {feedRate = 30.0})
-				, Move (V3 13.0 10.0 0.0) (Arc {direction = CCW, center = V3 13.0 5.0 0.0, feedRate = 100.0})
+				, Move (V3 13.0 0.0 0.0) (LinearInterpolation 30.0)
+				, Move (V3 13.0 10.0 0.0) (Arc {direction = CCW, center = V3 13.0 5.0 0.0, Sivi.IR.feedRate = 100.0})
 				]
