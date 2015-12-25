@@ -1,17 +1,17 @@
 {-|
-Module		: Sivi.IR.PositionTracking
-Description	: Helper functions to build functions that need to know the position of the tool
-Copyright	: (c) Maxime ANDRE, 2015
-License		: GPL-2
-Maintainer	: iemxblog@gmail.com
-Stability	: experimental
-Portability	: POSIX
+Module          : Sivi.IR.PositionTracking
+Description     : Helper functions to build functions that need to know the position of the tool
+Copyright       : (c) Maxime ANDRE, 2015
+License         : GPL-2
+Maintainer      : iemxblog@gmail.com
+Stability       : experimental
+Portability     : POSIX
 -}
 module Sivi.IR.PositionTracking
 (
-	TrackedPosition
-	, getPosition
-	, mapTrackPosition
+        TrackedPosition
+        , getPosition
+        , mapTrackPosition
 ) where
 
 import Control.Monad.State
@@ -35,14 +35,14 @@ getPosition :: TrackedPosition (V3 Double)
 getPosition = get
 
 -- | Runs a function than needs position tracking, and then updates the position stored in the 'State' monad.
-trackPosition :: (IRInstruction -> TrackedPosition a) 	-- ^ f : Function to run
-		-> IRInstruction				-- ^ i : Parameter of the function
-		-> TrackedPosition a
+trackPosition :: (IRInstruction -> TrackedPosition a)   -- ^ f : Function to run
+                -> IRInstruction                                -- ^ i : Parameter of the function
+                -> TrackedPosition a
 trackPosition f i = do
-			r <- f i
-			cp <- getPosition
-			setPosition (nextPosition i cp)
-			return r
+                        r <- f i
+                        cp <- getPosition
+                        setPosition (nextPosition i cp)
+                        return r
 
 -- | Maps a function over a list of instructions, with automatic tool position tracking.
 -- Position tracking is needed because I J K parameters for arcs are relative to the current position of the tool.

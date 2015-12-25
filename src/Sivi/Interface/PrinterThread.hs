@@ -1,15 +1,15 @@
 {-|
-Module		: Sivi.Interface.PrinterThread
-Description	: Thread for doing IO actions
-Copyright	: (c) Maxime ANDRE, 2015
-License		: GPL-2
-Maintainer	: iemxblog@gmail.com
-Stability	: experimental
-Portability	: POSIX
+Module          : Sivi.Interface.PrinterThread
+Description     : Thread for doing IO actions
+Copyright       : (c) Maxime ANDRE, 2015
+License         : GPL-2
+Maintainer      : iemxblog@gmail.com
+Stability       : experimental
+Portability     : POSIX
 -}
 module Sivi.Interface.PrinterThread
 (
-	printerThread
+        printerThread
 ) where
 import Control.Concurrent.Chan
 import Control.Monad(forever, join)

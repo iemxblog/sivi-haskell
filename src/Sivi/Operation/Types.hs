@@ -1,19 +1,19 @@
 {-|
-Module		: Sivi.Operation.Types
-Description	: Type declarations
-Copyright	: (c) Maxime ANDRE, 2015
-License		: GPL-2
-Maintainer	: iemxblog@gmail.com
-Stability	: experimental
-Portability	: POSIX
+Module          : Sivi.Operation.Types
+Description     : Type declarations
+Copyright       : (c) Maxime ANDRE, 2015
+License         : GPL-2
+Maintainer      : iemxblog@gmail.com
+Stability       : experimental
+Portability     : POSIX
 -}
 module Sivi.Operation.Types
 (
-	Transformation
-	, Operation
-	, Tool(..)
-	, ArcDirection(..)
-	, CuttingParameters(..)
+        Transformation
+        , Operation
+        , Tool(..)
+        , ArcDirection(..)
+        , CuttingParameters(..)
 ) where
 
 import Linear
@@ -44,22 +44,22 @@ type Operation a = ReaderT (Transformation, Double, Double, Double, Double) (Sta
 -- | Tool data type.
 -- Used for tool changes, radius compensation.
 data Tool = 
-	EndMill { diameter :: Double, len :: Double }
-	| BallEndMill { diameter :: Double, shankDiameter :: Double, len :: Double } -- ^ The coordinates of the tool are the center of the ball (and not the bottom of the tool)
-	| ProbeTool { diameter :: Double, len :: Double }
-	deriving (Eq, Show)
+        EndMill { diameter :: Double, len :: Double }
+        | BallEndMill { diameter :: Double, shankDiameter :: Double, len :: Double } -- ^ The coordinates of the tool are the center of the ball (and not the bottom of the tool)
+        | ProbeTool { diameter :: Double, len :: Double }
+        deriving (Eq, Show)
 
-data ArcDirection = 	CW 	-- ^ Clockwise
-			| CCW 	-- ^ Counterclockwise
-			deriving (Eq, Show)
+data ArcDirection =     CW      -- ^ Clockwise
+                        | CCW   -- ^ Counterclockwise
+                        deriving (Eq, Show)
 
 
 data CuttingParameters = CuttingParameters {
-	transformation :: Transformation
-	, feedRate :: Double
-	, plungeRate :: Double
-	, probeRate :: Double
-	, depthOfCut :: Double	-- ^ Must be a negative number
-	, initialPosition :: V3 Double
-	, initialTool :: Tool
-	}
+        transformation :: Transformation
+        , feedRate :: Double
+        , plungeRate :: Double
+        , probeRate :: Double
+        , depthOfCut :: Double  -- ^ Must be a negative number
+        , initialPosition :: V3 Double
+        , initialTool :: Tool
+        }

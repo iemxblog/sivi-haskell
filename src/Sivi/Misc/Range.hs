@@ -1,23 +1,23 @@
 {-|
-Module		: Sivi.Misc.Range
-Description	: Custom range function
-Copyright	: (c) Maxime ANDRE, 2015
-License		: GPL-2
-Maintainer	: iemxblog@gmail.com
-Stability	: experimental
-Portability	: POSIX
+Module          : Sivi.Misc.Range
+Description     : Custom range function
+Copyright       : (c) Maxime ANDRE, 2015
+License         : GPL-2
+Maintainer      : iemxblog@gmail.com
+Stability       : experimental
+Portability     : POSIX
 -}
 module Sivi.Misc.Range (
-	range
+        range
 ) where
 
 
 -- | Range which ends exactly at the end value : last (range start end step) == end
 -- Used in 'Sivi.Operation.Repetition.zRepetition' and 'Sivi.ArcInterpolation.arcInterpolation'.
-range :: (Eq a, Num a) => a 		-- ^ start (also the accumulator used for recursion)
-			-> a		-- ^ end
-			-> a		-- ^ step
-			-> [a]		-- ^ [start, start+step, start+2*step, ..., end]
-range start end step 	| signum (end - start) == signum step = start : range (start+step) end step 
-			| otherwise = [end]
+range :: (Eq a, Num a) => a             -- ^ start (also the accumulator used for recursion)
+                        -> a            -- ^ end
+                        -> a            -- ^ step
+                        -> [a]          -- ^ [start, start+step, start+2*step, ..., end]
+range start end step    | signum (end - start) == signum step = start : range (start+step) end step 
+                        | otherwise = [end]
 

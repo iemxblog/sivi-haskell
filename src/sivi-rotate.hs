@@ -8,10 +8,10 @@ parse [] = usage >> exitWith (ExitFailure 1)
 parse [s] = return (read s :: Double)
 
 rotateProgram angle = do
-	s <- getContents
-	case parseGCode s of
-		Left err -> error err
-		Right gcode -> print . getGCode defaultCuttingParameters . rotate angle . fromGCode $ gcode
+        s <- getContents
+        case parseGCode s of
+                Left err -> error err
+                Right gcode -> print . getGCode defaultCuttingParameters . rotate angle . fromGCode $ gcode
 
 main :: IO ()
 main = getArgs >>= parse >>= rotateProgram

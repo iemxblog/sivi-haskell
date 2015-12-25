@@ -1,5 +1,5 @@
 module Main (
-	main
+        main
 ) where
 
 import Sivi
@@ -16,17 +16,17 @@ m = 1
 
 cap :: Backend a => Bool -> Operation a
 cap hole = chain 1 [
-		circularPocket d2 (h-e1) 0.5
-		, name "hole" $ if hole then translate (V3 0 0 (-h+e1)) (circularPocket d1 (e1+m) 0.5) else noOp
-		, cylinderOuter d3 (h-e2)
-		, cylinderOuter d4 (h+1)
-	]
+                circularPocket d2 (h-e1) 0.5
+                , name "hole" $ if hole then translate (V3 0 0 (-h+e1)) (circularPocket d1 (e1+m) 0.5) else noOp
+                , cylinderOuter d3 (h-e2)
+                , cylinderOuter d4 (h+1)
+        ]
 
 caps :: Backend a => Int -> Bool -> Operation a
 caps n hole =
-	message "Please place the tool above the center of the first cap"
-	+++ defCurPos (V3 0 0 0) 
-	+++ gridRepetition n 1 (d4+3) 0 1 (cap hole)
+        message "Please place the tool above the center of the first cap"
+        +++ defCurPos (V3 0 0 0) 
+        +++ gridRepetition n 1 (d4+3) 0 1 (cap hole)
 
 main :: IO ()
 main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters {depthOfCut = -1} $ caps 1 True
