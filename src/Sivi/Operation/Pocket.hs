@@ -33,23 +33,21 @@ archimedeanSpiral ::    Backend a => Double     -- ^ d : External diameter of th
                         -> Operation a          -- ^ Resulting operation
 archimedeanSpiral d step_over = 
         do
-                a <- approach (V3 0 0 0) 
+                approach (V3 0 0 0) 
                 df <- getToolDiameter
                 let angle = [i * pi / 180 | i <- [0..]] -- angle = [1 degree, 2 degrees, ...]
                 let radius = takeWhile (\r -> r+df/2 < d/2) [a * (df - step_over) / (2 * pi) | a <- angle]
                 let lastPoint = ((d-df)/2, pi*(d-df)/(df-step_over))  -- So at the end we are at the exact radius (d-df)/2
-                sp <- opsequence [feed (V3 (r*cos a) (r*sin a) 0) | (r, a) <- zip radius angle ++ [lastPoint]]
-                return $ mconcat [a, sp]
+                sequence_ [feed (V3 (r*cos a) (r*sin a) 0) | (r, a) <- zip radius angle ++ [lastPoint]]
 
 -- | Generates a single pass of a circular pocket.
 circularPocketP :: Backend a => Double          -- ^ d : Diameter of the pocket
                 -> Double                       -- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
                 -> Operation a                  -- ^ Resulting operation
 circularPocketP d step_over = do
-                                a <- approach (V3 0 0 0)
-                                sp <- archimedeanSpiral d step_over
-                                c <- circleFromHere -- the spiral ends at radius = d-df/2, so we start a circle from here
-                                return $ mconcat [a, sp, c]
+                                approach (V3 0 0 0)
+                                archimedeanSpiral d step_over
+                                circleFromHere -- the spiral ends at radius = d-df/2, so we start a circle from here
 
 -- | Generates a circular pocket.
 circularPocket :: Backend a => Double           -- ^ d : Diameter of the pocket
@@ -88,7 +86,7 @@ rectangularPocketP lx ly step_over = do
                         if td > lx || td > ly 
                                 then noOp
                                 else do
-                                        a <- approach (V3 0 0 0)
+                                        approach (V3 0 0 0)
                                         let initial_spacing = td - step_over
                                         let cycles_x = floor $ (lx - td)/(2 * initial_spacing)
                                         let cycles_y = floor $ (ly - td)/(2 * initial_spacing)
@@ -96,9 +94,8 @@ rectangularPocketP lx ly step_over = do
                                         let spacing_x = (lx - td)/(2 * cycles)
                                         let spacing_y = (ly - td)/(2 * cycles)
                                         let sp' = takeWhile (\(x,y) -> abs x <= lx/2 && abs y <= ly/2) $ rectangularSpiral spacing_x spacing_y
-                                        sp <- opsequence [feed (V3 x y 0) | (x, y) <- sp']
-                                        r <- centeredRectangle (lx-td) (ly-td)
-                                        return $ mconcat [a, sp, r]
+                                        sequence_ [feed (V3 x y 0) | (x, y) <- sp']
+                                        centeredRectangle (lx-td) (ly-td)
 
 -- | Generates a rectangular pocket. (spiral version)
 rectangularPocket ::    Backend a => Double             -- ^ lx : Size of the pocket on the x axis
@@ -129,7 +126,7 @@ rectangularPocketZigzagP lx ly stepOver center = do
                                 let translation = case center of
                                         True -> V3 (-lx/2) (-ly/2) 0
                                         False -> V3 0 0 0
-                                translate translation $ zigzag [[d1v ^* (td/2) + d2v^*a, d1v ^* (d1-td/2) + d2v^*a] | a <- range (td/2) (d2-td/2) (td-stepOver)] +++ translate (V3 (td/2) (td/2) 0 ) (rectangle (lx-td) (ly-td))
+                                translate translation $ zigzag [[d1v ^* (td/2) + d2v^*a, d1v ^* (d1-td/2) + d2v^*a] | a <- range (td/2) (d2-td/2) (td-stepOver)] >> translate (V3 (td/2) (td/2) 0 ) (rectangle (lx-td) (ly-td))
 
 -- | Generates a rectangular pocket. (zigzag version)
 rectangularPocketZigzag ::      Backend a => Double             -- ^ lx : Size of the pocket on the x axis

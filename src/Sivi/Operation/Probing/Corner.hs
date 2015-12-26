@@ -25,19 +25,17 @@ import Sivi.Backend
 probeInnerCornerNE ::   Backend a => Double     -- ^ margin : Probing margin
                         -> Tool                 -- ^ probeTool : Tool used to probe the part
                         -> Operation a
-probeInnerCornerNE margin probeTool = 
-        withTool probeTool (
+probeInnerCornerNE margin probeTool = do
+        withTool probeTool $ do
                 message "Place the probe 5mm above the corner"
-                +++ defCurPos (V3 0 0 5)
-                +++ chain 5 [
+                defCurPos (V3 0 0 5)
+                chain 5 [
                         probeZMinus (V3 margin margin 0) margin
                         , probeXPlus (V3 0 (-margin) (-5)) margin
-                        , probeYPlus (V3 (-margin) 0 (-5)) margin
-                ]
-        )
-        +++ message "Tool length measurement"
-        +++ probeZMinus (V3 margin margin 0) margin
-        +++ message "Finished probing"
+                        , probeYPlus (V3 (-margin) 0 (-5)) margin ]
+        message "Tool length measurement"
+        probeZMinus (V3 margin margin 0) margin
+        message "Finished probing"
 
 
 -- | Probes a corner inside a rectangular pocket, in the North-West direction.
@@ -62,17 +60,15 @@ probeInnerCornerSE margin probeTool = rotate 270 $ probeInnerCornerNE margin pro
 probeOuterCornerNE ::   Backend a => Double     -- ^ margin : Probing margin
                         -> Tool                 -- ^ probeTool : Tool used to probe the part
                         -> Operation a
-probeOuterCornerNE margin probeTool = 
-        withTool probeTool (
+probeOuterCornerNE margin probeTool = do
+        withTool probeTool $ do
                 message "Place the probe 5mm above the corner"
-                +++ defCurPos (V3 0 0 5)
-                +++ chain 5 [
+                defCurPos (V3 0 0 5)
+                chain 5 [
                         probeZMinus (V3 margin margin 0) margin
                         , probeXPlus (V3 0 margin (-margin)) margin
-                        , probeYPlus (V3 margin 0 (-margin)) margin
-                ]
-        )
-        +++ message "Tool length measurement"
-        +++ probeZMinus (V3 margin margin 0) margin
-        +++ message "Finished probing"
+                        , probeYPlus (V3 margin 0 (-margin)) margin ]
+        message "Tool length measurement"
+        probeZMinus (V3 margin margin 0) margin
+        message "Finished probing"
 

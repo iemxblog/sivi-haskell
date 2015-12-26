@@ -19,6 +19,7 @@ import Sivi.Operation.Types
 import Sivi.Operation.Base
 import Data.Char
 import Control.Monad
+import Control.Monad.RWS
 import Data.Monoid()
 import Sivi.Misc
 
@@ -66,23 +67,23 @@ instance Monoid OSObject where
         
 
 instance Backend OSObject where
-        bRapid _ = return mempty        
+        bRapid _ = tell mempty        
         bFeed _ dst = do
                 cp <- getCurrentPosition
                 ts <- liftM toolShape getTool
-                return $ Hull [Translate cp ts, Translate dst ts]
+                tell $ Hull [Translate cp ts, Translate dst ts]
 
         bArc fr dir cen dst = do
                 cp <- getCurrentPosition
-                opsequence [bFeed fr p | p <- arcInterpolation cp dst cen dir 1]
+                sequence_ [bFeed fr p | p <- arcInterpolation cp dst cen dir 1]
 
-        bPause = return mempty
+        bPause = tell mempty
 
-        bProbe _ _ = return mempty
+        bProbe _ _ = tell mempty
 
-        bDefCurPos _ = return mempty
+        bDefCurPos _ = tell mempty
 
-        bComment _ = return mempty
+        bComment _ = tell mempty
 
         bName _ op = op
 

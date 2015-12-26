@@ -25,6 +25,7 @@ module Sivi.GCode.Base
 
 import Data.Monoid()
 import Linear
+import Control.Monad.RWS
 import Sivi.Backend
 import Sivi.Operation.Base
 import Sivi.Operation.Types
@@ -88,14 +89,14 @@ instance Backend GCode where
                 let (mx, my, mz) = optim dst cp
                 if cp == dst
                         then noOp
-                        else return $ GCode [G00 mx my mz]
+                        else tell $ GCode [G00 mx my mz]
 
         bFeed fr dst = do
                 cp <- getCurrentPosition
                 let (mx, my, mz) = optim dst cp
                 if cp == dst
                         then noOp
-                        else return  $ GCode [G01 mx my mz (Just fr)]   -- fr is not optimized :(
+                        else tell $ GCode [G01 mx my mz (Just fr)]   -- fr is not optimized :(
 
         bArc fr dir center dst = do
                 cp <- getCurrentPosition
@@ -103,26 +104,26 @@ instance Backend GCode where
                 let V3 i j k = center - cp
                 let notZero v = if v /= 0 then Just v else Nothing
                 case dir of 
-                        CW -> return $ GCode [G02 mx my mz (notZero i) (notZero j) (notZero k) (Just fr)]       -- fr is not optimized :(
-                        CCW -> return $ GCode [G03 mx my mz (notZero i) (notZero j) (notZero k) (Just fr)]      -- fr is not optimized :(
+                        CW -> tell $ GCode [G02 mx my mz (notZero i) (notZero j) (notZero k) (Just fr)]       -- fr is not optimized :(
+                        CCW -> tell $ GCode [G03 mx my mz (notZero i) (notZero j) (notZero k) (Just fr)]      -- fr is not optimized :(
 
-        bPause = return $ GCode [M00]
+        bPause = tell $ GCode [M00]
 
         bProbe pbr dst = do
                 cp <- getCurrentPosition
                 let (mx, my, mz) = optim dst cp
                 if cp == dst
                         then noOp
-                        else return  $ GCode [G38d2 mx my mz (Just pbr)]
+                        else tell $ GCode [G38d2 mx my mz (Just pbr)]
 
         bDefCurPos p = do
                 cp <- getCurrentPosition
                 let (mx, my, mz) = optim p cp
                 if cp == p
                         then noOp
-                        else return $ GCode [G92 mx my mz]
+                        else tell $ GCode [G92 mx my mz]
 
-        bComment s = return $ GCode [GComment s]
+        bComment s = tell $ GCode [GComment s]
 
         bName _ op = op -- name is ignored in this instance
 

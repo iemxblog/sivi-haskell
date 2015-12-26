@@ -28,9 +28,8 @@ saw_leftP :: Backend a => Double        -- ^ w : Width of the cut (tool radius c
         -> Operation a                  -- ^ Resulting operation
 saw_leftP w = do
                 df <- getToolDiameter
-                op1 <- approach $ V3 (-df/2) (-df/2) 0 
-                op2 <- feed $ V3 (-df/2) (w+df/2) 0
-                return $ mconcat [op1, op2]
+                approach $ V3 (-df/2) (-df/2) 0 
+                feed $ V3 (-df/2) (w+df/2) 0
 
 -- | Sawing operation. Cuts in the Y direction. Tool radius compensation is done on the left. 
 saw_left :: Backend a => Double         -- ^ w : Width of the cut (tool radius compensation is automatic)
@@ -68,5 +67,5 @@ compensatedArc comp from to cen dir ai = do
         let to' = case comp of
                 InnerCompensation -> compensate cen to (-td/2)
                 OuterCompensation -> compensate cen to (td/2)
-        approach from' +++ (opsequence . map feed) (arcInterpolation from' to' cen dir ai)
+        approach from' >> (sequence_ . map feed) (arcInterpolation from' to' cen dir ai)
         where compensate o p c = o +  (norm (p-o) + c) *^ signorm (p-o)

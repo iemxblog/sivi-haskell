@@ -12,7 +12,7 @@ probeCorner = translate corner $ probeInnerCornerNE 5 (ProbeTool 3 42)
 
 bearing = chain 1 [
                 circularPocket 14 2.5 0.5
-                , withTool (EndMill 2 42) $ probeZMinus (V3 15 0 0) 5 +++ cylinderInner 20 4
+                , withTool (EndMill 2 42) $ probeZMinus (V3 15 0 0) 5 >> cylinderInner 20 4
                 , probeZMinus (V3 15 0 0) 5
                 , translate (V3 0 0 (-2.5)) $ circularPocket 6.5 (11-2.5) 0.5
         ]

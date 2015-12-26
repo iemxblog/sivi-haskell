@@ -35,7 +35,7 @@ repetitionWithoutRetract :: Backend a =>
                                 -> (b -> Operation a -> Operation a)    -- ^ transformation
                                 -> (b -> Operation a)                   -- ^ vOp : Variable operation
                                 -> Operation a
-repetitionWithoutRetract xs transformation vOp = opsequence [transformation x (vOp x) | x <- xs]
+repetitionWithoutRetract xs transformation vOp = sequence_ [transformation x (vOp x) | x <- xs]
 
 -- | Repeats an operation at given positions.
 positionRepetition :: Backend a => 

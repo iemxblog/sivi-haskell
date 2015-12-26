@@ -34,12 +34,10 @@ probeHelper dir compFlag dst margin =
                         True -> td/2
                         False -> 0
                 let initPos = (-1)*(margin+comp) *^ dir
-                o1 <- approach_rapid initPos
-                o2 <- probe ((margin+comp) *^ dir)
-                o3 <- defCurPos (((-1) * comp) *^ dir)
-                o4 <- rapid initPos
-                return $ mconcat [o1, o2, o3, o4]
-                        
+                approach_rapid initPos
+                probe ((margin+comp) *^ dir)
+                defCurPos (((-1) * comp) *^ dir)
+                rapid initPos
         
 -- | Probes a part in the X direction, descending tool coordinate.
 probeXMinus ::  Backend a => V3 Double          -- ^ Point to probe

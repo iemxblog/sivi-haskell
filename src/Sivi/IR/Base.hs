@@ -20,6 +20,7 @@ module Sivi.IR.Base
 
 import Linear
 import Data.Monoid()
+import Control.Monad.RWS
 import Sivi.Operation.Types
 import Sivi.Operation.Base
 import Sivi.Backend
@@ -47,13 +48,13 @@ instance Monoid IR where
         IR xs `mappend` IR ys = IR $ xs ++ ys
 
 instance Backend IR where
-        bRapid dst = return $ IR [Move dst Rapid]
-        bFeed fr dst = return $ IR [Move dst (LinearInterpolation fr)]  
-        bArc fr dir center dst = return $ IR [Move dst (Arc dir center fr)]
-        bPause = return $ IR [Pause]
-        bProbe pbr dst = return $ IR [Move dst (Probe pbr)]
-        bDefCurPos dst = return $ IR [DefCurPos dst]
-        bComment s = return $ IR [Comment s]
+        bRapid dst = tell $ IR [Move dst Rapid]
+        bFeed fr dst = tell $ IR [Move dst (LinearInterpolation fr)]  
+        bArc fr dir center dst = tell $ IR [Move dst (Arc dir center fr)]
+        bPause = tell $ IR [Pause]
+        bProbe pbr dst = tell $ IR [Move dst (Probe pbr)]
+        bDefCurPos dst = tell $ IR [DefCurPos dst]
+        bComment s = tell $ IR [Comment s]
         bName _ op = op -- name is ignored
 
 -- | Returns IR code generated from an operation. This is an IR specific version of 'runOperation'.

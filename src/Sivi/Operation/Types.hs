@@ -11,14 +11,14 @@ module Sivi.Operation.Types
 (
         Transformation
         , Operation
+        , Operation'
         , Tool(..)
         , ArcDirection(..)
         , CuttingParameters(..)
 ) where
 
 import Linear
-import Control.Monad.State
-import Control.Monad.Reader
+import Control.Monad.RWS
 
 type Transformation = V3 Double -> V3 Double
 
@@ -35,10 +35,13 @@ type Transformation = V3 Double -> V3 Double
 --
 -- * Double : Depth of cut
 --
--- * Double (in the State Monad) : The current machine position
+-- * Double (in the State part of the Monad) : The current machine position
 --
--- * Tool (in the State Monad) : The current tool
-type Operation a = ReaderT (Transformation, Double, Double, Double, Double) (State (V3 Double, Tool)) a
+-- * Tool (in the State part of the Monad) : The current tool
+type Operation a = RWS (Transformation, Double, Double, Double, Double) a (V3 Double, Tool) ()
+
+-- | Auxiliary operation type, for functions that return something like 'getTransformation', etc.
+type Operation' w a = RWS (Transformation, Double, Double, Double, Double) w (V3 Double, Tool) a
 
 
 -- | Tool data type.

@@ -106,6 +106,6 @@ fromGCode' (CLine x y z i j k f) = do
 
 -- | Transforms GCode to an 'Operation'
 fromGCode :: Backend a => GCode -> Operation a
-fromGCode (GCode xs) = opsequence operations
+fromGCode (GCode xs) = sequence_ operations
         where
                 operations = evalState (mapM fromGCode' xs) ("", Map.fromList (zip "XYZIJKF" (repeat 0)))

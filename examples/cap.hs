@@ -23,10 +23,10 @@ cap hole = chain 1 [
         ]
 
 caps :: Backend a => Int -> Bool -> Operation a
-caps n hole =
+caps n hole = do
         message "Please place the tool above the center of the first cap"
-        +++ defCurPos (V3 0 0 0) 
-        +++ gridRepetition n 1 (d4+3) 0 1 (cap hole)
+        defCurPos (V3 0 0 0) 
+        gridRepetition n 1 (d4+3) 0 1 (cap hole)
 
 main :: IO ()
 main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters {depthOfCut = -1} $ caps 1 True

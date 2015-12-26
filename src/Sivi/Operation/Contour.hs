@@ -92,4 +92,4 @@ v2tov3 (V2 x y) = V3 x y 0
 v2Path :: Backend a => [V2 Double]      -- ^ path
         -> Operation a                  -- ^ The resulting operation
 v2Path [] = noOp
-v2Path (x:xs) = approach (v2tov3 x) +++ opsequence (map (feed . v2tov3) xs)
+v2Path (x:xs) = approach (v2tov3 x) >> sequence_ (map (feed . v2tov3) xs)

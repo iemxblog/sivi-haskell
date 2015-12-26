@@ -24,35 +24,31 @@ probeHorizontalCylinderRight :: Backend a => Double     -- ^ d : Diameter of the
                         -> Double                       -- ^ margin : Probing margin
                         -> Tool                         -- ^ probetool : Tool used to probe the part
                         -> Operation a                  -- ^ Resulting operation
-probeHorizontalCylinderRight d l margin probetool = 
-        withTool probetool (
-                message "Place the probe 5mm above the right side of the strut, centered on the axis of the cylinder"   
-                +++ defCurPos (V3 l (d/2) 5)
-                +++ chain 5 [
-                        probeZMinus (V3 l (d/2) 0) margin
-                        , probeXMinus (V3 l (d/2) (-d/2)) margin
-                        , probeYPlus (V3 0 0 (-3*d/4)) margin
-                ]
-        )
-        +++ message "Don't forget to put the probe connectors for tool length measurement."
-        +++ probeZMinus (V3 0 (d/2) 0) margin
-        +++ message "Remove the probe connectors"
+probeHorizontalCylinderRight d l margin probetool = do
+        withTool probetool $ do
+            message "Place the probe 5mm above the right side of the strut, centered on the axis of the cylinder"
+            defCurPos (V3 l (d/2) 5)
+            chain 5 [
+                probeZMinus (V3 l (d/2) 0) margin
+                , probeXMinus (V3 l (d/2) (-d/2)) margin
+                , probeYPlus (V3 0 0 (-3*d/4)) margin ]
+        message "Don't forget to put the probe connectors for tool length measurement."
+        probeZMinus (V3 0 (d/2) 0) margin
+        message "Remove the probe connectors"
 
 -- | Probes a vertical cylinder. Touches the outside surface.
 probeOuterCylinder ::   Backend a => Double     -- ^ d : Diameter of the cylinder
                         -> Double               -- ^ margin : Probing margin
                         -> Tool                 -- ^ probeTool : Tool used to probe the part
                         -> Operation a          -- ^ Resulting operation
-probeOuterCylinder d margin probeTool = 
-        withTool probeTool (
+probeOuterCylinder d margin probeTool = do
+        withTool probeTool $ do
                 message "Place the probe 5mm above the center of the cylinder"
-                +++ defCurPos (V3 0 0 5)
-                +++ chain 5 [
+                defCurPos (V3 0 0 5)
+                chain 5 [
                         probeZMinus (V3 (d/4) 0 0) margin
                         , probeXPlus (V3 (-d/2) 0 (-5)) margin
-                        , probeYPlus (V3 0 (-d/2) (-5)) margin
-                ]
-        )
-        +++ message "Tool length measurement"
-        +++ probeZMinus (V3 (d/4) 0 0) margin
-        +++ message "Finished probing."
+                        , probeYPlus (V3 0 (-d/2) (-5)) margin ]
+        message "Tool length measurement"
+        probeZMinus (V3 (d/4) 0 0) margin
+        message "Finished probing."

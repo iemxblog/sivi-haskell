@@ -31,7 +31,7 @@ import Linear
 -- Warning !!! No tool radius compensation !
 circle :: Backend a => Double           -- ^ d : Diameter of the circle
         -> Operation a                  -- ^ Resulting operation
-circle d = approach startingPoint +++ arc CCW (V3 0 0 0) startingPoint
+circle d = approach startingPoint >> arc CCW (V3 0 0 0) startingPoint
         where startingPoint = V3 (d/2) 0 0
 
 -- | Circle with tool radius compensation on the inner side. Does not cut the inside of the circle, but just the contour.
@@ -70,8 +70,12 @@ cylinderOuter d depth = zRepetition depth Nothing (const $ circleOuter d)
 rectangle ::    Backend a => Double     -- ^ w : Width of the rectangle (on the x axis)
                 -> Double               -- ^ h : height of the rectangle (on the y axis)
                 -> Operation a          -- ^ Resulting operation
-rectangle w h = approach (V3 0 0 0) +++ feed (V3 w 0 0) +++ feed (V3 w h 0) +++
-                feed (V3 0 h 0) +++ feed (V3 0 0 0)
+rectangle w h = do
+    approach (V3 0 0 0)
+    feed (V3 w 0 0)
+    feed (V3 w h 0)
+    feed (V3 0 h 0)
+    feed (V3 0 0 0)
 
 -- | Square.
 -- The origin is the bottom left corner.

@@ -13,11 +13,11 @@ strut' d l =
         ]
 
 strut :: Backend a => Double -> Double -> Operation a
-strut d l = 
+strut d l = do
         strut' d (l+2)
-        +++ retract 30
-        +++ message "Please rotate the strut to machine the other side"
-        +++ strut' d l 
+        retract 30
+        message "Please rotate the strut to machine the other side"
+        strut' d l 
 
 op :: Backend a => Operation a
 op = strut 10 47.1
