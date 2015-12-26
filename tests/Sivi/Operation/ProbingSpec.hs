@@ -28,7 +28,7 @@ spec =
 					]
 
 		describe "probeZMinus" $ do
-			it "probes with a ball nose end mill" $ do
+			it "probes with a ball nose end mill" $ 
 				runOperation defaultCuttingParameters {initialTool = BallEndMill{diameter=td, shankDiameter=td, len=42}, initialPosition = V3 1 1 10} (probeZMinus (V3 0 0 0) 5) `shouldBe`
 					IR [ Move (V3 0 0 10) Rapid
 					, Move (V3 0 0 (td/2+margin)) Rapid
@@ -36,7 +36,7 @@ spec =
 					, DefCurPos (V3 0 0 (td/2))
 					, Move (V3 0 0 (td/2+margin)) Rapid
 					]
-			it "probes with a flat bottom end mill" $ do
+			it "probes with a flat bottom end mill" $ 
 				runOperation defaultCuttingParameters {initialPosition = V3 1 1 10} (probeZMinus (V3 0 0 0) 5) `shouldBe`
 					IR [ Move (V3 0 0 10) Rapid
 					, Move (V3 0 0 margin) Rapid

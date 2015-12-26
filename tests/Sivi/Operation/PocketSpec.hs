@@ -11,7 +11,7 @@ import Sivi.IR
 spec :: SpecWith ()
 spec = 
 	describe "rectangularPocketZigzagP" $ do 
-		it "makes a basic rectangular pocket pass" $ do
+		it "makes a basic rectangular pocket pass" $ 
 			runOperation defaultCuttingParameters {initialPosition = V3 0 0 30} (rectangularPocketZigzagP 10 20 0.5 False) `shouldBe`
 				IR [
 					Move (V3 1.5 1.5 30.0) Rapid
@@ -32,5 +32,5 @@ spec =
 					, Move (V3 1.5 18.5 0) (LinearInterpolation 100.0)
 					, Move (V3 1.5 1.5 0) (LinearInterpolation 100.0)
 				]		
-		it "makes nothing for an a pocket with a dimension smaller than tool diameter" $ do
+		it "makes nothing for an a pocket with a dimension smaller than tool diameter" $ 
 			runOperation defaultCuttingParameters (rectangularPocketZigzagP 2 10 0.5 False) `shouldBe` IR []

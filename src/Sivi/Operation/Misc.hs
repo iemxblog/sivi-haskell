@@ -69,4 +69,4 @@ compensatedArc comp from to cen dir ai = do
                 InnerCompensation -> compensate cen to (-td/2)
                 OuterCompensation -> compensate cen to (td/2)
         approach from' +++ (opsequence . map feed) (arcInterpolation from' to' cen dir ai)
-        where compensate o p c = o +  ((norm (p-o)) + c) *^ (signorm (p-o))
+        where compensate o p c = o +  (norm (p-o) + c) *^ signorm (p-o)

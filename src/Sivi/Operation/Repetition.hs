@@ -81,5 +81,5 @@ zRepetition depth m_z_safe vOp = do
         step <- getDepthOfCut
         let zs = range step (negative depth) step
         case m_z_safe of
-                Just zSafe -> repetition zs zSafe (translate . (V3 0 0)) vOp
-                Nothing -> repetitionWithoutRetract zs (translate . (V3 0 0)) vOp
+                Just zSafe -> repetition zs zSafe (translate . V3 0 0) vOp
+                Nothing -> repetitionWithoutRetract zs (translate . V3 0 0) vOp

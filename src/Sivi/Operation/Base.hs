@@ -349,7 +349,7 @@ runOperation (CuttingParameters tr fr pr pbr dc ipos itool) op = evalState (runR
         
 -- | Default cutting parameters.
 defaultCuttingParameters :: CuttingParameters
-defaultCuttingParameters = CuttingParameters {transformation = id, feedRate = 100, plungeRate = 30, probeRate = 10, depthOfCut = -0.5, initialPosition = (V3 0 0 0), initialTool = EndMill{diameter = 3, len=42}}
+defaultCuttingParameters = CuttingParameters {transformation = id, feedRate = 100, plungeRate = 30, probeRate = 10, depthOfCut = -0.5, initialPosition = V3 0 0 0, initialTool = EndMill{diameter = 3, len=42}}
 
 
 -- | See 'zigzag'
