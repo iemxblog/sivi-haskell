@@ -21,10 +21,10 @@ import Sivi.Backend
 data Side = LeftSide | RightSide
 
 -- | Generates a contour with tool radius compensation. 
-contour :: Backend a => [V2 Double]     -- ^ path : The list of points of the path
+contour :: Backend w => [V2 Double]     -- ^ path : The list of points of the path
                 -> Side                 -- ^ side : Does the tool cut on the left or on the right of the path ?
                 -> Bool                 -- ^ cycle : Does the path make a cycle ? yes -> True, False -> No
-                -> Operation a          -- ^ The resulting operation
+                -> Operation m w ()     -- ^ The resulting operation
 contour [] _ _ = noOp
 contour path side cycle = 
         do
@@ -89,7 +89,7 @@ v2tov3 :: Num a => V2 a
 v2tov3 (V2 x y) = V3 x y 0
 
 -- | 2D path operation.
-v2Path :: Backend a => [V2 Double]      -- ^ path
-        -> Operation a                  -- ^ The resulting operation
+v2Path :: Backend w => [V2 Double]      -- ^ path
+        -> Operation m w ()             -- ^ The resulting operation
 v2Path [] = noOp
 v2Path (x:xs) = approach (v2tov3 x) >> sequence_ (map (feed . v2tov3) xs)

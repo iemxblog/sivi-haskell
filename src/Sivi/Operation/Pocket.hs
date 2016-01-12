@@ -28,9 +28,9 @@ import Data.Monoid
 
 -- | Generates an archimedean spiral. (used in 'circularPocket')
 -- Increment in angle is +1 degree. 
-archimedeanSpiral ::    Backend a => Double     -- ^ d : External diameter of the spiral
+archimedeanSpiral ::    Backend w => Double     -- ^ d : External diameter of the spiral
                         -> Double               -- ^ step_over : the end mill covers step_over mm of the precedent turn
-                        -> Operation a          -- ^ Resulting operation
+                        -> Operation m w ()     -- ^ Resulting operation
 archimedeanSpiral d step_over = 
         do
                 approach (V3 0 0 0) 
@@ -41,19 +41,19 @@ archimedeanSpiral d step_over =
                 sequence_ [feed (V3 (r*cos a) (r*sin a) 0) | (r, a) <- zip radius angle ++ [lastPoint]]
 
 -- | Generates a single pass of a circular pocket.
-circularPocketP :: Backend a => Double          -- ^ d : Diameter of the pocket
+circularPocketP :: Backend w => Double          -- ^ d : Diameter of the pocket
                 -> Double                       -- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
-                -> Operation a                  -- ^ Resulting operation
+                -> Operation m w ()             -- ^ Resulting operation
 circularPocketP d step_over = do
                                 approach (V3 0 0 0)
                                 archimedeanSpiral d step_over
                                 circleFromHere -- the spiral ends at radius = d-df/2, so we start a circle from here
 
 -- | Generates a circular pocket.
-circularPocket :: Backend a => Double           -- ^ d : Diameter of the pocket
+circularPocket :: Backend w => Double           -- ^ d : Diameter of the pocket
                 -> Double                       -- ^ depth : Depth of the pocket
                 -> Double                       -- ^ step_over : The end mill covers step_over mm of the precedent turn (in the spiral)
-                -> Operation a                  -- ^ Resulting operation
+                -> Operation m w ()             -- ^ Resulting operation
 circularPocket d depth step_over = zRepetition depth Nothing (const $ circularPocketP d step_over)
                                 
 
@@ -77,10 +77,10 @@ rectangularSpiral :: Num a =>
 rectangularSpiral = rectangularSpiralR (0, 0) 1
 
 -- | Generates a single pass of a rectangular pocket. The P means pass.
-rectangularPocketP ::   Backend a => Double                             -- ^ lx : Size of the pocket on the x axis
+rectangularPocketP ::   Backend w => Double                             -- ^ lx : Size of the pocket on the x axis
                         -> Double                       -- ^ ly : Size of the pocket on the y axis
                         -> Double                       -- ^ step_over : The end mill covers step_over mm of the precedent turn
-                        -> Operation a                  -- Resulting operation
+                        -> Operation m w ()             -- Resulting operation
 rectangularPocketP lx ly step_over = do
                         td <- getToolDiameter           
                         if td > lx || td > ly 
@@ -98,20 +98,20 @@ rectangularPocketP lx ly step_over = do
                                         centeredRectangle (lx-td) (ly-td)
 
 -- | Generates a rectangular pocket. (spiral version)
-rectangularPocket ::    Backend a => Double             -- ^ lx : Size of the pocket on the x axis
+rectangularPocket ::    Backend w => Double             -- ^ lx : Size of the pocket on the x axis
                         -> Double                       -- ^ ly : Size of the pocket on the y axis
                         -> Double                       -- ^ depth : Depth of the pocket
                         -> Double                       -- ^ step_over : Then end mill covers step_over mm of the precedent turn
-                        -> Operation a                  -- ^ Resulting operation
+                        -> Operation m w ()             -- ^ Resulting operation
 rectangularPocket lx ly depth step_over = zRepetition depth Nothing (const $ rectangularPocketP lx ly step_over)
 
 -- | Generates a single pass of a rectangular pocket (zigzag version).
-rectangularPocketZigzagP :: Backend a =>
+rectangularPocketZigzagP :: Backend w =>
                         Double          -- ^ lx : Size of the pocket on the x axis
                         -> Double               -- ^ ly : Size of the pocket on the y axis
                         -> Double               -- ^ stepOver : The end mill covers stepOver mm of the precedent turn
                         -> Bool                 -- ^ center : True -> centered, False -> not centered
-                        -> Operation a
+                        -> Operation m w ()
 rectangularPocketZigzagP lx ly stepOver center = do
                 td <- getToolDiameter
                 if td > lx || td > ly
@@ -129,11 +129,11 @@ rectangularPocketZigzagP lx ly stepOver center = do
                                 translate translation $ zigzag [[d1v ^* (td/2) + d2v^*a, d1v ^* (d1-td/2) + d2v^*a] | a <- range (td/2) (d2-td/2) (td-stepOver)] >> translate (V3 (td/2) (td/2) 0 ) (rectangle (lx-td) (ly-td))
 
 -- | Generates a rectangular pocket. (zigzag version)
-rectangularPocketZigzag ::      Backend a => Double             -- ^ lx : Size of the pocket on the x axis
+rectangularPocketZigzag ::      Backend w => Double             -- ^ lx : Size of the pocket on the x axis
                                 -> Double                       -- ^ ly : Size of the pocket on the y axis
                                 -> Double                       -- ^ depth : Depth of the pocket
                                 -> Double                       -- ^ step_over : Then end mill covers step_over mm of the precedent turn
                                 -> Bool                         -- ^ center : True -> centered, False -> not centered
-                                -> Operation a                  -- ^ Resulting operation
+                                -> Operation m w ()             -- ^ Resulting operation
 rectangularPocketZigzag lx ly depth step_over center = zRepetition depth Nothing (const $ rectangularPocketZigzagP lx ly step_over center)
 

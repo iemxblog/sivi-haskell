@@ -6,14 +6,14 @@ import Sivi
 import Linear
 
 
-cut :: Backend a => Double -> Double -> Operation a
+cut :: (Machine m, Backend w) => Double -> Double -> Operation m w ()
 cut d l = 
         chain 5 [
                 probeHorizontalCylinderRight d l 5 (ProbeTool 3 42)
                 , saw_left d d 1
         ]
 
-drillings :: Backend a => Double -> Double -> Double -> Double -> Operation a
+drillings :: (Machine m, Backend w) => Double -> Double -> Double -> Double -> Operation m w ()
 drillings d l d1 d2 = 
     withTool (EndMill 2 42) $
         chain 5 [
@@ -23,14 +23,14 @@ drillings d l d1 d2 =
             , translate (V3 (l-d2) (d/2) 0) (drill (d+1) 10)
         ]
 
-axialDrilling :: Backend a => Double -> Double -> Double -> Operation a
+axialDrilling :: (Machine m, Backend w) => Double -> Double -> Double -> Operation m w ()
 axialDrilling dc dd l = 
     chain 5 [
         probeOuterCylinder dc 5 (ProbeTool 3 42)
         , circularPocket dd l 0.5
     ]
 
-handle :: Backend a => Operation a
+handle :: (Machine m, Backend w) => Operation m w ()
 handle = do
     let l = 12
     let d = 10
@@ -46,5 +46,5 @@ handle = do
     axialDrilling d 4.5 l
 
 main :: IO ()
---main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters $ handle
-main = interface . getGCode defaultCuttingParameters $ handle
+--main = putStr . (++"M2\n") . show . getGCode MF70defaultCuttingParameters $ handle
+main = interface . getGCode MF70 defaultCuttingParameters $ handle

@@ -23,6 +23,7 @@ import Data.Monoid()
 import Control.Monad.RWS
 import Sivi.Operation.Types
 import Sivi.Operation.Base
+import Sivi.Machine
 import Sivi.Backend
 
 -- | Parameters for the 'Move' data constructor.
@@ -58,8 +59,10 @@ instance Backend IR where
         bName _ op = op -- name is ignored
 
 -- | Returns IR code generated from an operation. This is an IR specific version of 'runOperation'.
-getIR ::        CuttingParameters
-                -> Operation IR                 -- ^ op : Operation to tun
+getIR ::        Machine m =>
+                m                               -- Machine instance
+                -> CuttingParameters            -- Cutting parameters
+                -> Operation m IR ()            -- ^ op : Operation to tun
                 -> IR                           -- ^ Resulting GCode program
 getIR = runOperation
 

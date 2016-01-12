@@ -44,6 +44,8 @@ Library
         Sivi.IR.Base,
         Sivi.IR.PositionTracking,
         Sivi.IR.ToGCode,
+        Sivi.Machine,
+        Sivi.MachineInstances,
         Sivi.Misc,
         Sivi.Misc.ArcInterpolation,
         Sivi.Misc.Range,

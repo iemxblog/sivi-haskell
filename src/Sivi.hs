@@ -13,6 +13,8 @@ module Sivi
         , module Sivi.GCode
         , module Sivi.Operation
         , module Sivi.Interface
+        , module Sivi.Machine
+        , module Sivi.MachineInstances
         , module Sivi.Misc
         , module Sivi.Backend
         , module Sivi.OpenSCAD
@@ -22,6 +24,8 @@ import Sivi.Backlash
 import Sivi.GCode
 import Sivi.Operation
 import Sivi.Interface
+import Sivi.Machine
+import Sivi.MachineInstances
 import Sivi.Misc
 import Sivi.Backend
 import Sivi.OpenSCAD

@@ -24,41 +24,41 @@ import Sivi.Backend
 import Sivi.Misc.ArcInterpolation
 
 -- | Generates a single pass of a sawing operation. Cuts in the Y direction. Tool radius compensation is done on the left. P means "Pass".
-saw_leftP :: Backend a => Double        -- ^ w : Width of the cut (tool radius compensation is automatic)
-        -> Operation a                  -- ^ Resulting operation
+saw_leftP :: Backend w => Double        -- ^ w : Width of the cut (tool radius compensation is automatic)
+        -> Operation m w ()             -- ^ Resulting operation
 saw_leftP w = do
                 df <- getToolDiameter
                 approach $ V3 (-df/2) (-df/2) 0 
                 feed $ V3 (-df/2) (w+df/2) 0
 
 -- | Sawing operation. Cuts in the Y direction. Tool radius compensation is done on the left. 
-saw_left :: Backend a => Double         -- ^ w : Width of the cut (tool radius compensation is automatic)
+saw_left :: Backend w => Double         -- ^ w : Width of the cut (tool radius compensation is automatic)
         -> Double                       -- ^ depth : Depth of the cut
         -> Double                       -- ^ retraction : Altitude to go to between each pass
-        -> Operation a                  -- ^ Resulting operation
+        -> Operation m w ()             -- ^ Resulting operation
 saw_left w depth retraction = zRepetition depth (Just retraction) (const $ saw_leftP w)
 
 -- | Generates a single pass of a drilling operation. P means "pass".
-drillP :: Backend a => Operation a
+drillP :: Backend w => Operation m w ()
 drillP = approach (V3 0 0 0)
 
 -- | Drilling operation. Modify the depth of cut with 'withDepthOfCut' if you want to drill faster.
-drill :: Backend a => Double    -- ^ depth : Depth of the hole
+drill :: Backend w => Double    -- ^ depth : Depth of the hole
         -> Double               -- ^ retraction : Altitude to go to in order to evacuate the chips
-        -> Operation a          -- ^ Resulting operation
+        -> Operation m w ()     -- ^ Resulting operation
 drill depth retraction = zRepetition depth (Just retraction) (const drillP)
 
 data ArcCompensation = InnerCompensation | OuterCompensation deriving (Eq, Show)
 
 -- | Interpolated arc with tool radius compensation. Approach move is included in it.
-compensatedArc :: Backend a =>
+compensatedArc :: Backend w =>
                 ArcCompensation         -- ^ comp : Inner or outer compensation of the arc
                 -> V3 Double            -- ^ from : Starting point
                 -> V3 Double            -- ^ to : End point
                 -> V3 Double            -- ^ cen : Center of the arc
                 -> ArcDirection         -- ^ dir : Direction ('CW' : clockwise, or 'CCW' : counterclockwise)
                 -> Double               -- ^ ai : Angle increment (in degrees)
-                -> Operation a
+                -> Operation m w ()
 compensatedArc comp from to cen dir ai = do
         td <- getToolDiameter
         let from' = case comp of

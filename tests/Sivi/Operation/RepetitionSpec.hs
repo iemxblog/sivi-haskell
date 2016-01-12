@@ -12,7 +12,7 @@ spec :: SpecWith ()
 spec = 
         describe "zRepetition" $ do 
                 it "repeats an operation with tool retraction" $
-                        runOperation defaultCuttingParameters (zRepetition (-2.3) (Just 1) (const $ approach (V3 0 0 0) >> feed (V3 10 0 0))) `shouldBe`
+                        runOperation MF70 defaultCuttingParameters (zRepetition (-2.3) (Just 1) (const $ approach (V3 0 0 0) >> feed (V3 10 0 0))) `shouldBe`
                                 IR [    Move (V3 0.0 0.0 0.0) Rapid,
                                         Move (V3 0.0 0.0 (-0.5)) LinearInterpolation {feedRate = 30.0},
                                         Move (V3 10.0 0.0 (-0.5)) LinearInterpolation {feedRate = 100.0},
@@ -39,7 +39,7 @@ spec =
                                 ]
 
                 it "repeats an operation with tool retraction" $
-                        runOperation defaultCuttingParameters (zRepetition (-2.3) Nothing (const $ approach (V3 0 0 0) >> feed (V3 10 0 0))) `shouldBe`
+                        runOperation MF70 defaultCuttingParameters (zRepetition (-2.3) Nothing (const $ approach (V3 0 0 0) >> feed (V3 10 0 0))) `shouldBe`
                                 IR [    Move (V3 0.0 0.0 0.0) Rapid,
                                         Move (V3 0.0 0.0 (-0.5)) LinearInterpolation {feedRate = 30.0},
                                         Move (V3 10.0 0.0 (-0.5)) LinearInterpolation {feedRate = 100.0},

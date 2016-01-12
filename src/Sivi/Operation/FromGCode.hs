@@ -55,7 +55,7 @@ getParams = mapM getParam
                         
 
 -- | Transforms a 'GCode' instruction into an 'Operation'
-fromGCode' :: Backend a => GCodeInstruction -> GCodeTransformer (Operation a)
+fromGCode' :: Backend w => GCodeInstruction -> GCodeTransformer (Operation m w ())
 fromGCode' (G00 x y z) = do
                                 putParams "XYZ" [x,y,z]
                                 putCommand "G00"
@@ -105,7 +105,7 @@ fromGCode' (CLine x y z i j k f) = do
                                                 _ -> error $ "fromGCode' : Unknown memorized command (" ++ c ++ ")"
 
 -- | Transforms GCode to an 'Operation'
-fromGCode :: Backend a => GCode -> Operation a
+fromGCode :: Backend w => GCode -> Operation m w ()
 fromGCode (GCode xs) = sequence_ operations
         where
                 operations = evalState (mapM fromGCode' xs) ("", Map.fromList (zip "XYZIJKF" (repeat 0)))

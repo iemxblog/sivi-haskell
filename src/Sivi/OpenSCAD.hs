@@ -14,6 +14,7 @@ module Sivi.OpenSCAD
 ) where
 
 import Linear
+import Sivi.Machine
 import Sivi.Backend
 import Sivi.Operation.Types
 import Sivi.Operation.Base
@@ -87,5 +88,5 @@ instance Backend OSObject where
 
         bName _ op = op
 
-simulation :: OSObject -> CuttingParameters -> Operation OSObject -> String
-simulation raw params op = show $ Difference [raw, runOperation params op]
+simulation :: Machine m => OSObject -> m -> CuttingParameters -> Operation m OSObject () -> String
+simulation raw machine params op = show $ Difference [raw, runOperation machine params op]

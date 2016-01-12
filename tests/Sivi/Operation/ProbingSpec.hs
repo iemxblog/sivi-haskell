@@ -19,7 +19,7 @@ spec =
                         it "makes a simple probing operation" $ do
                                 let l = 10      
                                 let depth = -10
-                                runOperation defaultCuttingParameters (probeXMinus (V3 l 0 depth) margin) `shouldBe`
+                                runOperation MF70 defaultCuttingParameters (probeXMinus (V3 l 0 depth) margin) `shouldBe`
                                         IR [ Move (V3 (l+td/2+margin) 0 0) Rapid
                                         , Move (V3 (l+td/2+margin) 0 depth) Rapid
                                         , Move (V3 (l-td/2-margin) 0 depth) (Probe pbr)
@@ -29,7 +29,7 @@ spec =
 
                 describe "probeZMinus" $ do
                         it "probes with a ball nose end mill" $ 
-                                runOperation defaultCuttingParameters {initialTool = BallEndMill{diameter=td, shankDiameter=td, len=42}, initialPosition = V3 1 1 10} (probeZMinus (V3 0 0 0) 5) `shouldBe`
+                                runOperation MF70 defaultCuttingParameters {initialTool = BallEndMill{diameter=td, shankDiameter=td, len=42}, initialPosition = V3 1 1 10} (probeZMinus (V3 0 0 0) 5) `shouldBe`
                                         IR [ Move (V3 0 0 10) Rapid
                                         , Move (V3 0 0 (td/2+margin)) Rapid
                                         , Move (V3 0 0 (-td/2-margin)) (Probe pbr)
@@ -37,7 +37,7 @@ spec =
                                         , Move (V3 0 0 (td/2+margin)) Rapid
                                         ]
                         it "probes with a flat bottom end mill" $ 
-                                runOperation defaultCuttingParameters {initialPosition = V3 1 1 10} (probeZMinus (V3 0 0 0) 5) `shouldBe`
+                                runOperation MF70 defaultCuttingParameters {initialPosition = V3 1 1 10} (probeZMinus (V3 0 0 0) 5) `shouldBe`
                                         IR [ Move (V3 0 0 10) Rapid
                                         , Move (V3 0 0 margin) Rapid
                                         , Move (V3 0 0 (-margin)) (Probe pbr)

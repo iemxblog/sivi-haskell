@@ -22,11 +22,11 @@ import Sivi.Operation.Types
 import Sivi.Backend
 
 -- | To be used with translate to define the starting point of the probe move.
-probeHelper ::  Backend a => V3 Double  -- ^ dir : Direction
+probeHelper ::  Backend w => V3 Double  -- ^ dir : Direction
                 -> Bool                 -- ^ compFlag : True -> tool radius compensation, False -> no tool radius compensation
                 -> V3 Double            -- ^ dst : Destination
                 -> Double               -- ^ margin : Distance between initial probe position and destination
-                -> Operation a          -- ^ Resulting Operation
+                -> Operation m w ()     -- ^ Resulting Operation
 probeHelper dir compFlag dst margin = 
         translate dst $ do
                 td <- getToolDiameter
@@ -40,33 +40,33 @@ probeHelper dir compFlag dst margin =
                 rapid initPos
         
 -- | Probes a part in the X direction, descending tool coordinate.
-probeXMinus ::  Backend a => V3 Double          -- ^ Point to probe
+probeXMinus ::  Backend w => V3 Double          -- ^ Point to probe
                  -> Double                      -- ^ Margin (distance between point to probe and initial tool position)
-                 -> Operation a
+                 -> Operation m w ()
 probeXMinus = probeHelper (V3 (-1) 0 0) True
 
 -- | Probes a part in the X direction, ascending tool coordinate.
-probeXPlus ::   Backend a => V3 Double          -- ^ Point to probe
+probeXPlus ::   Backend w => V3 Double          -- ^ Point to probe
                 -> Double                       -- ^ Margin (distance between point to probe and initial tool position)
-                -> Operation a
+                -> Operation m w ()
 probeXPlus = probeHelper (V3 1 0 0) True
 
 -- | Probes a part in the Y direction, descending tool coordinate.
-probeYMinus ::  Backend a => V3 Double          -- ^ Point to probe
+probeYMinus ::  Backend w => V3 Double          -- ^ Point to probe
                 -> Double                       -- ^ Margin (distance between point to probe and initial tool position)
-                -> Operation a
+                -> Operation m w ()
 probeYMinus = probeHelper (V3 0 (-1) 0) True
 
 -- | Probes a part in the Y direction, ascending tool coordinate.
-probeYPlus ::   Backend a => V3 Double          -- ^ Point to probe
+probeYPlus ::   Backend w => V3 Double          -- ^ Point to probe
                 -> Double                       -- ^ Margin (distance between point to probe and initial tool position)
-                -> Operation a
+                -> Operation m w ()
 probeYPlus = probeHelper (V3 0 1 0) True
 
 -- | Probes a part in the Z direction, descending tool coordinate.
-probeZMinus ::  Backend a => V3 Double          -- ^ Point to probe
+probeZMinus ::  Backend w => V3 Double          -- ^ Point to probe
                 -> Double                       -- ^ Margin (distance between point to probe and initial tool position) 
-                -> Operation a
+                -> Operation m w ()
 probeZMinus dst margin = do
         t <- getTool
         case t of

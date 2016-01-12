@@ -40,4 +40,4 @@ spec = describe "fromGCode" $
                         , Pause
                         , Move (V3 0 0 0) Rapid
                         ]
-                runOperation defaultCuttingParameters (fromGCode program) `shouldBe` expectedOutput
+                runOperation MF70 defaultCuttingParameters (fromGCode program) `shouldBe` expectedOutput

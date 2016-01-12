@@ -19,12 +19,13 @@ import Linear hiding (rotate)
 import Sivi.Operation.Types
 import Sivi.Operation.Base
 import Sivi.Operation.Probing.Base
+import Sivi.Machine
 import Sivi.Backend
 
 -- | Probes a corner inside a rectangular pocket, in the North-East direction.
-probeInnerCornerNE ::   Backend a => Double     -- ^ margin : Probing margin
-                        -> Tool                 -- ^ probeTool : Tool used to probe the part
-                        -> Operation a
+probeInnerCornerNE ::   (Machine m, Backend w) => Double    -- ^ margin : Probing margin
+                        -> Tool                             -- ^ probeTool : Tool used to probe the part
+                        -> Operation m w ()
 probeInnerCornerNE margin probeTool = do
         withTool probeTool $ do
                 message "Place the probe 5mm above the corner"
@@ -39,27 +40,27 @@ probeInnerCornerNE margin probeTool = do
 
 
 -- | Probes a corner inside a rectangular pocket, in the North-West direction.
-probeInnerCornerNW ::   Backend a => Double     -- ^ margin : Probing margin
-                        -> Tool                 -- ^ probeTool : Tool used to probe the part
-                        -> Operation a
+probeInnerCornerNW ::   (Machine m, Backend w) => Double    -- ^ margin : Probing margin
+                        -> Tool                             -- ^ probeTool : Tool used to probe the part
+                        -> Operation m w ()
 probeInnerCornerNW margin probeTool = rotate 90 $ probeInnerCornerNE margin probeTool
 
 -- | Probes a corner inside a rectangular pocket, in the South-West direction.
-probeInnerCornerSW ::   Backend a => Double     -- ^ margin : Probing margin
-                        -> Tool                 -- ^ probeTool : Tool used to probe the part
-                        -> Operation a
+probeInnerCornerSW ::   (Machine m, Backend w) => Double    -- ^ margin : Probing margin
+                        -> Tool                             -- ^ probeTool : Tool used to probe the part
+                        -> Operation m w ()
 probeInnerCornerSW margin probeTool = rotate 180 $ probeInnerCornerNE margin probeTool
 
 -- | Probes a corner inside a rectangular pocket, in the South-East direction.
-probeInnerCornerSE ::   Backend a => Double     -- ^ margin : Probing margin
-                        -> Tool                 -- ^ probeTool : Tool used to probe the part
-                        -> Operation a
+probeInnerCornerSE ::   (Machine m, Backend w) => Double    -- ^ margin : Probing margin
+                        -> Tool                             -- ^ probeTool : Tool used to probe the part
+                        -> Operation m w ()
 probeInnerCornerSE margin probeTool = rotate 270 $ probeInnerCornerNE margin probeTool
 
 -- | Probes a corner, in the North-East direction.
-probeOuterCornerNE ::   Backend a => Double     -- ^ margin : Probing margin
-                        -> Tool                 -- ^ probeTool : Tool used to probe the part
-                        -> Operation a
+probeOuterCornerNE ::   (Machine m, Backend w) => Double    -- ^ margin : Probing margin
+                        -> Tool                             -- ^ probeTool : Tool used to probe the part
+                        -> Operation m w ()
 probeOuterCornerNE margin probeTool = do
         withTool probeTool $ do
                 message "Place the probe 5mm above the corner"

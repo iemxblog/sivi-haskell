@@ -19,7 +19,7 @@ spec =
                                 , [V3 0 15 0, V3 10 15 0]
                                 , [V3 0 20 0, V3 10 20 0]
                                 ]
-                        runOperation defaultCuttingParameters {initialPosition = V3 0 0 30} (zigzag path) `shouldBe`
+                        runOperation MF70 defaultCuttingParameters {initialPosition = V3 0 0 30} (zigzag path) `shouldBe`
                                 IR [
                                         Move (V3 0 0 30) Rapid
                                         , Move (V3 0 0 1) Rapid
@@ -37,7 +37,7 @@ spec =
                                 ]
                 it "makes nothing for an empty list" $ do
                         let path = []
-                        runOperation defaultCuttingParameters (zigzag path) `shouldBe` IR []
+                        runOperation MF70 defaultCuttingParameters (zigzag path) `shouldBe` IR []
                 it "makes nothing for a list of empty lists" $ do
                         let path = [[], [], [], []]
-                        runOperation defaultCuttingParameters (zigzag path) `shouldBe` IR []
+                        runOperation MF70 defaultCuttingParameters (zigzag path) `shouldBe` IR []

@@ -11,7 +11,6 @@ module Sivi.Operation.Types
 (
         Transformation
         , Operation
-        , Operation'
         , Tool(..)
         , ArcDirection(..)
         , CuttingParameters(..)
@@ -35,14 +34,12 @@ type Transformation = V3 Double -> V3 Double
 --
 -- * Double : Depth of cut
 --
--- * Double (in the State part of the Monad) : The current machine position
+-- * m : Machine -------------------------------------------------------------------------------- ############
+--
+-- * V3 Double (in the State part of the Monad) : The current machine position
 --
 -- * Tool (in the State part of the Monad) : The current tool
-type Operation a = RWS (Transformation, Double, Double, Double, Double) a (V3 Double, Tool) ()
-
--- | Auxiliary operation type, for functions that return something like 'getTransformation', etc.
-type Operation' w a = RWS (Transformation, Double, Double, Double, Double) w (V3 Double, Tool) a
-
+type Operation m w a = RWS (Transformation, Double, Double, Double, Double, m) w (V3 Double, Tool) a
 
 -- | Tool data type.
 -- Used for tool changes, radius compensation.

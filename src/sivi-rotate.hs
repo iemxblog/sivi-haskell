@@ -11,7 +11,7 @@ rotateProgram angle = do
         s <- getContents
         case parseGCode s of
                 Left err -> error err
-                Right gcode -> print . getGCode defaultCuttingParameters . rotate angle . fromGCode $ gcode
+                Right gcode -> print . getGCode MF70 defaultCuttingParameters . rotate angle . fromGCode $ gcode
 
 main :: IO ()
 main = getArgs >>= parse >>= rotateProgram

@@ -26,6 +26,7 @@ module Sivi.GCode.Base
 import Data.Monoid()
 import Linear
 import Control.Monad.RWS
+import Sivi.Machine
 import Sivi.Backend
 import Sivi.Operation.Base
 import Sivi.Operation.Types
@@ -128,8 +129,10 @@ instance Backend GCode where
         bName _ op = op -- name is ignored in this instance
 
 -- | Returns the GCode generated from an operation. This is a GCode specific version of 'runOperation'.
-getGCode ::     CuttingParameters
-                -> Operation GCode              -- ^ op : Operation to tun
+getGCode ::     Machine m =>
+                m                               -- Machine instance
+                -> CuttingParameters            -- Cutting parameters
+                -> Operation m GCode ()         -- ^ op : Operation to tun
                 -> GCode                        -- ^ Resulting GCode program
 getGCode = runOperation
 
