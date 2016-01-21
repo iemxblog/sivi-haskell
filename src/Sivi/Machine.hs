@@ -15,6 +15,8 @@ module Sivi.Machine
 import Sivi.Backend
 import Sivi.Operation.Types
 
+-- | Machine type class,
+-- used to define functions that are specific to a machine. 
+-- For example, the procedure is not the same to change a tool on 2 different machines.
 class Machine m where
-    changeTool :: Backend w => Tool -> Operation m w ()
-
+    changeTool :: Backend w => Tool -> Operation m w ()     -- ^ Do not forget to call 'putTool' in this function definition.
