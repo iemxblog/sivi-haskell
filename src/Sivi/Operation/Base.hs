@@ -287,9 +287,9 @@ symmetryY ::    Monoid w =>
 symmetryY = withTransformation (\(V3 x y z) -> V3 (-x) y z)
 
 -- | Chain two operations, with tool retraction at z=1 between the operations.
-(+^+) :: Backend a => Operation a	-- ^ o1 : Operation 1
-	-> Operation a			-- ^ o2 : Operation 2
-	-> Operation a			-- ^ Operation 1, retract at z=1, operation 2
+(+^+) :: (Backend w) => Operation m w ()    -- ^ o1 : Operation 1
+        -> Operation m w ()                 -- ^ o2 : Operation 2
+        -> Operation m w ()                 -- ^ Operation 1, retract at z=1, operation 2
 o1 +^+ o2 = o1 >> retract 1 >> o2
 
 -- | Chains a list of operations, and intersperses tool retractions between them.
