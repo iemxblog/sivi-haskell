@@ -206,7 +206,7 @@ arc :: Backend w => ArcDirection        -- ^ dir : CW (Clockwise) or CCW (Counte
 arc dir center dst = do
                         tr <- getTransformation
                         fr <- getFeedRate
-                        move (tr dst) (bArc fr dir center)
+                        move (tr dst) (bArc fr dir (tr center))
 
 -- | Circular interpolation, but does not apply the current transformation. Exported only for 'circleFromHere'. Only used as an internal helper function. (NT means "no transformation")
 arcNT :: Backend w => ArcDirection      -- ^ dir : CW (Clockwise) or CCW (Counter-clockwise)
