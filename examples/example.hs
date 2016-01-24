@@ -5,20 +5,12 @@ module Main (
 import Sivi
 import Linear
 
-bigPocket :: (Machine m, Backend w) => Operation m w ()
-bigPocket = circularPocket 50 10 0.5
-
-rectanglePlusCircle :: (Machine m, Backend w) => Operation m w ()
-rectanglePlusCircle = rectangularPocket 15 10 10 0.5 |>| (circularPocket 10 10 0.5)
-
-complexOp :: (Machine m, Backend w) => Operation m w ()
-complexOp = translate (V3 0 0 (-10)) . circularRepetition 20 6 0 1 $ rectanglePlusCircle 
- 
 op :: (Machine m, Backend w) => Operation m w ()
-op = complexOp  
+op = circularPocket 50 10 0.5 |.| 
+        (circularRepetition 20 6 0 1 (
+            rectangularPocket 15 10 10 0.5 |>| circularPocket 10 10 0.5))
 
-
-raw = Translate (V3 0 0 (-20)) $ Cylinder 20 50 50 False
+raw = Translate (V3 0 0 (-20)) $ Cylinder 30 55 55 False
 
 main :: IO ()
 main = putStr . (++"M2\n") . show . getGCode MF70 defaultCuttingParameters $ op
