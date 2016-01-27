@@ -20,7 +20,7 @@ spec =
                                 let l = 10      
                                 let depth = -10
                                 runOperation MF70 defaultCuttingParameters (probeXMinus (V3 l 0 depth) margin) `shouldBe`
-                                        IR [ Move (V3 (l+td/2+margin) 0 0) Rapid
+                                        IR [ Move (V3 (l+td/2+margin) 0 50) Rapid
                                         , Move (V3 (l+td/2+margin) 0 depth) Rapid
                                         , Move (V3 (l-td/2-margin) 0 depth) (Probe pbr)
                                         , DefCurPos (V3 (l+td/2) 0 depth)
