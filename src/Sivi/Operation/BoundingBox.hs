@@ -46,12 +46,17 @@ instance Monoid BoundingBox where
         mempty = BoundingBox (replicate 3 mempty)
         BoundingBox xs1 `mappend` BoundingBox xs2 = BoundingBox $ zipWith mappend xs1 xs2
 
+
+-- | Bounding boxes size depends only on feeds.
+-- For a flat operation, like 'rectangle', the depth is given by the feed that appends during the 'approach' move.
 instance Backend BoundingBox where
         bRapid _ = return ()
-        bFeed _ (V3 x y z) = do
+        bFeed _ (V3 x2 y2 z2) = do
                 td <- getToolDiameter   
                 dc <- getDepthOfCut
-                tell $ BoundingBox [Boundary (x-td/2, x+td/2), Boundary (y-td/2, y+td/2), Boundary (z, z + abs dc)]
+                V3 x1 y1 z1 <- getCurrentPosition
+                tell $ BoundingBox [Boundary (x1-td/2, x1+td/2), Boundary (y1-td/2, y1+td/2), Boundary (z1, z1)]
+                tell $ BoundingBox [Boundary (x2-td/2, x2+td/2), Boundary (y2-td/2, y2+td/2), Boundary (z2, z2)]
         bArc f dir center dst = do
                 cp <- getCurrentPosition
                 let points = arcInterpolation cp dst center dir 1
