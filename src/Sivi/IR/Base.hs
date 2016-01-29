@@ -30,6 +30,7 @@ import Data.List
 -- | Parameters for the 'Move' data constructor.
 -- A move is either a Rapid move, or a linear interpolation with a feed rate, or an arc. So there is only one data constructor for moves.
 data MoveParams = Rapid 
+                | Slow {feedRate :: Double}
                 | LinearInterpolation { feedRate :: Double } 
                 | Arc { direction :: ArcDirection, center :: V3 Double, feedRate :: Double }
                 | Probe {feedRate :: Double }
@@ -51,6 +52,7 @@ instance Monoid IR where
 
 instance Backend IR where
         bRapid dst = tell $ IR [Move dst Rapid]
+        bSlow fr dst = tell $ IR [Move dst (Slow fr)]
         bFeed fr dst = tell $ IR [Move dst (LinearInterpolation fr)]  
         bArc fr dir center dst = tell $ IR [Move dst (Arc dir center fr)]
         bPause = tell $ IR [Pause]

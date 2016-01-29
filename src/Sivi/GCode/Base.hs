@@ -92,6 +92,13 @@ instance Backend GCode where
                         then noOp
                         else tell $ GCode [G00 mx my mz]
 
+        bSlow fr dst = do
+                cp <- getCurrentPosition
+                let (mx, my, mz) = optim dst cp
+                if cp == dst
+                        then noOp
+                        else tell $ GCode [G01 mx my mz (Just fr)]   -- fr is not optimized :(
+
         bFeed fr dst = do
                 cp <- getCurrentPosition
                 let (mx, my, mz) = optim dst cp

@@ -20,7 +20,13 @@ class Monoid w => Backend w where
         -- | Rapid move (G00)
         bRapid :: V3 Double     -- ^ dst : Destination of the rapid move
                 -> Operation m w ()
-        -- | Linear interpolation (G01)
+        -- | Slow move, used in 'approach'. G01, but only for approach moves, not machining moves.
+        -- We need to separate bSlow and bFeed in order to calculate BoundingBox : we need to know when
+        -- machining is done. bFeed -> machining is done, bSlow -> slow, but no machining.
+        bSlow :: Double         -- ^ fr : Feed rate
+                -> V3 Double    -- ^ dst : Destination
+                -> Operation m w ()
+        -- | Linear interpolation (G01). For machining moves.
         bFeed :: Double         -- ^ fr : Feed rate
                 -> V3 Double    -- ^ dst : Destination
                 -> Operation m w ()

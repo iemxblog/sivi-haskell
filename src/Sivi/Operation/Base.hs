@@ -27,6 +27,7 @@ module Sivi.Operation.Base (
         , getToolDiameter
         , noOp  
         , rapid
+        , slow
         , feed
         , arc
         , arcNT
@@ -190,7 +191,24 @@ rapidNT :: Backend w => V3 Double       -- ^ dst : Destination
         -> Operation m w ()             -- ^ Resulting operation
 rapidNT dst = move dst bRapid
 
--- | Linear interpolation (with the default feedrate)
+-- | Linear interpolation, but only when the tool does not cut. It is for slow moves. See 'bSlow' for more information.
+slow :: Backend w => V3 Double          -- ^ dst : Destination
+         -> Operation m w ()            -- Resulting operation
+slow dst = do
+                tr <- getTransformation
+                fr <- getFeedRate       
+                move (tr dst) (bSlow fr)
+
+-- | Linear interpolation, but only when the tool does not cut. It is for slow moves. See 'bSlow' for more information.
+-- Version with no application of transformation (NT means no transformation). Used in 'approach' only.
+slowNT :: Backend w => V3 Double        -- ^ dst : Destination
+         -> Operation m w ()            -- Resulting operation
+slowNT dst = do
+                fr <- getFeedRate       
+                move dst (bSlow fr)
+
+
+-- | Linear interpolation (with the default feedrate), when the tools cuts matter.
 feed :: Backend w => V3 Double          -- ^ dst : Destination
          -> Operation m w ()            -- Resulting operation
 feed dst = do
@@ -247,11 +265,12 @@ approach :: Backend w => V3 Double      -- ^ dst : Destination
          -> Operation m w ()            -- ^ Resulting operation
 approach dst = do
         tr <- getTransformation
-        let V3 _ _ zd = tr dst
-        V3 _ _ z <- getCurrentPosition  
+        let V3 xd yd zd = tr dst
+        V3 x y z <- getCurrentPosition  
         dc <- getDepthOfCut
-        rapid_xy dst 
+        if (x /= xd || y/= yd) then rapid_xy dst else noOp
         if (z-zd) > 2 * abs dc then rapidNT (tr dst + V3 0 0 (2 * abs dc)) else noOp
+        if (z-zd) > abs dc then slowNT (tr dst + V3 0 0 (abs dc)) else noOp
         plunge dst
 
 -- | Same as approach, but plunge with rapid move only
