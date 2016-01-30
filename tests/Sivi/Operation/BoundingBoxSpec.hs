@@ -23,7 +23,7 @@ spec = describe "BoundingBox module" $ do
                                 BoundingBox [Boundary (-10, 35), Boundary (-10, 10), Boundary (-5, 0)]
                 it "calculates the bounding box of a simple line (takes into account the *beginning* and end of line)" $
                     boundingBox (rapid (V3 10 10 0) >> feed (V3 20 10 0)) `shouldBe`
-                        BoundingBox [Boundary (8.5, 21.5), Boundary (8.5, 11.5), Boundary (0, 0.5)] 
+                        BoundingBox [Boundary (8.5, 21.5), Boundary (8.5, 11.5), Boundary (0, 0)] 
 
 
         describe "|>|" $ do
@@ -36,12 +36,11 @@ spec = describe "BoundingBox module" $ do
                             (runOperation MF70 defaultCuttingParameters $ translate (V3 10 0 (-10)) (square 10 +^+ translate (V3 (10+3) 0 0) (square 15)))
                         
                 it "arc placed next to a diagonal line" $ 
-                        (runOperation MF70 defaultCuttingParameters (feed (V3 10 10 0) |>| (approach (V3 0 0 0) >> arc CCW (V3 0 5 0) (V3 0 10 0))) :: IR) `shouldBe`
-                                IR [Move (V3 10.0 10.0 0.0) (LinearInterpolation 100.0)
-                                , Move (V3 10.0 10.0 1.0) Rapid
-                                , Move (V3 13.0 0.0 1.0) Rapid
-                                , Move (V3 13.0 0.0 0.0) (LinearInterpolation 30.0)
-                                , Move (V3 13.0 10.0 0.0) (Arc {direction = CCW, center = V3 13.0 5.0 0.0, Sivi.IR.feedRate = 100.0})
-                                ]
-
-
+                        (runOperation MF70 defaultCuttingParameters ((rapid (V3 0 0 0) >> feed (V3 10 10 0)) |>| (approach (V3 0 0 0) >> arc CCW (V3 0 5 0) (V3 0 10 0))) :: IR) `shouldBe`
+                            (runOperation MF70 defaultCuttingParameters $ do
+                                rapid (V3 0 0 0)
+                                feed (V3 10 10 0)
+                                retract 1
+                                approach (V3 13 0 0)
+                                arc CCW (V3 13 5 0) (V3 13 10 0)
+                            )

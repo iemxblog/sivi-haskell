@@ -51,6 +51,7 @@ instance Monoid BoundingBox where
 -- For a flat operation, like 'rectangle', the depth is given by the feed that appends during the 'approach' move.
 instance Backend BoundingBox where
         bRapid _ = return ()
+        bSlow _ _ = return ()
         bFeed _ (V3 x2 y2 z2) = do
                 td <- getToolDiameter   
                 dc <- getDepthOfCut
