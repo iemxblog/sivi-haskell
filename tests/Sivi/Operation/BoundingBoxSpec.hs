@@ -44,3 +44,12 @@ spec = describe "BoundingBox module" $ do
                                 approach (V3 13 0 0)
                                 arc CCW (V3 13 5 0) (V3 13 10 0)
                             )
+
+        describe "|.|" $ do
+                it "stacks 2 circular pockets" $
+                    (runOperation MF70 defaultCuttingParameters (circularPocket 20 10 0.5 |.| circularPocket 15 10 0.5)::IR) `shouldBe`
+                        (runOperation MF70 defaultCuttingParameters $ do
+                            circularPocket 20 10 0.5
+                            translate (V3 0 0 (-10)) $ circularPocket 15 10 0.5
+                        )
+
