@@ -25,6 +25,7 @@ import Sivi.Operation.Types
 import Sivi.Operation.Base
 import Sivi.Machine
 import Sivi.Backend
+import Data.List
 
 -- | Parameters for the 'Move' data constructor.
 -- A move is either a Rapid move, or a linear interpolation with a feed rate, or an arc. So there is only one data constructor for moves.
@@ -42,7 +43,7 @@ data IRInstruction =
         | DefCurPos (V3 Double)         -- ^ Define current position
         deriving (Eq, Show)
 
-newtype IR = IR [IRInstruction] deriving (Eq, Show)
+newtype IR = IR [IRInstruction] deriving Eq
 
 instance Monoid IR where
         mempty = IR []
@@ -81,3 +82,7 @@ flatten (Node v ts) = opening `mappend` (mconcat . map flatten) ts `mappend` clo
         where
                 opening = if v == "" then mempty else IR [Comment ("> " ++ v)] 
                 closing = if v == "" then mempty else IR [Comment ("< " ++ v)]
+
+
+instance Show IR where
+    show (IR xs) = (concat . intersperse "\n" . map show) xs
