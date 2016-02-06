@@ -19,7 +19,7 @@ cabal-version:       >=1.10
 Library
     build-depends:       
         base >=4.7 && <4.9, 
-        linear >=1.18 && <1.19, 
+        linear >=1.18 && <1.21, 
         containers >=0.5 && <0.6, 
         mtl >=2.2 && <2.3, 
         bytestring >=0.10.4 && < 0.10.7,
@@ -74,7 +74,7 @@ executable sivi-rotate
     other-extensions:    OverloadedStrings
     build-depends:
         base >=4.7 && <4.9,
-        linear >=1.18 && <1.19,
+        linear >=1.18 && <1.21,
         containers >=0.5 && <0.6,
         mtl >=2.2 && <2.3,
         bytestring >=0.10.4 && < 0.10.7,
@@ -91,7 +91,7 @@ executable strut
     -- other-extensions: 
     build-depends:
         base >=4.7 && <4.9,
-        linear >=1.18 && <1.19,
+        linear >=1.18 && <1.21,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -103,7 +103,7 @@ executable example
     -- other-extensions:
     build-depends:
         base >=4.7 && <4.9,
-        linear >=1.18 && <1.19,
+        linear >=1.18 && <1.21,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -115,7 +115,7 @@ executable handle
     -- other-extensions: 
     build-depends:
         base >=4.7 && <4.9,
-        linear >=1.18 && <1.19,
+        linear >=1.18 && <1.21,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -127,7 +127,7 @@ executable coupling
     -- other-extensions: 
     build-depends:
         base >=4.7 && <4.9,
-        linear >=1.18 && <1.19,
+        linear >=1.18 && <1.21,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -139,7 +139,7 @@ executable cap
     -- other-extensions: 
     build-depends:
         base >=4.7 && <4.9,
-        linear >=1.18 && <1.19,
+        linear >=1.18 && <1.21,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -151,7 +151,7 @@ executable z_plate
     -- other-extensions: 
     build-depends:
         base >=4.7 && <4.9,
-        linear >=1.18 && <1.19,
+        linear >=1.18 && <1.21,
         sivi
     ghc-options:         -threaded
     hs-source-dirs:      examples 
@@ -163,7 +163,7 @@ test-suite tests
     main-is: Spec.hs
     build-depends:
         base >=4.7 && <4.9,
-        linear >=1.18 && <1.19,
+        linear >=1.18 && <1.21,
         containers >=0.5 && <0.6,
         mtl >=2.2 && <2.3,
         bytestring >=0.10.4 && < 0.10.7,
