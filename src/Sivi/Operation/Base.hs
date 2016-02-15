@@ -268,9 +268,11 @@ approach dst = do
         let V3 xd yd zd = tr dst
         V3 x y z <- getCurrentPosition  
         dc <- getDepthOfCut
+        let zmin = zd + 2 * abs dc
+        if z < zmin then retract zmin else noOp
         if (x /= xd || y/= yd) then rapid_xy dst else noOp
-        if (z-zd) > 2 * abs dc then rapidNT (tr dst + V3 0 0 (2 * abs dc)) else noOp
-        if (z-zd) > abs dc then slowNT (tr dst + V3 0 0 (abs dc)) else noOp
+        if z > zmin then rapidNT (tr dst + V3 0 0 (2 * abs dc)) else noOp
+        slowNT (tr dst + V3 0 0 (abs dc))
         plunge dst
 
 -- | Same as approach, but plunge with rapid move only
