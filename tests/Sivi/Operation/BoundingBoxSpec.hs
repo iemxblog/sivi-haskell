@@ -25,6 +25,11 @@ spec = describe "BoundingBox module" $ do
                     boundingBox (rapid (V3 10 10 0) >> feed (V3 20 10 0)) `shouldBe`
                         BoundingBox [Boundary (8.5, 21.5), Boundary (8.5, 11.5), Boundary (0, 0)] 
 
+                it "always returns the same result (equal to depth of cut) for an approach move, independently of the initial position of the tool" $ do
+                    let zs = [10, 5, 0, -3, -3.1, -3.5, -3.6, -3.9, -4, -4.5, -10]
+                    let bz (BoundingBox [_, _, z]) = z
+                    [bz $ boundingBox (rapid (V3 10 10 z) >> approach (V3 2 3 (-4))) | z <- zs] `shouldBe` replicate (length zs) (Boundary (-4.0, -3.5))
+
 
         describe "|>|" $ do
                 it "places a square next to another square" $
