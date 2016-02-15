@@ -17,16 +17,16 @@ spec = describe "base operations" $ do
                         runOperation MF70 defaultCuttingParameters (rapid (V3 3 4 50) >> rapid (V3 3 4 0.5) >> slow (V3 3 4 0) >> plunge (V3 3 4 (-0.5)))
                 it "makes an approach from an altitude between 0 and +dc, from above the destination" $ 
                     (runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 0.2) >> approach (V3 0 0 (-0.5)))::IR) `shouldBe`
-                        runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 0.2) >> slow (V3 0 0 0) >> plunge (V3 0 0 (-0.5)))
+                        runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 0.2) >> rapid (V3 0 0 0.5) >> slow (V3 0 0 0) >> plunge (V3 0 0 (-0.5)))
                 it "makes an approach from an altitude below 0, from above the destination" $ 
                     (runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 (-0.2)) >> approach (V3 0 0 (-0.5)))::IR) `shouldBe`
-                        runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 (-0.2)) >> plunge (V3 0 0 (-0.5)))
+                        runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 (-0.2)) >> rapid (V3 0 0 0.5) >> slow (V3 0 0 0) >> plunge (V3 0 0 (-0.5)))
                 it "makes an approach from an altitude between 0 and +dc" $ 
                     (runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 0.2) >> approach (V3 3 4 (-0.5)))::IR) `shouldBe`
-                        runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 0.2) >> rapid (V3 3 4 0.2) >> slow (V3 3 4 0) >> plunge (V3 3 4 (-0.5)))
+                        runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 0.2) >> rapid (V3 0 0 0.5) >> rapid (V3 3 4 0.5) >> slow (V3 3 4 0) >> plunge (V3 3 4 (-0.5)))
                 it "makes an approach from an altitude below 0" $ 
                     (runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 (-0.2)) >> approach (V3 3 4 (-0.5)))::IR) `shouldBe`
-                        runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 (-0.2)) >> rapid (V3 3 4 (-0.2)) >> plunge (V3 3 4 (-0.5)))
+                        runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 (-0.2)) >> rapid (V3 0 0 0.5) >> rapid (V3 3 4 0.5) >> slow (V3 3 4 0) >> plunge (V3 3 4 (-0.5)))
                 it "makes a rapid_xy even when destination x == current x" $
                     (runOperation MF70 defaultCuttingParameters (rapid (V3 3 0 30) >> approach (V3 3 4 (-0.5)))::IR) `shouldBe`
                         runOperation MF70 defaultCuttingParameters (rapid (V3 3 0 30) >> rapid (V3 3 4 30) >> rapid (V3 3 4 0.5) >> slow (V3 3 4 0) >> plunge (V3 3 4 (-0.5)))
@@ -36,6 +36,9 @@ spec = describe "base operations" $ do
                 it "makes an approach after a translation" $ 
                     (runOperation MF70 defaultCuttingParameters (translate (V3 5 6 (-10)) $ approach (V3 0 0 0))::IR) `shouldBe`
                         runOperation MF70 defaultCuttingParameters (rapid (V3 5 6 50) >> rapid (V3 5 6 (-9)) >> slow (V3 5 6 (-9.5)) >> plunge (V3 5 6 (-10)))
+                it "makes an approach from a very low altitude" $ 
+                    (runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 (-20)) >> approach (V3 1 2 (-2))) :: IR) `shouldBe`
+                        runOperation MF70 defaultCuttingParameters (rapid (V3 0 0 (-20)) >> rapid (V3 0 0 (-1)) >> rapid (V3 1 2 (-1)) >> slow (V3 1 2 (-1.5)) >> plunge (V3 1 2 (-2)))
 
             describe "arc" $ do
                 it "translates an arc" $
