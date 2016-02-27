@@ -41,6 +41,7 @@ module Sivi.Operation.Base (
         , symmetryY
         , chain
         , runOperation
+        , getReturnValue
         , defaultCuttingParameters
         , pause
         , probe
@@ -335,6 +336,16 @@ runOperation :: (Machine m, Backend w) =>
                 -> w 
 runOperation m (CuttingParameters tr fr pr pbr dc ipos itool) op = w
     where (_, _, w) = runRWS op (tr, fr, pr, pbr, dc, m) (ipos, itool)
+
+-- | Runs an operation and returns the return value. Used in tests.
+getReturnValue ::   m
+                    -> CuttingParameters
+                    -> Operation m w a 
+                    -> a
+getReturnValue m (CuttingParameters tr fr pr pbr dc ipos itool) op = a
+    where
+        a = fst $ evalRWS op (tr, fr, pr, pbr, dc, m) (ipos, itool)
+        CuttingParameters tr fr pr pbr dc ipos itool = defaultCuttingParameters
         
 -- | Default cutting parameters.
 defaultCuttingParameters :: CuttingParameters
