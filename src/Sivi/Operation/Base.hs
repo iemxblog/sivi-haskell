@@ -104,36 +104,36 @@ getDepthOfCut = do
 -- | Calls an operation with the specified transformation
 withTransformation :: Monoid w =>
                         Transformation          -- ^ ntr : The new transformation
-                        -> Operation m w ()     -- ^ The operation to call with the specified transformation
-                        -> Operation m w ()     -- ^ The resulting operation
+                        -> Operation m w a      -- ^ The operation to call with the specified transformation
+                        -> Operation m w a      -- ^ The resulting operation
 withTransformation ntr = local (\(tr, fr, pr, pbr, dc, m) -> (tr . ntr, fr, pr, pbr, dc, m))
 
 -- | Calls an operation with the specified feed rate
 withFeedRate :: Monoid w =>
                 Double                      -- ^ nfr : The new feed rate
-                -> Operation m w ()         -- ^ The operation to call with the new feed rate
-                -> Operation m w ()         -- ^ The resulting operation
+                -> Operation m w a          -- ^ The operation to call with the new feed rate
+                -> Operation m w a          -- ^ The resulting operation
 withFeedRate nfr = local (\(tr, _, pr, pbr, dc, m) -> (tr, nfr, pr, pbr, dc, m))
 
 -- | Calls an operation with the specified plunge rate
 withPlungeRate :: Monoid w =>
                 Double                      -- ^ npr : The new plunge rate
-                -> Operation m w ()         -- ^ The operation to call with the new plunge rate
-                -> Operation m w ()         -- ^ The resulting operation
+                -> Operation m w a          -- ^ The operation to call with the new plunge rate
+                -> Operation m w a          -- ^ The resulting operation
 withPlungeRate npr = local (\(tr, fr, _, pbr, dc, m) -> (tr, fr, npr, pbr, dc, m))
 
 -- | Calls an operation with the specified probe rate
 withProbeRate :: Monoid w =>
                 Double                  -- ^ npbr : The new probe rate
-                -> Operation m w ()     -- ^ The operation to call with the new probe rate
-                -> Operation m w ()     -- ^ The resulting operation
+                -> Operation m w a      -- ^ The operation to call with the new probe rate
+                -> Operation m w a      -- ^ The resulting operation
 withProbeRate npbr = local (\(tr, fr, pr, _, dc, m) -> (tr, fr, pr, npbr, dc, m))
 
 -- | Calls an operation with the specified depth of cut
 withDepthOfCut :: Monoid w =>
                 Double                  -- ^ ndc : The new depth of cut
-                -> Operation m w ()     -- ^ The operation to call with the new depth of cut
-                -> Operation m w ()     -- ^ The resulting operation
+                -> Operation m w a      -- ^ The operation to call with the new depth of cut
+                -> Operation m w a      -- ^ The resulting operation
 withDepthOfCut ndc = local (\(tr, fr, pr, pbr, _, m) -> (tr, fr, pr, pbr, ndc, m))
         
 -- | Returns the machine's current position (from the State monad)
@@ -261,28 +261,28 @@ approach_rapid dst = rapid_xy dst >> rapid dst
 -- | Translate an operation
 translate :: Monoid w =>
         V3 Double               -- ^ v : Translation vector
-        -> Operation m w ()     -- ^ o : Operation to translate
-        -> Operation m w ()     -- Resulting operation
+        -> Operation m w a      -- ^ o : Operation to translate
+        -> Operation m w a      -- Resulting operation
 translate v = withTransformation (+v)
 
 -- | Rotates an operation in the XY plane.
 rotate :: Monoid w =>
         Double                  -- ^ a : angle (in degrees)
-        -> Operation m w ()     -- ^ Operation to rotate
-        -> Operation m w ()     -- ^ Resulting operation
+        -> Operation m w a      -- ^ Operation to rotate
+        -> Operation m w a      -- ^ Resulting operation
 rotate a = withTransformation (Linear.rotate (axisAngle (V3 0 0 1) ar))
         where ar = a * pi / 180
 
 -- | Symmetry about the X axis.
 symmetryX ::    Monoid w =>
-                Operation m w () 
-                -> Operation m w () 
+                Operation m w a
+                -> Operation m w a 
 symmetryX = withTransformation (\(V3 x y z) -> V3 x (-y) z)
 
 -- | Symmetry about the Y axis.
 symmetryY ::    Monoid w =>
-                Operation m w () 
-                -> Operation m w () 
+                Operation m w a 
+                -> Operation m w a 
 symmetryY = withTransformation (\(V3 x y z) -> V3 (-x) y z)
 
 -- | Chains a list of operations, and intersperses tool retractions between them.
@@ -313,9 +313,14 @@ comment = bComment
 
 -- | Do an operation with a temporary tool.
 withTool :: (Machine m, Backend w) => Tool      -- ^ t : The tool to use for the operation
-        -> Operation m w ()                     -- ^ op : The operation to run with the given tool.
-        -> Operation m w ()                     -- ^ The resulting operation.
-withTool t op = getTool >>= (\mt -> changeTool t >> op >> changeTool mt)
+        -> Operation m w a                     -- ^ op : The operation to run with the given tool.
+        -> Operation m w a                     -- ^ The resulting operation.
+withTool t op = do
+                    mt <- getTool 
+                    changeTool t 
+                    rv <- op 
+                    changeTool mt
+                    return rv
 
 -- | Gives a name to an operation. (Used for displaying only an operation and not the others, etc.)
 name :: Backend w => String
