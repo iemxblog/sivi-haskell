@@ -112,7 +112,7 @@ spec = describe "base operations" $ do
                 it "gives the correct probe rate" $ 
                     getReturnValue MF70 defaultCuttingParameters {probeRate = 3} (getProbeRate :: Operation MF70 IR Double) `shouldBe` 3
                 it "gives the correct depth of cut" $ 
-                    getReturnValue MF70 defaultCuttingParameters {depthOfCut = -1} (getDepthOfCut :: Operation MF70 IR Double) `shouldBe` 4
+                    getReturnValue MF70 defaultCuttingParameters {depthOfCut = -1} (getDepthOfCut :: Operation MF70 IR Double) `shouldBe` -1 
                 it "gives the correct position" $ 
                     getReturnValue MF70 defaultCuttingParameters {initialPosition = (V3 5 8 9)} (getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` V3 5 8 9
                 it "gives the correct tool" $ 
