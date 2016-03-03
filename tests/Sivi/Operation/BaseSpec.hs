@@ -119,8 +119,8 @@ spec = describe "base operations" $ do
                     getReturnValue MF70 defaultCuttingParameters {initialTool = EndMill 20 100} (getTool :: Operation MF70 IR Tool) `shouldBe` EndMill 20 100
 
             describe "basic moves" $ do
+                let getz (V3 _ _ z) = z
                 it "doesn't do anything when cp == dst" $ do
-                    let getz (V3 _ _ z) = z
                     let ipos = V3 10 3 8
                     (map (\o -> runTest (rapid ipos >> o))
                         [ rapid ipos
@@ -129,7 +129,22 @@ spec = describe "base operations" $ do
                         , plunge ipos
                         , retract (getz ipos)
                         , rapid_xy ipos
-                        , approach_rapid ipos ] ) `shouldBe` replicate 7 (runTest (rapid ipos))
+                        , approach_rapid ipos
+                        , probe ipos
+                        , defCurPos ipos ] ) `shouldBe` replicate 9 (runTest (rapid ipos))
+                it "does'nt do anything when cp == dst, even when translated" $ do
+                    let ipos = V3 10 3 8
+                    (map (\o -> runTest (translate (V3 1 2 3) (rapid ipos >> o)))
+                        [ rapid ipos
+                        , slow ipos
+                        , feed ipos
+                        , plunge ipos
+                        , retract (getz ipos)
+                        , rapid_xy ipos
+                        , approach_rapid ipos
+                        , probe ipos
+                        , defCurPos ipos ] ) `shouldBe` replicate 9 (runTest (translate (V3 1 2 3) $ rapid ipos))
+
 
             describe "translate" $ do
                 it "makes a translated rapid move" $
