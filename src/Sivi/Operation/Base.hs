@@ -179,22 +179,28 @@ noOp = return ()
 move :: Backend w => V3 Double -> (V3 Double -> Operation m w ()) -> Operation m w ()
 move dst op = op dst <* putCurrentPosition dst
 
+-- | Checks if we are already at destination. If so, we don't do anything.
+checkDst :: Monoid w => V3 Double -> Operation m w () -> Operation m w ()
+checkDst dst op = do
+                    cp <- getCurrentPosition
+                    if cp == dst then noOp else op
+
 -- | Rapid positioning
 rapid :: Backend w => V3 Double         -- ^ dst : Destination
          -> Operation m w ()            -- Resulting operation
-rapid dst = do
+rapid dst = checkDst dst $ do
                 tr <- getTransformation
                 move (tr dst) bRapid
 
 -- | Rapid positioning, but does not apply the current transformation. Not meant to be exported, only used as an internal helper function. (NT means "no transformation")
 rapidNT :: Backend w => V3 Double       -- ^ dst : Destination
         -> Operation m w ()             -- ^ Resulting operation
-rapidNT dst = move dst bRapid
+rapidNT dst = checkDst dst $ move dst bRapid
 
 -- | Linear interpolation, but only when the tool does not cut. It is for slow moves. See 'bSlow' for more information.
 slow :: Backend w => V3 Double          -- ^ dst : Destination
          -> Operation m w ()            -- Resulting operation
-slow dst = do
+slow dst = checkDst dst $ do
                 tr <- getTransformation
                 fr <- getFeedRate       
                 move (tr dst) (bSlow fr)
@@ -203,7 +209,7 @@ slow dst = do
 -- Version with no application of transformation (NT means no transformation). Used in 'approach' only.
 slowNT :: Backend w => V3 Double        -- ^ dst : Destination
          -> Operation m w ()            -- Resulting operation
-slowNT dst = do
+slowNT dst = checkDst dst $ do
                 fr <- getFeedRate       
                 move dst (bSlow fr)
 
@@ -211,7 +217,7 @@ slowNT dst = do
 -- | Linear interpolation (with the default feedrate), when the tools cuts matter.
 feed :: Backend w => V3 Double          -- ^ dst : Destination
          -> Operation m w ()            -- Resulting operation
-feed dst = do
+feed dst = checkDst dst $ do
                 tr <- getTransformation
                 fr <- getFeedRate       
                 move (tr dst) (bFeed fr)
@@ -238,7 +244,7 @@ arcNT dir center dst = do
 -- | Linear interpolation (with the plunge feedrate)
 plunge :: Backend w => V3 Double        -- ^ dst : Destination
          -> Operation m w ()            -- ^ Resulting operation
-plunge dst = do
+plunge dst = checkDst dst $ do
                 tr <- getTransformation
                 pr <- getPlungeRate
                 move (tr dst) (bFeed pr)
@@ -326,13 +332,13 @@ pause = bPause
 -- | Basic probing operation.
 probe :: Backend w => V3 Double         -- ^ dst : The destination of the probing move
         -> Operation m w ()             -- ^ The resulting operation.
-probe dst = do
+probe dst = checkDst dst $ do
                 tr <- getTransformation
                 pbr <- getProbeRate
                 move (tr dst) (bProbe pbr)
 
 defCurPos :: Backend w => V3 Double -> Operation m w ()
-defCurPos p = do
+defCurPos p = checkDst p $ do
                 tr <- getTransformation
                 move (tr p) bDefCurPos
 
