@@ -124,9 +124,7 @@ spec = describe "base operations" $ do
                     let ipos = V3 10 3 8
                     (map (\o -> runTest (rapid ipos >> o))
                         [ rapid ipos
-                        , rapidNT ipos
                         , slow ipos
-                        , slowNT ipos
                         , feed ipos
                         , plunge ipos
                         , retract (getz ipos)
