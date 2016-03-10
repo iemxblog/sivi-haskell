@@ -183,6 +183,13 @@ move dst op = op dst <* putCurrentPosition dst
 checkDst :: Monoid w => V3 Double -> Operation m w () -> Operation m w ()
 checkDst dst op = do
                     cp <- getCurrentPosition
+                    tr <- getTransformation
+                    if cp == tr dst then noOp else op
+
+-- | Checks if we are already at destination (NT : does not apply transformation during checking). If so, we don't do anything.
+checkDstNT :: Monoid w => V3 Double -> Operation m w () -> Operation m w ()
+checkDstNT dst op = do
+                    cp <- getCurrentPosition
                     if cp == dst then noOp else op
 
 -- | Rapid positioning
@@ -195,7 +202,7 @@ rapid dst = checkDst dst $ do
 -- | Rapid positioning, but does not apply the current transformation. Not meant to be exported, only used as an internal helper function. (NT means "no transformation")
 rapidNT :: Backend w => V3 Double       -- ^ dst : Destination
         -> Operation m w ()             -- ^ Resulting operation
-rapidNT dst = checkDst dst $ move dst bRapid
+rapidNT dst = checkDstNT dst $ move dst bRapid
 
 -- | Linear interpolation, but only when the tool does not cut. It is for slow moves. See 'bSlow' for more information.
 slow :: Backend w => V3 Double          -- ^ dst : Destination
