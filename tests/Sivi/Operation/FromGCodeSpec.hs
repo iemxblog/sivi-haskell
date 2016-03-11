@@ -23,7 +23,7 @@ spec = describe "fromGCode" $
                         , g92 {x = Just 0}
                         , gcomment { getComment = "Hello, world!" }
                         , m00
-                        , g00 {x = Just 0, y = Just 0, z = Just 0}
+                        , g00 {x = Just 1, y = Just 0, z = Just 0}
                         ]
                 let expectedOutput = 
                         IR [ Move (V3 10 20 0) Rapid
@@ -38,6 +38,6 @@ spec = describe "fromGCode" $
                         , DefCurPos (V3 0 0 0)
                         , Comment "Hello, world!"
                         , Pause
-                        , Move (V3 0 0 0) Rapid
+                        , Move (V3 1 0 0) Rapid
                         ]
                 runOperation MF70 defaultCuttingParameters (fromGCode program) `shouldBe` expectedOutput
