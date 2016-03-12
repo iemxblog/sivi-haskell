@@ -3,7 +3,7 @@ module Sivi.Operation.BaseSpec (
 ) where
 
 import Test.Hspec
-import Linear
+import Linear hiding (rotate)
 import Sivi
 import Sivi.IR
 
