@@ -19,6 +19,12 @@ spec = describe "base operations" $ do
                     it "should run an operation with a transformation" $
                         runTest (withTransformation (\(V3 x y z) -> V3 (x+5) (y+6) (z+3)) $ rapid (V3 1 2 3)) `shouldBe`
                             runTest (rapid (V3 6 8 6))
+                    it "should apply a rotation, then a translation" $
+                        runTest (rapid (V3 0 0 0) >> translate (V3 1 0 0) (rotate 90 (feed (V3 2 0 0)))) `shouldBe`
+                            runTest (rapid (V3 0 0 0) >> feed (V3 1 2 0))
+                    it "should apply a translation, then a rotation" $
+                        runTest (rapid (V3 0 0 0) >> rotate 90 (translate (V3 1 0 0) (feed (V3 2 0 0)))) `shouldBe`
+                            runTest (rapid (V3 0 0 0) >> feed (V3 1 2 0))
                 describe "feed rate" $ do
                     it "should modify the feed rate" $
                         runTest (withFeedRate 1234 (feed (V3 1 2 3))) `shouldBe`
