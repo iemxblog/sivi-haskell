@@ -18,6 +18,7 @@ module Sivi
         , module Sivi.Misc
         , module Sivi.Backend
         , module Sivi.OpenSCAD
+        , module Sivi.Approx
 ) where
 
 import Sivi.Backlash
@@ -29,3 +30,4 @@ import Sivi.MachineInstances
 import Sivi.Misc
 import Sivi.Backend
 import Sivi.OpenSCAD
+import Sivi.Approx

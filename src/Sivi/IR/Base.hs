@@ -26,6 +26,7 @@ import Sivi.Operation.Base
 import Sivi.Operation.Run
 import Sivi.Machine
 import Sivi.Backend
+import Sivi.Approx
 import Data.List
 
 -- | Parameters for the 'Move' data constructor.
@@ -88,3 +89,11 @@ flatten (Node v ts) = opening `mappend` (mconcat . map flatten) ts `mappend` clo
 
 instance Show IR where
     show (IR xs) = (concat . intersperse "\n" . map show) xs
+
+instance Approx IRInstruction where
+    (Move v1 mp1) ~= (Move v2 mp2) = (v1 ~= v2) && (mp1 == mp2)
+    (DefCurPos v1) ~= (DefCurPos v2) = v1 ~= v2
+    iri1 ~= iri2 = iri1 == iri2
+
+instance Approx IR where
+    (IR xs1) ~= (IR xs2) = xs1 ~= xs2
