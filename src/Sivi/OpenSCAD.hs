@@ -87,7 +87,5 @@ instance Backend OSObject where
 
         bComment _ = tell mempty
 
-        bName _ op = op
-
 simulation :: Machine m => OSObject -> CuttingParameters m -> Operation m OSObject () -> String
 simulation raw params op = show $ Difference [raw, runOperation params op]

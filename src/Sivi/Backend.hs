@@ -49,3 +49,4 @@ class Monoid w => Backend w where
         bComment :: String -> Operation m w ()
         -- | Gives a name to an operation
         bName :: String -> Operation m w () -> Operation m w ()
+        bName n op = bComment ("Beginning of operation \""++ n ++ "\"") >> op >> bComment ("End of operation \"" ++ n ++"\"")

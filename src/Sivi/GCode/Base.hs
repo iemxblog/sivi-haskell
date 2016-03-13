@@ -134,8 +134,6 @@ instance Backend GCode where
 
         bComment s = tell $ GCode [GComment s]
 
-        bName _ op = op -- name is ignored in this instance
-
 -- | Returns the GCode generated from an operation. This is a GCode specific version of 'runOperation'.
 getGCode ::     Machine m =>
                 CuttingParameters m          -- Cutting parameters
