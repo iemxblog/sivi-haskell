@@ -70,6 +70,9 @@ instance Monoid OSObject where
 
 instance Backend OSObject where
         bRapid _ = tell mempty        
+        
+        bSlow _ _ = tell mempty
+        
         bFeed _ dst = do
                 cp <- getCurrentPosition
                 ts <- liftM toolShape getTool
