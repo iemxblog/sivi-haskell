@@ -18,7 +18,7 @@ class Approx n where
     (~=) :: n -> n -> Bool
 
 -- | Comparison of doubles with epsilon = 0.0001.
--- Why 0.0001 ? Because it is the least input increment of the majority of CNC machines that work with inches.
+-- Why 0.0001 ? Because it is the least input increment of the majority of CNC machines that work in inches.
 -- And it is below the least input increment of machines that work in millimeters (0.001).
 instance Approx Double where
     a ~= b = abs (b-a) < 0.0001
