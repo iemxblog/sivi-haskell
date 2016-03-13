@@ -11,9 +11,13 @@ module Sivi.Operation.Types
 (
         Transformation
         , Operation
+        , OpEnvironment(..)
+        , OpState(..)
         , Tool(..)
         , ArcDirection(..)
         , CuttingParameters(..)
+        , buildEnvironment
+        , buildState
 ) where
 
 import Linear
@@ -22,24 +26,27 @@ import Control.Monad.RWS
 type Transformation = V3 Double -> V3 Double
 
 -- | The Operation type.
--- Parameters are :
---
--- * Transformation : the current 'Transformation'
---
--- * Double : Feed rate
---
--- * Double : Plunge rate
---
--- * Double : Probe rate
---
--- * Double : Depth of cut
---
--- * m : Machine -------------------------------------------------------------------------------- ############
---
--- * V3 Double (in the State part of the Monad) : The current machine position
---
--- * Tool (in the State part of the Monad) : The current tool
-type Operation m w a = RWS (Transformation, Double, Double, Double, Double, m) w (V3 Double, Tool) a
+type Operation m w a = RWS (OpEnvironment m) w OpState a
+
+
+-- | Contains the Reader part of the 'Operation' monad.
+-- Before, a tuple was used. But a custom datatype is more readable, and it is easier to add new parameters.
+-- Each parameter name is prepended with an "e" to avoid name collisions with functions like 'Sivi.Operation.Base.getTransformation', 'Sivi.Operation.Base.getFeedRate', ... Moreover, these names are used only internally, and won't be used by the user. They are a bit ugly, but it's not really a problem.
+data OpEnvironment m = OpEnvironment {
+    eTransformation :: Transformation 
+    , eFeedRate :: Double 
+    , ePlungeRate :: Double 
+    , eProbeRate :: Double 
+    , eDepthOfCut :: Double 
+    , eMachine :: m
+    }
+
+-- | Contains the State part of the 'Operation' monad.
+-- Each parameter is prepended with an "s" tto avoid name collisions. For the same reason as 'OpEnvironment'.
+data OpState = OpState {
+    sCurrentPosition :: (V3 Double) 
+    , sTool :: Tool
+    }
 
 -- | Tool data type.
 -- Used for tool changes, radius compensation.
@@ -53,13 +60,22 @@ data ArcDirection =     CW      -- ^ Clockwise
                         | CCW   -- ^ Counterclockwise
                         deriving (Eq, Show)
 
-
-data CuttingParameters = CuttingParameters {
-        transformation :: Transformation
+-- | Cutting parameters : contains the feed rate, plunge rate, etc. They are needed when we want to run an operation with 'Sivi.Operation.Run.runOperation'.
+data CuttingParameters m = CuttingParameters {
+        transformation :: Transformation    -- ^ the initial transformation should always be 'Prelude.id' (identity function, i.e. no transformation). Use something else if you know what you are doing.
         , feedRate :: Double
         , plungeRate :: Double
         , probeRate :: Double
         , depthOfCut :: Double  -- ^ Must be a negative number
+        , machine :: m
         , initialPosition :: V3 Double
         , initialTool :: Tool
         }
+
+-- | Gets the environment part of the cutting parameters.
+buildEnvironment :: CuttingParameters m -> OpEnvironment m
+buildEnvironment (CuttingParameters tr fr pr pbr dc m _ _) = OpEnvironment tr fr pr pbr dc m
+
+-- | Gets the state part of the cutting parameters.
+buildState :: CuttingParameters m -> OpState
+buildState (CuttingParameters _ _ _ _ _ _ ipos itool) = OpState ipos itool

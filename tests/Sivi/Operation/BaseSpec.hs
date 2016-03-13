@@ -8,7 +8,7 @@ import Sivi
 import Sivi.IR
 
 runTest :: Operation MF70 IR () -> IR
-runTest = runOperation MF70 defaultCuttingParameters
+runTest = runOperation defaultCuttingParameters
 
 
 spec :: SpecWith ()
@@ -30,99 +30,99 @@ spec = describe "base operations" $ do
                         runTest (withFeedRate 1234 (feed (V3 1 2 3))) `shouldBe`
                             IR [Move (V3 1 2 3) (LinearInterpolation 1234)]
                     it "should return the feed rate" $
-                        getReturnValue MF70 defaultCuttingParameters (withFeedRate 1234 getFeedRate :: Operation MF70 IR Double) `shouldBe` 1234
+                        getReturnValue defaultCuttingParameters (withFeedRate 1234 getFeedRate :: Operation MF70 IR Double) `shouldBe` 1234
 
                 describe "plunge rate" $ do
                     it "should modify the plunge rate" $
                         runTest (withPlungeRate 1234 (plunge (V3 1 2 0))) `shouldBe`
                             IR [Move (V3 1 2 0) (LinearInterpolation 1234)]
                     it "should return the plunge rate" $
-                        getReturnValue MF70 defaultCuttingParameters (withPlungeRate 1234 getPlungeRate :: Operation MF70 IR Double) `shouldBe` 1234
+                        getReturnValue defaultCuttingParameters (withPlungeRate 1234 getPlungeRate :: Operation MF70 IR Double) `shouldBe` 1234
 
                 describe "probe rate" $ do
                     it "should modify the probe rate" $
                         runTest (withProbeRate 1234 (probe (V3 1 2 0))) `shouldBe`
                             IR [Move (V3 1 2 0) (Probe 1234)]
                     it "should return the probe rate" $
-                        getReturnValue MF70 defaultCuttingParameters (withProbeRate 1234 getProbeRate :: Operation MF70 IR Double) `shouldBe` 1234
+                        getReturnValue defaultCuttingParameters (withProbeRate 1234 getProbeRate :: Operation MF70 IR Double) `shouldBe` 1234
 
                 describe "depth of cut" $ do
                     it "should modify the depth of cut" $
                         runTest (withDepthOfCut (-1) (zRepetition 5 Nothing (const $ feed (V3 1 0 0)))) `shouldBe`
                             runTest (sequence_ [translate (V3 0 0 (-t)) (feed (V3 1 0 0)) | t <- [1..5]])
                     it "should return the depth of cut" $
-                        getReturnValue MF70 defaultCuttingParameters (withDepthOfCut 5 getDepthOfCut :: Operation MF70 IR Double) `shouldBe` 5
+                        getReturnValue defaultCuttingParameters (withDepthOfCut 5 getDepthOfCut :: Operation MF70 IR Double) `shouldBe` 5
                 
             describe "state monad" $ do
                 describe "position" $ do
                     describe "rapid" $ do
                         it "updates the current position" $
-                            getReturnValue MF70 defaultCuttingParameters (rapid (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
+                            getReturnValue defaultCuttingParameters (rapid (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
                         it "updates the current position correctly with a translation" $
-                            getReturnValue MF70 defaultCuttingParameters (translate (V3 1 2 3) (rapid (V3 10 17 32)) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 11 19 35)
+                            getReturnValue defaultCuttingParameters (translate (V3 1 2 3) (rapid (V3 10 17 32)) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 11 19 35)
                     describe "slow" $ do
                         it "updates the current position" $ 
-                            getReturnValue MF70 defaultCuttingParameters (slow (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
+                            getReturnValue defaultCuttingParameters (slow (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
                     describe "feed" $ do
                         it "updates the current position" $ 
-                            getReturnValue MF70 defaultCuttingParameters (feed (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
+                            getReturnValue defaultCuttingParameters (feed (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
                     describe "arc" $ do
                         it "updates the current position" $ 
-                            getReturnValue MF70 defaultCuttingParameters (rapid (V3 0 0 0) >> arc CCW (V3 0 0 0) (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
+                            getReturnValue defaultCuttingParameters (rapid (V3 0 0 0) >> arc CCW (V3 0 0 0) (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
                     describe "plunge" $ do
                         it "updates the current position" $ 
-                            getReturnValue MF70 defaultCuttingParameters (plunge (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
+                            getReturnValue defaultCuttingParameters (plunge (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
                     describe "probe" $ do 
                         it "updates the current position" $ 
-                            getReturnValue MF70 defaultCuttingParameters (probe (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
+                            getReturnValue defaultCuttingParameters (probe (V3 10 17 32) >> getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` (V3 10 17 32)
                             
 
                 describe "tool" $ do
                     describe "changeTool" $ do
                         it "changes the current tool" $ 
-                            getReturnValue MF70 defaultCuttingParameters (changeTool (EndMill 20 100) >> getTool :: Operation MF70 IR Tool) `shouldBe` EndMill 20 100
+                            getReturnValue defaultCuttingParameters (changeTool (EndMill 20 100) >> getTool :: Operation MF70 IR Tool) `shouldBe` EndMill 20 100
 
             describe "runOperation" $ do
                 describe "transformation" $ do
                     it "should run an operation with a transformation" $
-                        runOperation MF70 defaultCuttingParameters {transformation = \(V3 x y z) -> V3 (x+5) (y+6) (z+3)} (rapid (V3 1 2 3)) `shouldBe`
+                        runOperation defaultCuttingParameters {transformation = \(V3 x y z) -> V3 (x+5) (y+6) (z+3)} (rapid (V3 1 2 3)) `shouldBe`
                             runTest (rapid (V3 6 8 6))
                 describe "feed rate" $ do
                     it "should modify the feed rate" $
-                        runOperation MF70 defaultCuttingParameters {Sivi.feedRate = 1234} (feed (V3 1 2 3)) `shouldBe`
+                        runOperation defaultCuttingParameters {Sivi.feedRate = 1234} (feed (V3 1 2 3)) `shouldBe`
                             IR [Move (V3 1 2 3) (LinearInterpolation 1234)]
 
                 describe "plunge rate" $ do
                     it "should modify the plunge rate" $
-                        runOperation MF70 defaultCuttingParameters {plungeRate = 1234} (plunge (V3 1 2 0)) `shouldBe`
+                        runOperation defaultCuttingParameters {plungeRate = 1234} (plunge (V3 1 2 0)) `shouldBe`
                             IR [Move (V3 1 2 0) (LinearInterpolation 1234)]
 
                 describe "probe rate" $ do
                     it "should modify the probe rate" $
-                        runOperation MF70 defaultCuttingParameters {probeRate = 1234} (probe (V3 1 2 0)) `shouldBe`
+                        runOperation defaultCuttingParameters {probeRate = 1234} (probe (V3 1 2 0)) `shouldBe`
                             IR [Move (V3 1 2 0) (Probe 1234)]
 
                 describe "depth of cut" $ do
                     it "should modify the depth of cut" $
-                        runOperation MF70 defaultCuttingParameters {depthOfCut = -1} (zRepetition 5 Nothing (const $ feed (V3 1 0 0))) `shouldBe`
+                        runOperation defaultCuttingParameters {depthOfCut = -1} (zRepetition 5 Nothing (const $ feed (V3 1 0 0))) `shouldBe`
                             runTest (sequence_ [translate (V3 0 0 (-t)) (feed (V3 1 0 0)) | t <- [1..5]])
 
             describe "getReturnValue" $ do
                 it "gives the correct transformation" $ do
-                    let t = getReturnValue MF70 defaultCuttingParameters {transformation = \(V3 x y z) -> V3 (x+5) (y+4) (z+3)} (getTransformation :: Operation MF70 IR Transformation)
+                    let t = getReturnValue defaultCuttingParameters {transformation = \(V3 x y z) -> V3 (x+5) (y+4) (z+3)} (getTransformation :: Operation MF70 IR Transformation)
                     t (V3 0 0 0) `shouldBe` V3 5 4 3
                 it "gives the correct feed rate" $
-                    getReturnValue MF70 defaultCuttingParameters {Sivi.feedRate = 1} (getFeedRate :: Operation MF70 IR Double) `shouldBe` 1
+                    getReturnValue defaultCuttingParameters {Sivi.feedRate = 1} (getFeedRate :: Operation MF70 IR Double) `shouldBe` 1
                 it "gives the correct plunge rate" $ 
-                    getReturnValue MF70 defaultCuttingParameters {plungeRate = 2} (getPlungeRate :: Operation MF70 IR Double) `shouldBe` 2
+                    getReturnValue defaultCuttingParameters {plungeRate = 2} (getPlungeRate :: Operation MF70 IR Double) `shouldBe` 2
                 it "gives the correct probe rate" $ 
-                    getReturnValue MF70 defaultCuttingParameters {probeRate = 3} (getProbeRate :: Operation MF70 IR Double) `shouldBe` 3
+                    getReturnValue defaultCuttingParameters {probeRate = 3} (getProbeRate :: Operation MF70 IR Double) `shouldBe` 3
                 it "gives the correct depth of cut" $ 
-                    getReturnValue MF70 defaultCuttingParameters {depthOfCut = -1} (getDepthOfCut :: Operation MF70 IR Double) `shouldBe` -1 
+                    getReturnValue defaultCuttingParameters {depthOfCut = -1} (getDepthOfCut :: Operation MF70 IR Double) `shouldBe` -1 
                 it "gives the correct position" $ 
-                    getReturnValue MF70 defaultCuttingParameters {initialPosition = (V3 5 8 9)} (getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` V3 5 8 9
+                    getReturnValue defaultCuttingParameters {initialPosition = (V3 5 8 9)} (getCurrentPosition :: Operation MF70 IR (V3 Double)) `shouldBe` V3 5 8 9
                 it "gives the correct tool" $ 
-                    getReturnValue MF70 defaultCuttingParameters {initialTool = EndMill 20 100} (getTool :: Operation MF70 IR Tool) `shouldBe` EndMill 20 100
+                    getReturnValue defaultCuttingParameters {initialTool = EndMill 20 100} (getTool :: Operation MF70 IR Tool) `shouldBe` EndMill 20 100
 
             describe "basic moves" $ do
                 let ipos = V3 10 3 8

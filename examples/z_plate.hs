@@ -58,5 +58,5 @@ zPlate = chain 1 [
         ]
 
 main :: IO ()
-main = putStr . (++"M2\n") . show . getGCode MF70 defaultCuttingParameters $ zPlate
---main = interface . getGCode MF70 defaultCuttingParameters $ zPlate
+main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters $ zPlate
+--main = interface . getGCode defaultCuttingParameters $ zPlate

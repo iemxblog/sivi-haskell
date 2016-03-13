@@ -18,6 +18,7 @@ import Sivi.Machine
 import Sivi.Backend
 import Sivi.Operation.Types
 import Sivi.Operation.Base
+import Sivi.Operation.Run
 import Data.Char
 import Control.Monad
 import Control.Monad.RWS
@@ -88,5 +89,5 @@ instance Backend OSObject where
 
         bName _ op = op
 
-simulation :: Machine m => OSObject -> m -> CuttingParameters -> Operation m OSObject () -> String
-simulation raw machine params op = show $ Difference [raw, runOperation machine params op]
+simulation :: Machine m => OSObject -> CuttingParameters m -> Operation m OSObject () -> String
+simulation raw params op = show $ Difference [raw, runOperation params op]

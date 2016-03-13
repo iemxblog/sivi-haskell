@@ -29,5 +29,5 @@ caps n hole = do
         gridRepetition n 1 (d4+3) 0 1 (cap hole)
 
 main :: IO ()
-main = putStr . (++"M2\n") . show . getGCode MF70 defaultCuttingParameters {depthOfCut = -1} $ caps 1 True
---main = interface . getGCode MF70 defaultCuttingParameters {depthOfCut = -1} $ caps 1 True
+main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters {depthOfCut = -1} $ caps 1 True
+--main = interface . getGCode defaultCuttingParameters {depthOfCut = -1} $ caps 1 True

@@ -30,6 +30,7 @@ import Sivi.Machine
 import Sivi.Backend
 import Sivi.Operation.Base
 import Sivi.Operation.Types
+import Sivi.Operation.Run
 import Sivi.Misc
 
 data GCodeInstruction  =
@@ -137,8 +138,7 @@ instance Backend GCode where
 
 -- | Returns the GCode generated from an operation. This is a GCode specific version of 'runOperation'.
 getGCode ::     Machine m =>
-                m                               -- Machine instance
-                -> CuttingParameters            -- Cutting parameters
+                CuttingParameters m          -- Cutting parameters
                 -> Operation m GCode ()         -- ^ op : Operation to tun
                 -> GCode                        -- ^ Resulting GCode program
 getGCode = runOperation

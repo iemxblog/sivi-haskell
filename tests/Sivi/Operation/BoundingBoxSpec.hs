@@ -11,7 +11,7 @@ import Sivi.IR
 spec :: SpecWith ()
 spec = describe "BoundingBox module" $ do
         describe "boundingBox" $ do
-                let boundingBox = runOperation MF70 defaultCuttingParameters
+                let boundingBox = runOperation defaultCuttingParameters
                 it "calculates the bounding box of a circular pocket" $ 
                         boundingBox (circularPocket 20 5 0.5) `shouldBe` BoundingBox [Boundary (-10, 10), Boundary (-10, 10), Boundary (-5, 0)]
                 it "calculates the bounding box of a translated circular pocket" $ 
@@ -33,16 +33,16 @@ spec = describe "BoundingBox module" $ do
 
         describe "|>|" $ do
                 it "places a square next to another square" $
-                        (runOperation MF70 defaultCuttingParameters $ square 10 |>| square 15 :: IR) `shouldBe`
-                            (runOperation MF70 defaultCuttingParameters $ square 10 +^+ translate (V3 (10+3) 0 0) (square 15))
+                        (runOperation defaultCuttingParameters $ square 10 |>| square 15 :: IR) `shouldBe`
+                            (runOperation defaultCuttingParameters $ square 10 +^+ translate (V3 (10+3) 0 0) (square 15))
                         -- +3 because of the diameter of the tool
                 it "translation of 2 squares placed next to each other" $
-                        ((runOperation MF70 defaultCuttingParameters (translate (V3 10 0 (-10) ) (square 10 |>| square 15))) :: IR) `shouldBe`
-                            (runOperation MF70 defaultCuttingParameters $ translate (V3 10 0 (-10)) (square 10 +^+ translate (V3 (10+3) 0 0) (square 15)))
+                        ((runOperation defaultCuttingParameters (translate (V3 10 0 (-10) ) (square 10 |>| square 15))) :: IR) `shouldBe`
+                            (runOperation defaultCuttingParameters $ translate (V3 10 0 (-10)) (square 10 +^+ translate (V3 (10+3) 0 0) (square 15)))
                         
                 it "arc placed next to a diagonal line" $ 
-                        (runOperation MF70 defaultCuttingParameters ((rapid (V3 0 0 0) >> feed (V3 10 10 0)) |>| (approach (V3 0 0 0) >> arc CCW (V3 0 5 0) (V3 0 10 0))) :: IR) `shouldBe`
-                            (runOperation MF70 defaultCuttingParameters $ do
+                        (runOperation defaultCuttingParameters ((rapid (V3 0 0 0) >> feed (V3 10 10 0)) |>| (approach (V3 0 0 0) >> arc CCW (V3 0 5 0) (V3 0 10 0))) :: IR) `shouldBe`
+                            (runOperation defaultCuttingParameters $ do
                                 rapid (V3 0 0 0)
                                 feed (V3 10 10 0)
                                 retract 1
@@ -52,8 +52,8 @@ spec = describe "BoundingBox module" $ do
 
         describe "|.|" $ do
                 it "stacks 2 circular pockets" $
-                    (runOperation MF70 defaultCuttingParameters (circularPocket 20 10 0.5 |.| circularPocket 15 10 0.5)::IR) `shouldBe`
-                        (runOperation MF70 defaultCuttingParameters $ do
+                    (runOperation defaultCuttingParameters (circularPocket 20 10 0.5 |.| circularPocket 15 10 0.5)::IR) `shouldBe`
+                        (runOperation defaultCuttingParameters $ do
                             circularPocket 20 10 0.5
                             translate (V3 0 0 (-10)) $ circularPocket 15 10 0.5
                         )

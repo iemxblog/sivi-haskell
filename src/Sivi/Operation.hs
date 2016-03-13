@@ -18,6 +18,7 @@ module Sivi.Operation(
         , module Sivi.Operation.Probing
         , module Sivi.Operation.FromGCode
 	, module Sivi.Operation.BoundingBox
+	, module Sivi.Operation.Run
 ) where
 
 import Sivi.Operation.Types
@@ -30,3 +31,4 @@ import Sivi.Operation.Contour
 import Sivi.Operation.Probing
 import Sivi.Operation.FromGCode
 import Sivi.Operation.BoundingBox
+import Sivi.Operation.Run

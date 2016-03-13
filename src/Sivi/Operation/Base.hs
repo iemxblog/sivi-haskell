@@ -42,9 +42,6 @@ module Sivi.Operation.Base (
         , symmetryY
         , (+^+)
         , chain
-        , runOperation
-        , getReturnValue
-        , defaultCuttingParameters
         , pause
         , probe
         , defCurPos
@@ -68,9 +65,7 @@ import Data.Monoid()
 
 -- | Returns the current transformation
 getTransformation :: Monoid w => Operation m w Transformation
-getTransformation = do
-                        (tr, _, _, _, _, _) <- ask
-                        return tr
+getTransformation = liftM eTransformation ask
 
 -- | Returns the origin of an operation
 getOrigin :: Monoid w => Operation m w (V3 Double)
@@ -80,83 +75,74 @@ getOrigin = do
 
 -- | Returns the current feed rate
 getFeedRate :: Monoid w => Operation m w Double
-getFeedRate = do
-                (_, fr, _, _, _, _) <- ask
-                return fr
+getFeedRate = liftM eFeedRate ask
 
 -- | Returns the current plunge rate
 getPlungeRate :: Monoid w => Operation m w Double
-getPlungeRate = do
-                (_, _, pr, _, _, _) <- ask
-                return pr
+getPlungeRate = liftM ePlungeRate ask
 
 -- | Returns the current probe rate
 getProbeRate :: Monoid w => Operation m w Double
-getProbeRate = do
-                (_, _, _, pbr, _, _) <- ask
-                return pbr
-
+getProbeRate = liftM eProbeRate ask
 
 -- | Returns the current depth of cut
 getDepthOfCut :: Monoid w => Operation m w Double
-getDepthOfCut = do
-                (_, _, _, _, dc, _) <- ask
-                return dc
+getDepthOfCut = liftM eDepthOfCut ask
 
 -- | Calls an operation with the specified transformation
 withTransformation :: Monoid w =>
                         Transformation          -- ^ ntr : The new transformation
                         -> Operation m w a      -- ^ The operation to call with the specified transformation
                         -> Operation m w a      -- ^ The resulting operation
-withTransformation ntr = local (\(tr, fr, pr, pbr, dc, m) -> (tr . ntr, fr, pr, pbr, dc, m))
+withTransformation ntr = local (\e -> let tr = eTransformation e in e {eTransformation = tr . ntr})
 
 -- | Calls an operation with the specified feed rate
 withFeedRate :: Monoid w =>
                 Double                      -- ^ nfr : The new feed rate
                 -> Operation m w a          -- ^ The operation to call with the new feed rate
                 -> Operation m w a          -- ^ The resulting operation
-withFeedRate nfr = local (\(tr, _, pr, pbr, dc, m) -> (tr, nfr, pr, pbr, dc, m))
+withFeedRate nfr = local (\e -> e {eFeedRate = nfr})
 
 -- | Calls an operation with the specified plunge rate
 withPlungeRate :: Monoid w =>
                 Double                      -- ^ npr : The new plunge rate
                 -> Operation m w a          -- ^ The operation to call with the new plunge rate
                 -> Operation m w a          -- ^ The resulting operation
-withPlungeRate npr = local (\(tr, fr, _, pbr, dc, m) -> (tr, fr, npr, pbr, dc, m))
+withPlungeRate npr = local (\e -> e {ePlungeRate = npr})
 
 -- | Calls an operation with the specified probe rate
 withProbeRate :: Monoid w =>
                 Double                  -- ^ npbr : The new probe rate
                 -> Operation m w a      -- ^ The operation to call with the new probe rate
                 -> Operation m w a      -- ^ The resulting operation
-withProbeRate npbr = local (\(tr, fr, pr, _, dc, m) -> (tr, fr, pr, npbr, dc, m))
+withProbeRate npbr = local (\e -> e {eProbeRate = npbr})
 
--- | Calls an operation with the specified depth of cut
+-- | Calls an operation with the specified depth of cut. (depth of cut must be a negative number)
 withDepthOfCut :: Monoid w =>
                 Double                  -- ^ ndc : The new depth of cut
                 -> Operation m w a      -- ^ The operation to call with the new depth of cut
                 -> Operation m w a      -- ^ The resulting operation
-withDepthOfCut ndc = local (\(tr, fr, pr, pbr, _, m) -> (tr, fr, pr, pbr, ndc, m))
+withDepthOfCut ndc = local (\e -> e {eDepthOfCut = ndc})
         
 -- | Returns the machine's current position (from the State monad)
 getCurrentPosition :: Monoid w => Operation m w (V3 Double)
-getCurrentPosition = liftM fst get
+getCurrentPosition = liftM sCurrentPosition get
 
 -- | Sets the current position
 putCurrentPosition :: Monoid w => V3 Double -> Operation m w ()
 putCurrentPosition cp = do
-                                (_, t) <- get
-                                put (cp, t)
+                                s <- get
+                                put s {sCurrentPosition = cp}
 
 -- | Returns the current tool
 getTool :: Monoid w => Operation m w Tool
-getTool = liftM snd get
+getTool = liftM sTool get
 
 -- | Sets the current tool
 putTool :: Monoid w => Tool -> Operation m w ()
 putTool t = do
-                (cp, _) <- get
-                put (cp, t)
+                s <- get
+                put s {sTool = t}
 
 -- | Returns the current tool's diameter
 getToolDiameter :: Monoid w => Operation m w Double
@@ -373,29 +359,6 @@ name = bName
 message :: Backend w => String
         -> Operation m w () 
 message s = comment ("MSG, " ++ s) >> pause
-
--- | Runs an operation with the specified parameters.
-runOperation :: (Machine m, Backend w) => 
-                m                               -- m : Machine instance
-                -> CuttingParameters            -- ^ Cutting parameters
-                -> Operation m w ()             -- ^ op : Operation to run
-                -> w 
-runOperation m (CuttingParameters tr fr pr pbr dc ipos itool) op = w
-    where (_, _, w) = runRWS op (tr, fr, pr, pbr, dc, m) (ipos, itool)
-
--- | Runs an operation and returns the return value. Used in tests.
-getReturnValue ::   m
-                    -> CuttingParameters
-                    -> Operation m w a 
-                    -> a
-getReturnValue m (CuttingParameters tr fr pr pbr dc ipos itool) op = a
-    where
-        a = fst $ evalRWS op (tr, fr, pr, pbr, dc, m) (ipos, itool)
-        
--- | Default cutting parameters.
-defaultCuttingParameters :: CuttingParameters
-defaultCuttingParameters = CuttingParameters {transformation = id, feedRate = 100, plungeRate = 30, probeRate = 10, depthOfCut = -0.5, initialPosition = V3 0 0 50, initialTool = EndMill{diameter = 3, len=42}}
-
 
 -- | See 'zigzag'
 zigzag' :: Backend w => Bool -> [[V3 Double]] -> Operation m w ()

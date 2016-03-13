@@ -23,6 +23,7 @@ import Data.Monoid()
 import Control.Monad.RWS
 import Sivi.Operation.Types
 import Sivi.Operation.Base
+import Sivi.Operation.Run
 import Sivi.Machine
 import Sivi.Backend
 import Data.List
@@ -63,8 +64,7 @@ instance Backend IR where
 
 -- | Returns IR code generated from an operation. This is an IR specific version of 'runOperation'.
 getIR ::        Machine m =>
-                m                               -- Machine instance
-                -> CuttingParameters            -- Cutting parameters
+                CuttingParameters m          -- Cutting parameters
                 -> Operation m IR ()            -- ^ op : Operation to tun
                 -> IR                           -- ^ Resulting GCode program
 getIR = runOperation

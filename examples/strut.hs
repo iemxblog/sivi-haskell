@@ -23,5 +23,5 @@ op :: (Machine m, Backend w) => Operation m w ()
 op = strut 10 47.1
                 
 main :: IO ()
---main = putStr . (++"M2\n") . show . getGCode MF70 defaultCuttingParameters $ op
-main = interface . getGCode MF70 defaultCuttingParameters $ op
+--main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters $ op
+main = interface . getGCode defaultCuttingParameters $ op

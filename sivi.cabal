@@ -64,6 +64,7 @@ Library
         Sivi.Operation.Probing.Corner,
         Sivi.Operation.Probing.Cylinder,
         Sivi.Operation.Repetition,
+        Sivi.Operation.Run,
         Sivi.Operation.Types
     ghc-options:         -Wall -fno-warn-unused-do-bind
     hs-source-dirs:      src 

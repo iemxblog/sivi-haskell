@@ -46,5 +46,5 @@ handle = do
     axialDrilling d 4.5 l
 
 main :: IO ()
---main = putStr . (++"M2\n") . show . getGCode MF70defaultCuttingParameters $ handle
-main = interface . getGCode MF70 defaultCuttingParameters $ handle
+--main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters $ handle
+main = interface . getGCode defaultCuttingParameters $ handle

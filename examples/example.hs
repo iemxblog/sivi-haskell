@@ -13,6 +13,6 @@ op = circularPocket 50 10 0.5 |.|
 raw = Translate (V3 0 0 (-20)) $ Cylinder 30 55 55 False
 
 main :: IO ()
-main = putStr . (++"M2\n") . show . getGCode MF70 defaultCuttingParameters $ op
---main = interface . getGCode MF70 defaultCuttingParameters $ op
---main = putStr $ simulation raw MF70 defaultCuttingParameters op
+main = putStr . (++"M2\n") . show . getGCode defaultCuttingParameters $ op
+--main = interface . getGCode defaultCuttingParameters $ op
+--main = putStr $ simulation raw defaultCuttingParameters op
