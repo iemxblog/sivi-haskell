@@ -13,9 +13,6 @@ module Sivi.IR.Base
         , IRInstruction(..)
         , IR(..)
         , getIR
-        , Tree(..)
-        , IRTree
-        , flatten
 ) where
 
 import Linear
@@ -69,23 +66,6 @@ getIR ::        Machine m =>
                 -> Operation m IR ()            -- ^ op : Operation to tun
                 -> IR                           -- ^ Resulting GCode program
 getIR = runOperation
-
-data Tree v a = 
-        Leaf a
-        | Node v [Tree v a]
-
--- | Tree of instructions
-type IRTree = Tree String IRInstruction
-
--- | Transforms a tree of intructions to a list of instructions. Annotations are transformed into comments.
--- It could be possible to make a more general function which accepts more types, but would probably be overkill ??
-flatten :: IRTree-> IR
-flatten (Leaf i) = IR [i]
-flatten (Node v ts) = opening `mappend` (mconcat . map flatten) ts `mappend` closing
-        where
-                opening = if v == "" then mempty else IR [Comment ("> " ++ v)] 
-                closing = if v == "" then mempty else IR [Comment ("< " ++ v)]
-
 
 instance Show IR where
     show (IR xs) = (concat . intersperse "\n" . map show) xs
